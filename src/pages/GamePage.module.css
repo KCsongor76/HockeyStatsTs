@@ -1,0 +1,26 @@
+.rinkContainer {
+    position: relative;
+    display: inline-block;
+    margin: 10px; /* Added for spacing */
+}
+
+/* Added new class for icon container */
+.iconContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allows clicks to pass through to image */
+}
+
+/* GamePage.module.css */
+.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.selectedRow {
+    background-color: #e0e0e0;
+    cursor: pointer;
+}

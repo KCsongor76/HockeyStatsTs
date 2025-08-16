@@ -1,11 +1,259 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {TeamService} from "../OOP/services/TeamService";
+import {GameService} from "../OOP/services/GameService";
+import {useLoaderData, useNavigate} from "react-router-dom";
+import {ITeam} from "../OOP/interfaces/ITeam";
+import {IGame} from "../OOP/interfaces/IGame";
+import {Championship} from "../OOP/enums/Championship";
+import {Season} from "../OOP/enums/Season";
+import {GameType} from "../OOP/enums/GameType";
 
-const SavedGamesPage = () => {
+interface SavedGamesPageProps {
+    playerGames?: IGame[];
+    showFilters?: boolean;
+}
+
+const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
+    const [teams, setTeams] = useState<ITeam[]>([]);
+    const [games, setGames] = useState<IGame[]>(playerGames || []);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [homeTeamId, setHomeTeamId] = useState<string>("");
+    const [awayTeamId, setAwayTeamId] = useState<string>("");
+    const [championship, setChampionship] = useState<Championship | "">("")
+    const [season, setSeason] = useState<Season | "">("");
+    const [gameType, setGameType] = useState<GameType | "">("");
+    const [sortOrder, setSortOrder] = useState('newest');
+    const [pagination, setPagination] = useState({page: 1, perPage: 10});
+    const perPageOptions = [10, 25, 50, 100];
+
+    const navigate = useNavigate();
+
+    const filteredGames = games.filter(game => {
+        return (
+            (!homeTeamId || game.teams.home.id === homeTeamId) &&
+            (!awayTeamId || game.teams.away.id === awayTeamId) &&
+            (!championship || game.championship === championship) &&
+            (!gameType || game.type === gameType) &&
+            (!season || game.season === season)
+        );
+    });
+
+    const sortedGames = [...filteredGames].sort((a, b) => {
+        const dateA = new Date(a.timestamp).getTime();
+        const dateB = new Date(b.timestamp).getTime();
+        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+
+    const indexOfLastGame = pagination.page * pagination.perPage;
+    const indexOfFirstGame = indexOfLastGame - pagination.perPage;
+    const currentGames = sortedGames.slice(indexOfFirstGame, indexOfLastGame);
+    const totalPages = Math.ceil(sortedGames.length / pagination.perPage);
+
+    const goToPreviousPage = () => {
+        if (pagination.page > 1) {
+            setPagination(p => ({...p, page: p.page - 1}));
+        }
+    };
+
+    const goToNextPage = () => {
+        if (pagination.page < totalPages) {
+            setPagination(p => ({...p, page: p.page + 1}));
+        }
+    };
+
+    useEffect(() => {
+        // scroll automatically to the bottom on page change or team per page change
+        window.scrollTo(0, document.body.scrollHeight);
+    }, [pagination.page, pagination.perPage]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Only fetch data if we don't have playerGames provided as props
+                if (!playerGames) {
+                    const [teamsData, gamesData] = await Promise.all([
+                        TeamService.getAllTeams(),
+                        GameService.getAllGames()
+                    ]);
+                    setTeams(teamsData);
+                    setGames(gamesData);
+                } else {
+                    const teamsData = await TeamService.getAllTeams();
+                    setTeams(teamsData);
+                }
+            } catch (err) {
+                console.error("Failed to fetch data:", err);
+                setError("Failed to load games data. Please try again later.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [playerGames]);
+
+    if (isLoading) {
+        return <div>Loading games...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
+
+    if (games.length === 0 || filteredGames.length === 0) return <div>No games available.</div>;
+
     return (
         <div>
+            {showFilters && (
+                <>
+                    <label>
+                        Home team:
+                        <select
+                            value={homeTeamId}
+                            onChange={(e) => setHomeTeamId(e.target.value)}
+                        >
+                            {teams.map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                    </label>
 
+                    <label>
+                        Away team:
+                        <select
+                            value={awayTeamId}
+                            onChange={(e) => setAwayTeamId(e.target.value)}
+                        >
+                            {teams.map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label>
+                        Championship:
+                        <select
+                            value={championship}
+                            onChange={(e) => setChampionship(e.target.value as Championship)}
+                        >
+                            <option key="" value="">All Championships</option>
+                            {Object.values(Championship).map(championship => (
+                                <option key={championship} value={championship}>{championship}</option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label>
+                        Season:
+                        <select
+                            value={season}
+                            onChange={(e) => setSeason(e.target.value as Season)}
+                        >
+                            <option key="" value="">All Seasons</option>
+                            {Object.values(Season).map(season => (
+                                <option key={season} value={season}>{season}</option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label>
+                        GameType:
+                        <select
+                            value={gameType}
+                            onChange={(e) => setGameType(e.target.value as GameType)}
+                        >
+                            <option key="" value="">All GameTypes</option>
+                            {Object.values(GameType).map(gameType => (
+                                <option key={gameType} value={gameType}>{gameType}</option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                        >
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </label>
+                </>
+            )}
+
+            <ul>
+                {currentGames.length > 0 ? (
+                    currentGames.map((game: IGame) => (
+                        <li key={game.id} onClick={() => navigate(`/previous_games/${game.id}`, {state: game})}>
+                            <img
+                                src={game.teams.home.logo}
+                                alt={game.teams.home.logo}
+                            />
+                            <span>{game.teams.home.name}</span>
+
+                            <span>{game.score.home.goals} - {game.score.away.goals}</span>
+
+                            <img
+                                src={game.teams.away.logo}
+                                alt={game.teams.away.logo}
+                            />
+                            <span>{game.teams.away.name}</span>
+
+                            <span>{game.timestamp}</span>
+
+                            <span>Type: {game.type}</span>
+                            <span>Season: {game.season || "Not specified"}</span>
+                            {/*<span>Championship: {game.championship}</span>*/}
+                        </li>
+                    ))
+                ) : <p>No games found.</p>}
+            </ul>
+
+            <div>
+                <div>
+                    <button
+                        type="button"
+                        disabled={pagination.page === 1}
+                        onClick={goToPreviousPage}
+                    >
+                        Previous
+                    </button>
+
+                    <button
+                        type="button"
+                        disabled={pagination.page >= totalPages}
+                        onClick={goToNextPage}
+                    >
+                        Next
+                    </button>
+                </div>
+
+                <select
+                    value={pagination.perPage}
+                    onChange={e => setPagination({
+                        page: 1,
+                        perPage: parseInt(e.target.value)
+                    })}
+                >
+                    {perPageOptions.map(option => (
+                        <option key={option} value={option}>
+                            {option} per page
+                        </option>
+                    ))}
+                </select>
+            </div>
         </div>
     );
 };
 
 export default SavedGamesPage;
+//
+// export const loader = async () => {
+//     console.log("SavedGamesPageLoader running...")
+//     const teams = await TeamService.getAllTeams();
+//     const games = await GameService.getAllGames();
+//
+//     return {teams, games};
+// }
