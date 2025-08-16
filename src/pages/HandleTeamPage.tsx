@@ -199,37 +199,23 @@ const HandleTeamPage = () => {
         setIsEditing(true);
     };
 
-    const getCurrentLogoFileName = (): string | null => {
-        if (!team.logo) return null;
-        try {
-            const url = new URL(team.logo);
-            const pathParts = url.pathname.split('/');
-            const encodedFileName = pathParts[pathParts.length - 1];
-            return decodeURIComponent(encodedFileName.split('?')[0]);
-        } catch (error) {
-            console.error('Error parsing logo URL:', error);
-            return null;
-        }
-    };
-
-    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const allowedTypes = ['image/jpeg', 'image/png'];
+            const error = Team.validateLogoFile(file);
 
-            if (!allowedTypes.includes(file.type)) {
-                setErrors(prev => ({...prev, logo: 'Only .jpg and .png formats are allowed'}));
+            if (error) {
+                setErrors(prev => ({...prev, logo: error}));
                 return;
             }
 
-            if (file.size > 2 * 1024 * 1024) {
-                setErrors(prev => ({...prev, logo: "Logo must be less than 2MB"}));
-                return;
-            }
+            const fileNameError = await Team.validateLogoFileName(
+                file.name,
+                team.logo
+            );
 
-            const currentLogoFileName = getCurrentLogoFileName();
-            if (currentLogoFileName && ("team-logos/" + file.name) === currentLogoFileName) {
-                setErrors(prev => ({...prev, logo: 'Please choose a different file name'}));
+            if (fileNameError) {
+                setErrors(prev => ({...prev, logo: fileNameError}));
                 return;
             }
 
@@ -254,11 +240,12 @@ const HandleTeamPage = () => {
             let logoUrl = team.logo;
 
             if (logoFile) {
-                const logoError = await Team.validateLogo(logoFile.name);
-                if (logoError) {
-                    setErrors(prev => ({...prev, logo: logoError}));
+                const logoNameError = await Team.validateLogoFileName(logoFile.name, team.logo);
+                if (logoNameError) {
+                    setErrors(prev => ({...prev, logo: logoNameError}));
                     return;
                 }
+
                 if (team.logo) {
                     await TeamService.deleteLogo(team.logo);
                 }

@@ -2,8 +2,8 @@
 import {ITeam} from "../interfaces/ITeam";
 import {Championship} from "../enums/Championship";
 import {IPlayer} from "../interfaces/IPlayer";
-import {TeamService} from "../services/TeamService";
-import React from "react";
+import {getDownloadURL, ref} from "firebase/storage";
+import {storage} from "../../firebase";
 
 export class Team implements ITeam {
     id: string;
@@ -47,15 +47,6 @@ export class Team implements ITeam {
         return null;
     }
 
-    static async validateLogo(logo: string): Promise<string | null> {
-        if (!logo) return "Logo is required";
-        const logoExists = await TeamService.checkLogoExists(logo, true);
-        if (logoExists) return "Logo is already taken";
-        // Note: For file size validation, we need to handle that in the component
-        // as it requires file object access which shouldn't be in this class
-        return null;
-    }
-
     static validateColors(homeColor: { primary: string, secondary: string }, awayColor: {
         primary: string,
         secondary: string
@@ -70,5 +61,57 @@ export class Team implements ITeam {
     static validateChampionships(championships: Championship[]): string | null {
         if (championships.length === 0) return "At least one championship must be selected";
         return null;
+    }
+
+    static checkLogoExists = async (fileName: string, isTeamCreation: boolean = false): Promise<boolean> => {
+        const logoRef = ref(storage, `team-logos/${fileName}`);
+        try {
+            await getDownloadURL(logoRef);
+            return true;
+        } catch (error) {
+            if (!isTeamCreation) {
+                console.error("Error deleting logo:", error);
+            }
+            return false;
+        }
+    };
+
+    static validateLogoFile(file: File): string | null {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+
+        if (!allowedTypes.includes(file.type)) {
+            return 'Only .jpg and .png formats are allowed';
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            return "Logo must be less than 2MB";
+        }
+
+        return null;
+    }
+
+    static getFileNameFromLogoUrl(logoUrl: string): string | null {
+        if (!logoUrl) return null;
+        try {
+            const url = new URL(logoUrl);
+            const pathParts = url.pathname.split('/');
+            const encodedFileName = pathParts[pathParts.length - 1];
+            return decodeURIComponent(encodedFileName.split('?')[0]);
+        } catch (error) {
+            console.error('Error parsing logo URL:', error);
+            return null;
+        }
+    }
+
+    static async validateLogoFileName(fileName: string, currentLogoUrl?: string): Promise<string | null> {
+        if (currentLogoUrl) {
+            const currentFileName = this.getFileNameFromLogoUrl(currentLogoUrl);
+            if (currentFileName && `team-logos/${fileName}` === currentFileName) {
+                return 'Please choose a different file name';
+            }
+        }
+
+        const exists = await this.checkLogoExists(fileName);
+        return exists ? "Logo file name is already taken" : null;
     }
 }

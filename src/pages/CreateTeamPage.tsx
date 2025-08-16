@@ -21,19 +21,15 @@ const CreateTeamPage = () => {
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const allowedTypes = ['image/jpeg', 'image/png'];
+            const error = Team.validateLogoFile(file);
 
-            if (!allowedTypes.includes(file.type)) {
-                setErrors(prev => ({...prev, logo: 'Only .jpg and .png formats are allowed'}));
-                return;
-            }
-
-            if (file.size > 2 * 1024 * 1024) {
-                setErrors(prev => ({...prev, logo: "Logo must be less than 2MB"}));
+            if (error) {
+                setErrors(prev => ({...prev, logo: error}));
                 return;
             }
 
             setLogoFile(file);
+            setErrors(prev => ({...prev, logo: ''}));
         }
     };
 
@@ -59,9 +55,9 @@ const CreateTeamPage = () => {
             return;
         }
 
-        const logoError = await Team.validateLogo(logoFile.name);
-        if (logoError) {
-            setErrors(prev => ({...prev, logo: logoError}));
+        const logoNameError = await Team.validateLogoFileName(logoFile.name);
+        if (logoNameError) {
+            setErrors(prev => ({...prev, logo: logoNameError}));
             return;
         }
 
