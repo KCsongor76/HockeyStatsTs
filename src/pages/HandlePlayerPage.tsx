@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {IGame} from "../OOP/interfaces/IGame";
@@ -11,13 +11,15 @@ import {Season} from "../OOP/enums/Season";
 import {ActionType} from "../OOP/enums/ActionType";
 import {GameType} from "../OOP/enums/GameType";
 import SavedGamesPage from "./SavedGamesPage";
+import {Player} from "../OOP/classes/Player";
 
 const HandlePlayerPage = () => {
+    // todo: current team, previous teams
+
     const data = useLocation();
     const [player, setPlayer] = useState<IPlayer>(data.state.player);
     const games = data.state.games as IGame[];
     const [team, setTeam] = useState<ITeam | null>(null);
-
     const [name, setName] = useState<string>(player.name);
     const [position, setPosition] = useState<Position>(player.position);
     const [jerseyNumber, setJerseyNumber] = useState<number>(player.jerseyNumber);
@@ -38,7 +40,7 @@ const HandlePlayerPage = () => {
         const championships: Championship[] = [];
 
         games.forEach(g => {
-            if (g.teams.home.roster.some(p => p.id === player.id)) {
+            if (g.teams.home.roster?.some(p => p.id === player.id)) {
                 if (!availableTeamIds.has(g.teams.home.id)) {
                     availableTeamIds.add(g.teams.home.id);
                     teams.push(g.teams.home);
@@ -48,7 +50,7 @@ const HandlePlayerPage = () => {
                     championships.push(g.championship);
                 }
             }
-            if (g.teams.away.roster.some(p => p.id === player.id)) {
+            if (g.teams.away.roster?.some(p => p.id === player.id)) {
                 if (!availableTeamIds.has(g.teams.away.id)) {
                     availableTeamIds.add(g.teams.away.id);
                     teams.push(g.teams.away);
@@ -59,7 +61,7 @@ const HandlePlayerPage = () => {
                 }
             }
 
-            if (g.teams.home.roster.some(p => p.id === player.id) || g.teams.away.roster.some(p => p.id === player.id)) {
+            if (g.teams.home.roster?.some(p => p.id === player.id) || g.teams.away.roster?.some(p => p.id === player.id)) {
                 playerGames.push(g);
             }
         });
@@ -71,88 +73,11 @@ const HandlePlayerPage = () => {
         };
     }
 
-    const getPlayerStats = (games: IGame[], player: IPlayer) => {
-        const playerGames = games.filter(game => {
-            const homePlayers = game.teams.home.roster || [];
-            const awayPlayers = game.teams.away.roster || [];
-            return homePlayers.some(p => p.id === player.id) ||
-                awayPlayers.some(p => p.id === player.id);
-        });
-
-        let goals = 0;
-        let shots = 0;
-        let turnovers = 0;
-        let hits = 0;
-        let assists = 0;
-
-        playerGames.forEach(game => {
-            game.actions.forEach(action => {
-                if (action.player?.id === player.id) {
-                    switch (action.type) {
-                        case ActionType.TURNOVER:
-                            turnovers++;
-                            break;
-                        case ActionType.SHOT:
-                            shots++;
-                            break;
-                        case ActionType.GOAL:
-                            goals++;
-                            shots++;
-                            break;
-                        case ActionType.HIT:
-                            hits++;
-                            break;
-                    }
-                }
-                if (action.type === ActionType.GOAL &&
-                    action.assists?.some(p => p.id === player.id)) {
-                    assists++;
-                }
-            });
-        });
-
-        const gamesPlayed = playerGames.length;
-        const shotPercentage = shots > 0 ? (goals / shots) * 100 : 0;
-        const points = goals + assists;
-
-        return {
-            gamesPlayed,
-            goals,
-            assists,
-            points,
-            shots,
-            turnovers,
-            hits,
-            shotPercentage
-        };
-    };
-
     const {playerGames, availableTeams, availableChampionships} = getAvailableTeamsAndChampionships(player);
-
-    // const filteredGames = useMemo(() => {
-    //     let result = [...playerGames];
-    //
-    //     if (selectedSeason !== '') {
-    //         result = result.filter(game => game.season === selectedSeason);
-    //     }
-    //
-    //     if (selectedTeamId !== '') {
-    //         result = result.filter(game =>
-    //             game.teams.home.id === selectedTeamId ||
-    //             game.teams.away.id === selectedTeamId
-    //         );
-    //     }
-    //
-    //     if (selectedChampionship !== '') {
-    //         result = result.filter(game => game.championship === selectedChampionship);
-    //     }
-    //
-    //     return result;
-    // }, [playerGames, selectedSeason, selectedTeamId, selectedChampionship]);
 
     const getFilteredGames = (type?: GameType) => {
         const filteredGamesByTeam = games.filter(g => g.teams.home.id === team?.id || g.teams.away.id === team?.id);
-        const filteredGamesByPlayer = filteredGamesByTeam.filter(g => g.teams.home.roster.some(p => p.id === player.id) || g.teams.away.roster.some(p => p.id === player.id))
+        const filteredGamesByPlayer = filteredGamesByTeam.filter(g => g.teams.home.roster?.some(p => p.id === player.id) || g.teams.away.roster?.some(p => p.id === player.id))
         if (type) {
             const filteredGamesByType = filteredGamesByPlayer.filter(game => game.type === type)
             const filteredGamesByChampionship = filteredGamesByType.filter(game => {
@@ -178,8 +103,8 @@ const HandlePlayerPage = () => {
     const filteredGamesRegular = getFilteredGames(GameType.REGULAR)
     const filteredGamesPlayoff = getFilteredGames(GameType.PLAYOFF)
 
-    const regularStats = getPlayerStats(filteredGamesRegular, player);
-    const playoffStats = getPlayerStats(filteredGamesPlayoff, player);
+    const regularStats = Player.getPlayerStats(filteredGamesRegular, player);
+    const playoffStats = Player.getPlayerStats(filteredGamesPlayoff, player);
 
     const saveHandler = async () => {
         if (name === player.name && position === player.position && jerseyNumber === player.jerseyNumber) {
@@ -367,12 +292,7 @@ const HandlePlayerPage = () => {
                         <td>{(regularStats.shotPercentage || 0).toFixed(2)}%</td>
                         <td>
                             <button
-                                onClick={() => navigate(`../../handlePlayers/${player.id}`, {
-                                    state: {
-                                        player,
-                                        games
-                                    }
-                                })}
+                                onClick={() => navigate(`../../handlePlayers/${player.id}`, {state: {player, games}})}
                             >
                                 View Player
                             </button>

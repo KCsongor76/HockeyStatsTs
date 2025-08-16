@@ -1,9 +1,9 @@
 import {IGameAction} from "./IGameAction";
 import {IScoreData} from "./IScoreData";
-import ITeamWithRoster from "./ITeamWithRoster";
 import {GameType} from "../enums/GameType";
 import {Season} from "../enums/Season";
 import {Championship} from "../enums/Championship";
+import {ITeam} from "./ITeam";
 
 export interface IGame {
     id: string;
@@ -13,9 +13,6 @@ export interface IGame {
     actions: IGameAction[];
     timestamp: string;
     score: { home: IScoreData; away: IScoreData };
-    teams: {
-        home: ITeamWithRoster,
-        away: ITeamWithRoster
-    };
+    teams: { home: ITeam, away: ITeam };
     selectedImage: string;
 }

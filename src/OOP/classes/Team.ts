@@ -3,6 +3,7 @@ import {ITeam} from "../interfaces/ITeam";
 import {Championship} from "../enums/Championship";
 import {IPlayer} from "../interfaces/IPlayer";
 import {TeamService} from "../services/TeamService";
+import React from "react";
 
 export class Team implements ITeam {
     id: string;

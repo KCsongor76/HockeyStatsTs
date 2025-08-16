@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
-import {ITeam} from "../OOP/interfaces/ITeam";
-import {Championship} from "../OOP/enums/Championship";
 import {Team} from "../OOP/classes/Team";
+import {Championship} from "../OOP/enums/Championship";
+import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 
 const CreateTeamPage = () => {
+    // todo: Team -> TeamService?
+
     const location = useLocation()
     const teams = location.state.teams as ITeam[];
     const [name, setName] = useState<string>("");

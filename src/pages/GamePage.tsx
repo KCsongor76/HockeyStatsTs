@@ -18,7 +18,6 @@ import {Position} from "../OOP/enums/Position";
 import ActionDetailsModal from "../modals/ActionDetailsModal";
 import {IGame} from "../OOP/interfaces/IGame";
 import {GameService} from "../OOP/services/GameService";
-import ITeamWithRoster from "../OOP/interfaces/ITeamWithRoster";
 
 interface GameSetup {
     season: Season;
@@ -364,8 +363,8 @@ const GamePage = () => {
                 timestamp: new Date().toISOString(),
                 score: {home: homeScore, away: awayScore},
                 teams: {
-                    home: gameSetup.homeTeam as ITeamWithRoster,
-                    away: gameSetup.awayTeam as ITeamWithRoster
+                    home: gameSetup.homeTeam,
+                    away: gameSetup.awayTeam
                 },
                 selectedImage: gameSetup.rinkImage
             };

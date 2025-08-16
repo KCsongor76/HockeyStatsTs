@@ -26,7 +26,7 @@ import {auth} from "./firebase";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
-    const [isSignedIn, setIsSignedIn] = useState<boolean | undefined>(undefined); // todo: undefined
+    const [isSignedIn, setIsSignedIn] = useState<boolean | undefined>(undefined);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -48,7 +48,7 @@ function App() {
         return () => unsubscribe();
     }, []);
 
-    TeamService.createFreeAgentTeamIfNotExists();
+    TeamService.createFreeAgentTeamIfNotExists()
 
     const adminRoutes = [
         {

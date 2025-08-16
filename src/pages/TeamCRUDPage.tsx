@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {TeamService} from "../OOP/services/TeamService";
+import React, {useState} from 'react';
 import {useLoaderData, useNavigate} from "react-router-dom";
-import {ITeam} from "../OOP/interfaces/ITeam";
-import {GameService} from "../OOP/services/GameService";
-import {IGame} from "../OOP/interfaces/IGame";
-import {Season} from "../OOP/enums/Season";
 import {Championship} from "../OOP/enums/Championship";
+import {Season} from "../OOP/enums/Season";
+import {ITeam} from "../OOP/interfaces/ITeam";
+import {IGame} from "../OOP/interfaces/IGame";
+import {GameService} from "../OOP/services/GameService";
+import {TeamService} from "../OOP/services/TeamService";
+import Pagination from "../components/Pagination";
 
 const TeamCrudPage = () => {
     const loaderData = useLoaderData() as {
@@ -14,14 +15,13 @@ const TeamCrudPage = () => {
     };
     const [teams, setTeams] = useState<ITeam[]>(loaderData.teams);
     const games = loaderData.games;
-    const [filters, setFilters] = useState({search: '', season: '', championship: ''});
+    const [filters, setFilters] = useState({name: '', season: '', championship: ''});
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
     const navigate = useNavigate();
-    const perPageOptions = [10, 25, 50, 100];
 
     const filteredTeams = teams.filter(team => {
         // Name filter
-        if (filters.search && !team.name.toLowerCase().includes(filters.search.toLowerCase())) {
+        if (filters.name && !team.name.toLowerCase().includes(filters.name.toLowerCase())) {
             return false;
         }
 
@@ -65,23 +65,6 @@ const TeamCrudPage = () => {
         }
     };
 
-    const goToPreviousPage = () => {
-        if (pagination.page > 1) {
-            setPagination(p => ({...p, page: p.page - 1}));
-        }
-    };
-
-    const goToNextPage = () => {
-        if (pagination.page < totalPages) {
-            setPagination(p => ({...p, page: p.page + 1}));
-        }
-    };
-
-    useEffect(() => {
-        // scroll automatically to the bottom on page change or team per page change
-        window.scrollTo(0, document.body.scrollHeight);
-    }, [pagination.page, pagination.perPage]);
-
     return (
         <div>
             <button onClick={() => navigate("create", {state: {teams: teams}})}>Create New Team</button>
@@ -91,7 +74,7 @@ const TeamCrudPage = () => {
                 <input
                     type="text"
                     name="nameSearch"
-                    value={filters.search}
+                    value={filters.name}
                     onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
                     placeholder={"Search by name"}
                 />
@@ -133,39 +116,7 @@ const TeamCrudPage = () => {
                 ) : <p>No teams found</p>}
             </ul>
 
-            <div>
-                <div>
-                    <button
-                        type="button"
-                        disabled={pagination.page === 1}
-                        onClick={goToPreviousPage}
-                    >
-                        Previous
-                    </button>
-
-                    <button
-                        type="button"
-                        disabled={pagination.page >= totalPages}
-                        onClick={goToNextPage}
-                    >
-                        Next
-                    </button>
-                </div>
-
-                <select
-                    value={pagination.perPage}
-                    onChange={e => setPagination({
-                        page: 1,
-                        perPage: parseInt(e.target.value)
-                    })}
-                >
-                    {perPageOptions.map(option => (
-                        <option key={option} value={option}>
-                            {option} per page
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
 
             <button onClick={() => navigate(-1)}>Go Back</button>
         </div>

@@ -1,22 +1,24 @@
 import React, {useMemo, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {Team} from "../OOP/classes/Team";
-import {TeamService} from "../OOP/services/TeamService";
-import {Season} from "../OOP/enums/Season";
+import {PlayoffPeriod, RegularPeriod} from "../OOP/enums/Period";
 import {Championship} from "../OOP/enums/Championship";
+import {ActionType} from "../OOP/enums/ActionType";
+import {GameType} from "../OOP/enums/GameType";
+import {Season} from "../OOP/enums/Season";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {IGame} from "../OOP/interfaces/IGame";
 import {ITeam} from "../OOP/interfaces/ITeam";
-import {ActionType} from "../OOP/enums/ActionType";
-import {GameType} from "../OOP/enums/GameType";
-import {PlayoffPeriod, RegularPeriod} from "../OOP/enums/Period";
+import {TeamService} from "../OOP/services/TeamService";
 import SavedGamesPage from "./SavedGamesPage";
+import {Player} from "../OOP/classes/Player";
 
 const HandleTeamPage = () => {
+    // todo: tables - hit, turnover, save%
+
     const location = useLocation();
-    const [team, setTeam] = useState(location.state.team as ITeam);
     const games = location.state.games as IGame[];
-    console.log(games)
+    const [team, setTeam] = useState(location.state.team as ITeam);
     const [name, setName] = useState(team.name);
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -39,6 +41,7 @@ const HandleTeamPage = () => {
     const navigate = useNavigate();
 
     const getFilteredGames = (type?: GameType) => {
+        // todo: simplify
         const filteredGamesByTeam = games.filter(g => g.teams.home.id === team.id || g.teams.away.id === team.id);
         if (type) {
             const filteredGamesByType = filteredGamesByTeam.filter(game => game.type === type)
@@ -63,7 +66,7 @@ const HandleTeamPage = () => {
     }
 
     const filteredPlayers = useMemo(() => {
-        // todo: add season and championship filter
+        // todo: no memo?
         const allPlayersInGames = new Map<string, IPlayer>();
 
         games.forEach(game => {
@@ -93,62 +96,6 @@ const HandleTeamPage = () => {
 
         return Array.from(allPlayersInGames.values());
     }, [team.players, games, team.id]);
-
-    const getPlayerStats = (games: IGame[], player: IPlayer) => {
-        const playerGames = games.filter(game => {
-            const homePlayers = game.teams.home.roster || [];
-            const awayPlayers = game.teams.away.roster || [];
-            return homePlayers.some(p => p.id === player.id) ||
-                awayPlayers.some(p => p.id === player.id);
-        });
-
-        let goals = 0;
-        let shots = 0;
-        let turnovers = 0;
-        let hits = 0;
-        let assists = 0;
-
-        playerGames.forEach(game => {
-            game.actions.forEach(action => {
-                if (action.player?.id === player.id) {
-                    switch (action.type) {
-                        case ActionType.TURNOVER:
-                            turnovers++;
-                            break;
-                        case ActionType.SHOT:
-                            shots++;
-                            break;
-                        case ActionType.GOAL:
-                            goals++;
-                            shots++;
-                            break;
-                        case ActionType.HIT:
-                            hits++;
-                            break;
-                    }
-                }
-                if (action.type === ActionType.GOAL &&
-                    action.assists?.some(p => p.id === player.id)) {
-                    assists++;
-                }
-            });
-        });
-
-        const gamesPlayed = playerGames.length;
-        const shotPercentage = shots > 0 ? (goals / shots) * 100 : 0;
-        const points = goals + assists;
-
-        return {
-            gamesPlayed,
-            goals,
-            assists,
-            points,
-            shots,
-            turnovers,
-            hits,
-            shotPercentage
-        };
-    };
 
     const getTeamStats = (team: ITeam, games: IGame[]) => {
         let gamesPlayed = 0;
@@ -499,7 +446,7 @@ const HandleTeamPage = () => {
                                             const filteredGames = getFilteredGames(GameType.REGULAR);
                                             const playerStatsMap: Record<string, any> = {};
                                             filteredPlayers.forEach(player => {
-                                                playerStatsMap[player.id] = getPlayerStats(filteredGames, player);
+                                                playerStatsMap[player.id] = Player.getPlayerStats(filteredGames, player);
                                             });
                                             const sortedPlayers = sortPlayers(filteredPlayers, playerStatsMap, sortConfigs.regular);
 
@@ -518,7 +465,12 @@ const HandleTeamPage = () => {
                                                         <td>{(playerStats.shotPercentage || 0).toFixed(2)}%</td>
                                                         <td>
                                                             <button
-                                                                onClick={() => navigate(`../../handlePlayers/${player.id}`, {state: {player, games}})}
+                                                                onClick={() => navigate(`../../handlePlayers/${player.id}`, {
+                                                                    state: {
+                                                                        player,
+                                                                        games
+                                                                    }
+                                                                })}
                                                             >
                                                                 View Player
                                                             </button>
@@ -553,7 +505,7 @@ const HandleTeamPage = () => {
                                             const filteredGames = getFilteredGames(GameType.PLAYOFF);
                                             const playerStatsMap: Record<string, any> = {};
                                             filteredPlayers.forEach(player => {
-                                                playerStatsMap[player.id] = getPlayerStats(filteredGames, player);
+                                                playerStatsMap[player.id] = Player.getPlayerStats(filteredGames, player);
                                             });
                                             const sortedPlayers = sortPlayers(filteredPlayers, playerStatsMap, sortConfigs.playoff);
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {TeamService} from "../OOP/services/TeamService";
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {ITeam} from "../OOP/interfaces/ITeam";
@@ -8,6 +8,7 @@ import {Season} from "../OOP/enums/Season";
 import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Position} from "../OOP/enums/Position";
+import Pagination from "../components/Pagination";
 
 const PlayerCrudPage = () => {
     const loaderData = useLoaderData() as {
@@ -21,7 +22,6 @@ const PlayerCrudPage = () => {
     const [filters, setFilters] = useState({team: '', position: '', jerseyNr: '', search: '', season: ''});
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
     const navigate = useNavigate();
-    const perPageOptions = [10, 25, 50, 100];
 
     // Update the filteredPlayers filter logic to include the season filter
     const filteredPlayers = players.filter(player => {
@@ -53,23 +53,6 @@ const PlayerCrudPage = () => {
             setPlayers(prev => prev.filter(p => p.id !== player.id));
         }
     };
-
-    const goToPreviousPage = () => {
-        if (pagination.page > 1) {
-            setPagination(p => ({...p, page: p.page - 1}));
-        }
-    };
-
-    const goToNextPage = () => {
-        if (pagination.page < totalPages) {
-            setPagination(p => ({...p, page: p.page + 1}));
-        }
-    };
-
-    useEffect(() => {
-        // scroll automatically to the bottom on page change or team per page change
-        window.scrollTo(0, document.body.scrollHeight);
-    }, [pagination.page, pagination.perPage]);
 
     return (
         <div>
@@ -148,39 +131,7 @@ const PlayerCrudPage = () => {
                 ) : <p>No teams found</p>}
             </ul>
 
-            <div>
-                <div>
-                    <button
-                        type="button"
-                        disabled={pagination.page === 1}
-                        onClick={goToPreviousPage}
-                    >
-                        Previous
-                    </button>
-
-                    <button
-                        type="button"
-                        disabled={pagination.page >= totalPages}
-                        onClick={goToNextPage}
-                    >
-                        Next
-                    </button>
-                </div>
-
-                <select
-                    value={pagination.perPage}
-                    onChange={e => setPagination({
-                        page: 1,
-                        perPage: parseInt(e.target.value)
-                    })}
-                >
-                    {perPageOptions.map(option => (
-                        <option key={option} value={option}>
-                            {option} per page
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
 
             <button onClick={() => navigate(-1)}>Go Back</button>
         </div>

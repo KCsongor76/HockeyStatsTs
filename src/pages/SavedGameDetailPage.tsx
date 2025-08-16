@@ -20,8 +20,6 @@ const SavedGameDetailPage = () => {
     const [skatersSortConfig, setSkatersSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
     const [goaliesSortConfig, setGoaliesSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
-    console.log(game)
-
     const getAvailablePeriods = () => {
         const availablePeriods = new Set<number>();
         game.actions.forEach(action => {
@@ -58,9 +56,8 @@ const SavedGameDetailPage = () => {
         return allPlayers;
     }
 
-    const getIndividualStats = (player: IPlayer) => {
-        const name = player.name;
-        const jerseyNumber = player.jerseyNumber;
+    // todo:
+    const getPlayerStats = (player: IPlayer) => {
         let goals = 0;
         let assists = 0;
         let shots = 0;
@@ -90,22 +87,22 @@ const SavedGameDetailPage = () => {
                 }
             }
         })
-        const points = goals + assists;
+
         let shotPercentage;
         if (player.position !== Position.GOALIE) {
+            // player is skater
             shotPercentage = shots > 0 ? goals / shots : 0;
         } else {
-            if (game && player.teamId === game.teams.home.id) {
+            // player is goalie
+            if (player.teamId === game.teams.home.id) {
                 shotPercentage = (game.score.away.shots - game.score.away.goals) / game.score.away.shots;
-            } else if (game) {
-                shotPercentage = (game.score.home.shots - game.score.home.goals) / game.score.home.shots;
             } else {
-                shotPercentage = 0;
+                shotPercentage = (game.score.home.shots - game.score.home.goals) / game.score.home.shots;
             }
         }
         shotPercentage *= 100
-
-        return {name, jerseyNumber, goals, assists, points, hits, turnovers, shots, shotPercentage}
+        const points = goals + assists;
+        return {goals, assists, points, shots, turnovers, hits, shotPercentage}
     }
 
     const getFilteredActions = () => {
@@ -142,8 +139,8 @@ const SavedGameDetailPage = () => {
         if (!skatersSortConfig) return skaters;
 
         return [...skaters].sort((a, b) => {
-            const statsA = getIndividualStats(a);
-            const statsB = getIndividualStats(b);
+            const statsA = getPlayerStats(a);
+            const statsB = getPlayerStats(b);
             const key = skatersSortConfig.key as keyof typeof statsA;
 
             if (statsA[key] < statsB[key]) {
@@ -162,8 +159,8 @@ const SavedGameDetailPage = () => {
         if (!goaliesSortConfig) return goalies;
 
         return [...goalies].sort((a, b) => {
-            const statsA = getIndividualStats(a);
-            const statsB = getIndividualStats(b);
+            const statsA = getPlayerStats(a);
+            const statsB = getPlayerStats(b);
             const key = goaliesSortConfig.key as keyof typeof statsA;
 
             if (statsA[key] < statsB[key]) {
@@ -356,13 +353,13 @@ const SavedGameDetailPage = () => {
                         >
                             <td>{player.name}</td>
                             <td>{player.jerseyNumber}</td>
-                            <td>{getIndividualStats(player).goals}</td>
-                            <td>{getIndividualStats(player).assists}</td>
-                            <td>{getIndividualStats(player).points}</td>
-                            <td>{getIndividualStats(player).shots}</td>
-                            <td>{getIndividualStats(player).hits}</td>
-                            <td>{getIndividualStats(player).turnovers}</td>
-                            <td>{getIndividualStats(player).shotPercentage.toFixed(2)}%</td>
+                            <td>{getPlayerStats(player).goals}</td>
+                            <td>{getPlayerStats(player).assists}</td>
+                            <td>{getPlayerStats(player).points}</td>
+                            <td>{getPlayerStats(player).shots}</td>
+                            <td>{getPlayerStats(player).hits}</td>
+                            <td>{getPlayerStats(player).turnovers}</td>
+                            <td>{getPlayerStats(player).shotPercentage.toFixed(2)}%</td>
                         </tr>
                     ))}
                     </tbody>
@@ -409,13 +406,13 @@ const SavedGameDetailPage = () => {
                         >
                             <td>{player.name}</td>
                             <td>{player.jerseyNumber}</td>
-                            <td>{getIndividualStats(player).goals}</td>
-                            <td>{getIndividualStats(player).assists}</td>
-                            <td>{getIndividualStats(player).points}</td>
-                            <td>{getIndividualStats(player).shots}</td>
-                            <td>{getIndividualStats(player).hits}</td>
-                            <td>{getIndividualStats(player).turnovers}</td>
-                            <td>{getIndividualStats(player).shotPercentage.toFixed(2)}%</td>
+                            <td>{getPlayerStats(player).goals}</td>
+                            <td>{getPlayerStats(player).assists}</td>
+                            <td>{getPlayerStats(player).points}</td>
+                            <td>{getPlayerStats(player).shots}</td>
+                            <td>{getPlayerStats(player).hits}</td>
+                            <td>{getPlayerStats(player).turnovers}</td>
+                            <td>{getPlayerStats(player).shotPercentage.toFixed(2)}%</td>
                         </tr>
                     ))}
                     </tbody>

@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {signOut} from "firebase/auth";
+import {auth} from "../firebase";
 
 interface HomePageProps {
     isSignedIn: boolean | undefined;
@@ -11,7 +13,7 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
     const [menuItems, setMenuItems] = useState([{
         title: 'Start New Game',
         description: 'Begin a new hockey game tracking session',
-        icon: '🏒', // Hockey stick emoji
+        icon: '🏒',
         path: '/start',
     }]);
 
@@ -42,12 +44,6 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
                     icon: '👥',
                     path: '/handlePlayers'
                 },
-                {
-                    title: 'Log Out',
-                    description: 'Sign out of your admin account',
-                    icon: '🔒',
-                    path: "/"
-                }
             ]);
         } else {
             setMenuItems([
