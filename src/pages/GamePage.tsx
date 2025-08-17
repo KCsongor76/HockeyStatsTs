@@ -20,6 +20,10 @@ import {IGame} from "../OOP/interfaces/IGame";
 import {GameService} from "../OOP/services/GameService";
 import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
+import GameScoreData from "../components/GameScoreData";
+import TeamFilters from "../components/TeamFilters";
+import PeriodFilters from "../components/PeriodFilters";
+import ActionTypeFilters from "../components/ActionTypeFilters";
 
 interface GameSetup {
     season: Season;
@@ -90,24 +94,19 @@ const GamePage = () => {
     const updateScores = (action: IGameAction) => {
         if (!gameSetup) return;
 
+        const updateScore = (setter: React.Dispatch<React.SetStateAction<IScoreData>>) => {
+            setter(prev => ({
+                goals: prev.goals + (action.type === ActionType.GOAL ? 1 : 0),
+                shots: prev.shots + ([ActionType.SHOT, ActionType.GOAL].includes(action.type) ? 1 : 0),
+                turnovers: prev.turnovers + (action.type === ActionType.TURNOVER ? 1 : 0),
+                hits: prev.hits + (action.type === ActionType.HIT ? 1 : 0),
+            }));
+        };
+
         if (action.team.id === gameSetup.homeTeam.id) {
-            setHomeScore(prev => {
-                const newScore = {goals: 0, shots: 0, turnovers: 0, hits: 0} as IScoreData;
-                newScore.goals = prev.goals + (action.type === ActionType.GOAL ? 1 : 0);
-                newScore.shots = prev.shots + ([ActionType.SHOT, ActionType.GOAL].includes(action.type) ? 1 : 0);
-                newScore.turnovers = prev.turnovers + (action.type === ActionType.TURNOVER ? 1 : 0);
-                newScore.hits = prev.hits + (action.type === ActionType.HIT ? 1 : 0);
-                return newScore;
-            });
+            updateScore(setHomeScore);
         } else {
-            setAwayScore(prev => {
-                const newScore = {goals: 0, shots: 0, turnovers: 0, hits: 0} as IScoreData
-                newScore.goals = prev.goals + (action.type === ActionType.GOAL ? 1 : 0);
-                newScore.shots = prev.shots + ([ActionType.SHOT, ActionType.GOAL].includes(action.type) ? 1 : 0);
-                newScore.turnovers = prev.turnovers + (action.type === ActionType.TURNOVER ? 1 : 0);
-                newScore.hits = prev.hits + (action.type === ActionType.HIT ? 1 : 0);
-                return newScore;
-            });
+            updateScore(setAwayScore);
         }
     };
 
@@ -134,6 +133,9 @@ const GamePage = () => {
         })
         return actionTypesArray;
     }
+
+    const availablePeriods = getAvailablePeriods();
+    const availableActionTypes = getAvailableActionTypes();
 
     const getFilteredPlayers = () => {
         if (!gameSetup) return [];
@@ -343,31 +345,16 @@ const GamePage = () => {
                 </div>}
             </div>
 
-            <div>
-                <p>Season: {gameSetup.season}</p>
-                <p>Championship: {gameSetup.championship}</p>
-                <p>Game type: {gameSetup.gameType}</p>
-                <p>Score: {homeScore.goals} - {awayScore.goals}</p>
-
-                <img src={gameSetup.homeTeam.logo} alt="home team"/>
-                <p>Shots: {homeScore.shots}</p>
-                <p>Turnovers: {homeScore.turnovers}</p>
-                <p>Hits: {homeScore.hits}</p>
-
-                <img src={gameSetup.awayTeam.logo} alt="away team"/>
-                <p>Shots: {awayScore.shots}</p>
-                <p>Turnovers: {awayScore.turnovers}</p>
-                <p>Hits: {awayScore.hits}</p>
-            </div>
+            {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
 
             <div>
+                <Button styleType={"positive"} type="button" onClick={saveGameLocally}>Save Game Locally</Button>
+                <Button styleType={"positive"} type="button" onClick={finalizeGame}>Finalize Game</Button>
                 <Button
-                    styleType={"positive"} type="button" onClick={saveGameLocally}>Save Game Locally</Button>
-                <Button
-                    styleType={"positive"} type="button" onClick={finalizeGame}>Finalize Game</Button>
-                <Button
-                    styleType={showDetails ? "negative" : "positive"} type="button"
-                    onClick={() => setShowDetails(!showDetails)}>
+                    styleType={showDetails ? "negative" : "positive"}
+                    type="button"
+                    onClick={() => setShowDetails(!showDetails)}
+                >
                     {showDetails ? 'Hide Details' : 'Show Details'}
                 </Button>
             </div>
@@ -375,63 +362,21 @@ const GamePage = () => {
             {showDetails && (
                 <>
                     <h3>Team View</h3>
-                    <Button
-                        styleType={"neutral"}
-                        type="button"
-                        className={teamView === 'all' ? styles.active : ''}
-                        onClick={() => setTeamView('all')}
-                    >
-                        All Teams
-                    </Button>
-                    <Button
-                        styleType={"neutral"}
-                        type="button"
-                        className={teamView === 'home' ? styles.active : ''}
-                        onClick={() => setTeamView('home')}
-                    >
-                        Home Team
-                    </Button>
-                    <Button
-                        styleType={"neutral"}
-                        type="button"
-                        className={teamView === 'away' ? styles.active : ''}
-                        onClick={() => setTeamView('away')}
-                    >
-                        Away Team
-                    </Button>
+                    <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
 
                     <h3>Periods</h3>
-                    {getAvailablePeriods().length > 0 ?
-                        getAvailablePeriods().map(period => (
-                            <Button
-                                styleType={"neutral"}
-                                key={period}
-                                type="button"
-                                className={selectedPeriods.includes(period) ? styles.active : ''}
-                                onClick={() => togglePeriod(period)}
-                            >
-                                {period}
-                            </Button>
-                        )) :
-                        <p>No available period data yet.</p>
-                    }
+                    <PeriodFilters
+                        availablePeriods={availablePeriods}
+                        selectedPeriods={selectedPeriods}
+                        togglePeriod={togglePeriod}
+                    />
 
                     <h3>Action Types</h3>
-                    {getAvailableActionTypes().length > 0 ?
-                        getAvailableActionTypes().map(action => (
-                            <Button
-                                styleType={"neutral"}
-                                key={action}
-                                type="button"
-                                className={selectedActionTypes.includes(action) ? styles.active : ''}
-                                onClick={() => toggleActionType(action)}
-                            >
-                                {action}
-                            </Button>
-                        )) :
-                        <p>No action types yet.</p>
-                    }
-
+                    <ActionTypeFilters
+                        availableActionTypes={availableActionTypes}
+                        selectedActionTypes={selectedActionTypes}
+                        toggleActionType={toggleActionType}
+                    />
 
                     {/* Second rink */}
                     <div className={styles.rinkContainer}>
@@ -478,7 +423,6 @@ const GamePage = () => {
                 </>
             )}
 
-            {/* Modals */}
             <ActionSelectorModal
                 isOpen={modalStep === 'action'}
                 onClose={resetModalFlow}

@@ -10,6 +10,10 @@ import {Position} from "../OOP/enums/Position";
 import ActionDetailsModal from "../modals/ActionDetailsModal";
 import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
+import GameScoreData from "../components/GameScoreData";
+import TeamFilters from "../components/TeamFilters";
+import PeriodFilters from "../components/PeriodFilters";
+import ActionTypeFilters from "../components/ActionTypeFilters";
 
 const SavedGameDetailPage = () => {
     const locationData = useLocation();
@@ -92,87 +96,30 @@ const SavedGameDetailPage = () => {
 
     return (
         <div>
-            <div>
-                <p>Season: {game.season}</p>
-                <p>Championship: {game.championship}</p>
-                <p>Game type: {game.type}</p>
-                <p>Score: {game.score.home.goals} - {game.score.away.goals}</p>
-
-                <img src={game.teams.home.logo} alt="home team"/>
-                <p>Shots: {game.score.home.shots}</p>
-                <p>Turnovers: {game.score.home.turnovers}</p>
-                <p>Hits: {game.score.home.hits}</p>
-
-                <img src={game.teams.away.logo} alt="away team"/>
-                <p>Shots: {game.score.away.shots}</p>
-                <p>Turnovers: {game.score.away.turnovers}</p>
-                <p>Hits: {game.score.away.hits}</p>
-            </div>
+            <GameScoreData game={game} score={game.score}/>
 
             <div>
                 <h3>Team View</h3>
-                <Button
-                    styleType={"neutral"}
-                    type="button"
-                    className={teamView === 'all' ? styles.active : ''}
-                    onClick={() => setTeamView('all')}
-                >
-                    All Teams
-                </Button>
-                <Button
-                    styleType={"neutral"}
-                    type="button"
-                    className={teamView === 'home' ? styles.active : ''}
-                    onClick={() => setTeamView('home')}
-                >
-                    Home Team
-                </Button>
-                <Button
-                    styleType={"neutral"}
-                    type="button"
-                    className={teamView === 'away' ? styles.active : ''}
-                    onClick={() => setTeamView('away')}
-                >
-                    Away Team
-                </Button>
+                <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
 
                 <h3>Periods</h3>
-                {availablePeriods.length > 0 ?
-                    availablePeriods.map(period => (
-                        <Button
-                            styleType={"neutral"}
-                            key={period}
-                            type="button"
-                            className={selectedPeriods.includes(period) ? styles.active : ''}
-                            onClick={() => togglePeriod(period)}
-                        >
-                            {period}
-                        </Button>
-                    )) :
-                    <p>No available period data yet.</p>
-                }
+                <PeriodFilters
+                    availablePeriods={availablePeriods}
+                    selectedPeriods={selectedPeriods}
+                    togglePeriod={togglePeriod}
+                />
 
                 <h3>Action Types</h3>
-                {availableActionTypes.length > 0 ?
-                    availableActionTypes.map(action => (
-                        <Button
-                            styleType={"neutral"}
-                            key={action}
-                            type="button"
-                            className={selectedActionTypes.includes(action) ? styles.active : ''}
-                            onClick={() => toggleActionType(action)}
-                        >
-                            {action}
-                        </Button>
-                    )) :
-                    <p>No action types yet.</p>
-                }
+                <ActionTypeFilters
+                    availableActionTypes={availableActionTypes}
+                    selectedActionTypes={selectedActionTypes}
+                    toggleActionType={toggleActionType}
+                />
             </div>
 
             <div className={styles.rinkContainer}>
                 <img src={game.selectedImage} alt="rink"/>
                 <div className={styles.iconContainer}>
-                    {/*todo: colors from game setup?*/}
                     {getFilteredActions().map((action, index) => (
                         <Icon
                             key={`second-${index}`}
@@ -190,22 +137,26 @@ const SavedGameDetailPage = () => {
             <div>
                 <h2>Player Statistics</h2>
                 <h3>Skaters</h3>
-                <PlayerTable
-                    pageType="game"
-                    players={getFilteredPlayers().filter(p => p.position !== Position.GOALIE)}
-                    games={[game]}
-                    selectedPlayer={selectedPlayer}
-                    togglePlayer={togglePlayer}
-                />
+                {game && (
+                    <PlayerTable
+                        pageType="game"
+                        players={getFilteredPlayers().filter(p => p.position !== Position.GOALIE)}
+                        games={[game]}
+                        selectedPlayer={selectedPlayer}
+                        togglePlayer={togglePlayer}
+                    />
+                )}
 
                 <h3>Goalies</h3>
-                <PlayerTable
-                    pageType="game"
-                    players={getFilteredPlayers().filter(p => p.position === Position.GOALIE)}
-                    games={[game]}
-                    selectedPlayer={selectedPlayer}
-                    togglePlayer={togglePlayer}
-                />
+                {game && (
+                    <PlayerTable
+                        pageType="game"
+                        players={getFilteredPlayers().filter(p => p.position === Position.GOALIE)}
+                        games={[game]}
+                        selectedPlayer={selectedPlayer}
+                        togglePlayer={togglePlayer}
+                    />
+                )}
             </div>
 
             <ActionDetailsModal
