@@ -1,5 +1,5 @@
 // PlayerTable.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import styles from "../pages/GamePage.module.css";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Player} from "../OOP/classes/Player";
@@ -16,6 +16,9 @@ interface PlayerTableProps {
     togglePlayer?: (playerId: string) => void;
 }
 
+type SortDirection = 'asc' | 'desc';
+type SortableField = 'name' | 'jerseyNumber' | 'position' | 'gamesPlayed' | 'goals' | 'assists' | 'points' | 'shots' | 'hits' | 'turnovers' | 'shotPercentage';
+
 const PlayerTable: React.FC<PlayerTableProps> = ({
                                                      pageType,
                                                      players = [],
@@ -25,6 +28,99 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
                                                      togglePlayer,
                                                  }) => {
     const navigate = useNavigate();
+    const [sortField, setSortField] = useState<SortableField>('name');
+    const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+    const handleSort = (field: SortableField) => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    };
+
+    const sortPlayers = (playersToSort: IPlayer[]) => {
+        return [...playersToSort].sort((a, b) => {
+            const statsA = Player.getPlayerStats(games, a);
+            const statsB = Player.getPlayerStats(games, b);
+
+            let valueA: any;
+            let valueB: any;
+
+            switch (sortField) {
+                case 'name':
+                    valueA = a.name.toLowerCase();
+                    valueB = b.name.toLowerCase();
+                    break;
+                case 'jerseyNumber':
+                    valueA = a.jerseyNumber;
+                    valueB = b.jerseyNumber;
+                    break;
+                case 'position':
+                    valueA = a.position;
+                    valueB = b.position;
+                    break;
+                case 'gamesPlayed':
+                    valueA = statsA.gamesPlayed || 0;
+                    valueB = statsB.gamesPlayed || 0;
+                    break;
+                case 'goals':
+                    valueA = statsA.goals || 0;
+                    valueB = statsB.goals || 0;
+                    break;
+                case 'assists':
+                    valueA = statsA.assists || 0;
+                    valueB = statsB.assists || 0;
+                    break;
+                case 'points':
+                    valueA = statsA.points || 0;
+                    valueB = statsB.points || 0;
+                    break;
+                case 'shots':
+                    valueA = statsA.shots || 0;
+                    valueB = statsB.shots || 0;
+                    break;
+                case 'hits':
+                    valueA = statsA.hits || 0;
+                    valueB = statsB.hits || 0;
+                    break;
+                case 'turnovers':
+                    valueA = statsA.turnovers || 0;
+                    valueB = statsB.turnovers || 0;
+                    break;
+                case 'shotPercentage':
+                    valueA = statsA.shotPercentage || 0;
+                    valueB = statsB.shotPercentage || 0;
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (valueA < valueB) {
+                return sortDirection === 'asc' ? -1 : 1;
+            }
+            if (valueA > valueB) {
+                return sortDirection === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    };
+
+    const renderSortableHeader = (field: SortableField, label: string) => {
+        return (
+            <th
+                onClick={() => handleSort(field)}
+                style={{ cursor: 'pointer' }}
+            >
+                {label}
+                {sortField === field && (
+                    <span>{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>
+                )}
+            </th>
+        );
+    };
+
     const renderTableHead = () => {
         if (pageType === "player") {
             return (
@@ -50,17 +146,17 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
             return (
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>#</th>
-                    <th>Position</th>
-                    <th>GP</th>
-                    <th>G</th>
-                    <th>A</th>
-                    <th>P</th>
-                    <th>S</th>
-                    <th>H</th>
-                    <th>T</th>
-                    <th>S%</th>
+                    {renderSortableHeader('name', 'Name')}
+                    {renderSortableHeader('jerseyNumber', '#')}
+                    {renderSortableHeader('position', 'Position')}
+                    {renderSortableHeader('gamesPlayed', 'GP')}
+                    {renderSortableHeader('goals', 'G')}
+                    {renderSortableHeader('assists', 'A')}
+                    {renderSortableHeader('points', 'P')}
+                    {renderSortableHeader('shots', 'S')}
+                    {renderSortableHeader('hits', 'H')}
+                    {renderSortableHeader('turnovers', 'T')}
+                    {renderSortableHeader('shotPercentage', 'S%')}
                     <th></th>
                 </tr>
                 </thead>
@@ -71,15 +167,15 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
             return (
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>#</th>
-                    <th>G</th>
-                    <th>A</th>
-                    <th>P</th>
-                    <th>S</th>
-                    <th>H</th>
-                    <th>T</th>
-                    <th>S%</th>
+                    {renderSortableHeader('name', 'Name')}
+                    {renderSortableHeader('jerseyNumber', '#')}
+                    {renderSortableHeader('goals', 'G')}
+                    {renderSortableHeader('assists', 'A')}
+                    {renderSortableHeader('points', 'P')}
+                    {renderSortableHeader('shots', 'S')}
+                    {renderSortableHeader('hits', 'H')}
+                    {renderSortableHeader('turnovers', 'T')}
+                    {renderSortableHeader('shotPercentage', 'S%')}
                 </tr>
                 </thead>
             );
@@ -89,6 +185,8 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
     };
 
     const renderTableBody = () => {
+        const sortedPlayers = sortPlayers(players);
+
         if (pageType === "player" && player) {
             return (
                 <tbody>
@@ -112,7 +210,7 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
         if (pageType === "team") {
             return (
                 <tbody>
-                {players.map((player) => (
+                {sortedPlayers.map((player) => (
                     <tr key={player.id}>
                         <td>{player.name}</td>
                         <td>{player.jerseyNumber}</td>
@@ -141,7 +239,7 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
         if (pageType === "game") {
             return (
                 <tbody>
-                {players.map((player) => (
+                {sortedPlayers.map((player) => (
                     <tr
                         key={player.id}
                         className={selectedPlayer === player.id ? styles.selectedRow : ''}
