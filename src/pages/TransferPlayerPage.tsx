@@ -6,6 +6,7 @@ import {TeamService} from "../OOP/services/TeamService";
 import {PlayerService} from "../OOP/services/PlayerService";
 import Button from "../components/Button";
 import Select from "../components/Select";
+import styles from "./TransferPlayerPage.module.css"
 
 const TransferPlayerPage = () => {
     const location = useLocation();
@@ -62,11 +63,17 @@ const TransferPlayerPage = () => {
     }, []);
 
     return (
-        <div>
-            <h1>Transfer Player</h1>
-            <p>Player: {player.name}</p>
-            <p>Current Team: {team.name}</p>
-            <form onSubmit={submitHandler}>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1>Transfer Player</h1>
+            </div>
+
+            <div className={styles.playerInfo}>
+                <p>Player: {player.name}</p>
+                <p>Current Team: {team.name}</p>
+            </div>
+
+            <form onSubmit={submitHandler} className={styles.form}>
                 <Select
                     label="Transfer to:"
                     value={selectedTeamId}
@@ -80,26 +87,33 @@ const TransferPlayerPage = () => {
                     error={errors.team}
                 />
 
-                {errors.jersey && <span style={{color: 'red'}}>{errors.jersey}</span>}
-                {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
+                {errors.jersey && <span className={styles.error}>{errors.jersey}</span>}
+                {errors.general && <span className={styles.error}>{errors.general}</span>}
 
-                {!isFreeAgent && (
+                <div className={styles.buttonGroup}>
+                    {!isFreeAgent && (
+                        <Button
+                            styleType={"neutral"}
+                            type="button"
+                            onClick={freeAgentHandler}
+                        >
+                            Set to free agent
+                        </Button>
+                    )}
                     <Button
-                        styleType={"neutral"}
-                        type="button" onClick={freeAgentHandler}>
-                        Set to free agent
+                        styleType={"positive"}
+                        type="submit"
+                    >
+                        Transfer
                     </Button>
-                )}
-                <Button
-                    styleType={"positive"}
-                    type="submit">
-                    Transfer
-                </Button>
-                <Button
-                    styleType={"negative"}
-                    type="button" onClick={() => navigate(-1)}>
-                    Cancel
-                </Button>
+                    <Button
+                        styleType={"negative"}
+                        type="button"
+                        onClick={() => navigate(-1)}
+                    >
+                        Cancel
+                    </Button>
+                </div>
             </form>
         </div>
     );

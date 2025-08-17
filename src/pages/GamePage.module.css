@@ -1,26 +1,25 @@
 .rinkContainer {
     position: relative;
-    display: inline-block;
-    margin: 10px; /* Added for spacing */
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    max-width: 900px;
+    margin: 0 auto; /* Center the container horizontally */
+    /*width: fit-content; !* Make container only as wide as its content *!*/
 }
 
-/* Added new class for icon container */
+.clickableRink {
+    cursor: crosshair;
+    display: block; /* Ensure image behaves as block element */
+    max-width: 100%; /* Ensure image doesn't overflow container */
+    height: auto; /* Maintain aspect ratio */
+}
+
 .iconContainer {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100%; /* Match the image width */
     height: 100%;
     pointer-events: none; /* Allows clicks to pass through to image */
-}
-
-/* GamePage.module.css */
-.active {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.selectedRow {
-    background-color: #e0e0e0;
-    cursor: pointer;
 }

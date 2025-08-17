@@ -9,6 +9,7 @@ import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
 import Select from "../components/Select";
+import styles from "./SavedGamesPage.module.css";
 
 interface SavedGamesPageProps {
     playerGames?: IGame[];
@@ -90,9 +91,9 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     if (games.length === 0 || filteredGames.length === 0) return <div>No games available.</div>;
 
     return (
-        <div>
+        <div className={styles.container}>
             {showFilters && (
-                <>
+                <div className={styles.filters}>
                     <Select
                         label="Home team:"
                         value={homeTeamId}
@@ -118,7 +119,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         value={championship}
                         onChange={(e) => setChampionship(e.target.value as Championship)}
                         options={[
-                            { value: "", label: "All Championships" },
+                            {value: "", label: "All Championships"},
                             ...Object.values(Championship).map(championship => ({
                                 value: championship,
                                 label: championship
@@ -131,7 +132,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         value={season}
                         onChange={(e) => setSeason(e.target.value as Season)}
                         options={[
-                            { value: "", label: "All Seasons" },
+                            {value: "", label: "All Seasons"},
                             ...Object.values(Season).map(season => ({
                                 value: season,
                                 label: season
@@ -144,7 +145,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         value={gameType}
                         onChange={(e) => setGameType(e.target.value as GameType)}
                         options={[
-                            { value: "", label: "All GameTypes" },
+                            {value: "", label: "All GameTypes"},
                             ...Object.values(GameType).map(gameType => ({
                                 value: gameType,
                                 label: gameType
@@ -157,41 +158,58 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value)}
                         options={[
-                            { value: "newest", label: "Newest First" },
-                            { value: "oldest", label: "Oldest First" }
+                            {value: "newest", label: "Newest First"},
+                            {value: "oldest", label: "Oldest First"}
                         ]}
                     />
-                </>
+                </div>
             )}
 
-            <ul>
+            <ul className={styles.gameList}>
                 {currentGames.length > 0 ? (
                     currentGames.map((game: IGame) => (
-                        <li key={game.id} onClick={() => navigate(`/previous_games/${game.id}`, {state: game})}>
-                            <img
-                                src={game.teams.home.logo}
-                                alt={game.teams.home.logo}
-                            />
-                            <span>{game.teams.home.name}</span>
+                        <li
+                            key={game.id}
+                            className={styles.gameItem}
+                            onClick={() => navigate(`/previous_games/${game.id}`, {state: game})}
+                        >
+                            <div className={styles.gameTeams}>
+                                <div>
+                                    <img
+                                        src={game.teams.home.logo}
+                                        alt={game.teams.home.logo}
+                                        className={styles.gameLogo}
+                                    />
+                                    <span>{game.teams.home.name}</span>
+                                </div>
 
-                            <span>{game.score.home.goals} - {game.score.away.goals}</span>
+                                <span className={styles.gameScore}>
+                                {game.score.home.goals} - {game.score.away.goals}
+                            </span>
 
-                            <img
-                                src={game.teams.away.logo}
-                                alt={game.teams.away.logo}
-                            />
-                            <span>{game.teams.away.name}</span>
+                                <div>
+                                    <img
+                                        src={game.teams.away.logo}
+                                        alt={game.teams.away.logo}
+                                        className={styles.gameLogo}
+                                    />
+                                    <span>{game.teams.away.name}</span>
+                                </div>
+                            </div>
 
-                            <span>{game.timestamp}</span>
-
-                            <span>Type: {game.type}</span>
-                            <span>Season: {game.season || "Not specified"}</span>
+                            <div className={styles.gameInfo}>
+                                <span>{game.timestamp}</span>
+                                <span>Type: {game.type}</span>
+                                <span>Season: {game.season || "Not specified"}</span>
+                            </div>
                         </li>
                     ))
                 ) : <p>No games found.</p>}
             </ul>
 
-            <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
+            <div className={styles.pagination}>
+                <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
+            </div>
         </div>
     );
 };

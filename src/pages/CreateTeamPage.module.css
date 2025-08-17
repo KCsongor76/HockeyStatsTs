@@ -1,0 +1,58 @@
+.formContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.formTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #111827;
+}
+
+.colorGroup {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.championshipGroup {
+    margin-bottom: 1.5rem;
+}
+
+.championshipItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .formContainer {
+        padding: 1rem;
+    }
+
+    .colorGroup {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .formContainer {
+        padding: 0.75rem;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+}

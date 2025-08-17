@@ -10,6 +10,7 @@ import {storage} from "../firebase";
 import Button from "../components/Button";
 import Select from "../components/Select";
 import Input from "../components/Input";
+import styles from "./StartPage.module.css"
 
 const StartPage = () => {
     const loaderData = useLoaderData();
@@ -129,168 +130,206 @@ const StartPage = () => {
     }, [navigate]);
 
     return (
-        <form onSubmit={submitHandler}>
-            <Select
-                label="Season:"
-                value={season}
-                onChange={e => setSeason(e.target.value as Season)}
-                options={Object.values(Season).map(s => ({
-                    value: s,
-                    label: s
-                }))}
-            />
+        <div className={styles.container}>
+            <form onSubmit={submitHandler}>
+                <div className={styles.formGrid}>
+                    <Select
+                        label="Season:"
+                        value={season}
+                        onChange={e => setSeason(e.target.value as Season)}
+                        options={Object.values(Season).map(s => ({
+                            value: s,
+                            label: s
+                        }))}
+                    />
 
-            <Select
-                label="Championship:"
-                value={championship}
-                onChange={e => setChampionship(e.target.value as Championship)}
-                options={Object.values(Championship).map(ch => ({
-                    value: ch,
-                    label: ch
-                }))}
-            />
+                    <Select
+                        label="Championship:"
+                        value={championship}
+                        onChange={e => setChampionship(e.target.value as Championship)}
+                        options={Object.values(Championship).map(ch => ({
+                            value: ch,
+                            label: ch
+                        }))}
+                    />
 
-            <Select
-                label="Home team:"
-                value={homeTeamId}
-                onChange={e => setHomeTeamId(e.target.value)}
-                options={teams.filter(t => t.championships.includes(championship))
-                    .map(team => ({
-                        value: team.id,
-                        label: team.name
-                    }))
-                }
-                error={errors.homeTeamId}
-            />
+                    <Select
+                        label="Home team:"
+                        value={homeTeamId}
+                        onChange={e => setHomeTeamId(e.target.value)}
+                        options={teams.filter(t => t.championships.includes(championship))
+                            .map(team => ({
+                                value: team.id,
+                                label: team.name
+                            }))
+                        }
+                        error={errors.homeTeamId}
+                    />
 
-            <Select
-                label="Away team:"
-                value={awayTeamId}
-                onChange={e => setAwayTeamId(e.target.value)}
-                options={teams.filter(t => t.championships.includes(championship))
-                    .map(team => ({
-                        value: team.id,
-                        label: team.name
-                    }))
-                }
-                error={errors.awayTeamId}
-            />
-            {errors.sameTeams && <span style={{color: 'red'}}>{errors.sameTeams}</span>}
+                    <Select
+                        label="Away team:"
+                        value={awayTeamId}
+                        onChange={e => setAwayTeamId(e.target.value)}
+                        options={teams.filter(t => t.championships.includes(championship))
+                            .map(team => ({
+                                value: team.id,
+                                label: team.name
+                            }))
+                        }
+                        error={errors.awayTeamId}
+                    />
+                    {errors.sameTeams && <span className={styles.error}>{errors.sameTeams}</span>}
 
-            <Select
-                label="Game type:"
-                value={gameType}
-                onChange={e => setGameType(e.target.value as GameType)}
-                options={Object.values(GameType).map(gt => ({
-                    value: gt,
-                    label: gt
-                }))}
-            />
+                    <Select
+                        label="Game type:"
+                        value={gameType}
+                        onChange={e => setGameType(e.target.value as GameType)}
+                        options={Object.values(GameType).map(gt => ({
+                            value: gt,
+                            label: gt
+                        }))}
+                    />
 
-            <Input
-                label="Home Primary color"
-                type="color"
-                value={homeColors.primary}
-                onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
-            />
+                    <div className={styles.colorGroup}>
+                        <Input
+                            label="Home Primary color"
+                            type="color"
+                            value={homeColors.primary}
+                            onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
+                        />
 
-            <Input
-                label="Home Secondary color"
-                type="color"
-                value={homeColors.secondary}
-                onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
-                error={errors.homeColors}
-            />
+                        <Input
+                            label="Home Secondary color"
+                            type="color"
+                            value={homeColors.secondary}
+                            onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
+                            error={errors.homeColors}
+                        />
+                    </div>
 
-            <Input
-                label="Away Primary color"
-                type="color"
-                value={awayColors.primary}
-                onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
-            />
+                    <div className={styles.colorGroup}>
+                        <Input
+                            label="Away Primary color"
+                            type="color"
+                            value={awayColors.primary}
+                            onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
+                        />
 
-            <Input
-                label="Away Secondary color"
-                type="color"
-                value={awayColors.secondary}
-                onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
-                error={errors.awayColors}
-            />
-            {errors.sameColors && <span style={{color: 'red'}}>{errors.sameColors}</span>}
+                        <Input
+                            label="Away Secondary color"
+                            type="color"
+                            value={awayColors.secondary}
+                            onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
+                            error={errors.awayColors}
+                        />
+                    </div>
+                    {errors.sameColors && <span className={styles.error}>{errors.sameColors}</span>}
+                </div>
 
-            <Button styleType={showRosters ? "negative" : "positive"} type="button"
-                    onClick={() => setShowRosters(!showRosters)}>
-                {showRosters ? 'Hide Rosters' : 'Show Rosters'}
-            </Button>
+                <div className={styles.rinkImages}>
+                    <label
+                        className={`${styles.rinkOption} ${selectedImage === rinkImages.rinkUp ? styles.selected : ''}`}>
+                        <input
+                            type="radio"
+                            name="rinkImage"
+                            value={rinkImages.rinkUp}
+                            checked={selectedImage === rinkImages.rinkUp}
+                            onChange={(e) => setSelectedImage(e.target.value)}
+                            style={{display: 'none'}}
+                        />
+                        Up
+                        <img src={rinkImages.rinkUp || undefined} alt="Up"/>
+                    </label>
 
-            {showRosters && (
-                <>
-                    {/* HOME */}
-                    <h3>Home Roster</h3>
-                    <h4>Available Players</h4>
-                    {getAvailablePlayers(homeTeamId).map(player => (
-                        <div key={player.id} onClick={() => addToRoster(homeTeamId, player)}>
-                            {player.name}
+                    <label
+                        className={`${styles.rinkOption} ${selectedImage === rinkImages.rinkDown ? styles.selected : ''}`}>
+                        <input
+                            type="radio"
+                            name="rinkImage"
+                            value={rinkImages.rinkDown}
+                            checked={selectedImage === rinkImages.rinkDown}
+                            onChange={(e) => setSelectedImage(e.target.value)}
+                            style={{display: 'none'}}
+                        />
+                        Down
+                        <img src={rinkImages.rinkDown || undefined} alt="Down"/>
+                    </label>
+                </div>
+                {errors.rinkImage && <span className={styles.error}>{errors.rinkImage}</span>}
+
+                <Button
+                    styleType={showRosters ? "negative" : "positive"}
+                    type="button"
+                    onClick={() => setShowRosters(!showRosters)}
+                >
+                    {showRosters ? 'Hide Rosters' : 'Show Rosters'}
+                </Button>
+
+                {showRosters && (
+                    <div className={styles.rosterSection}>
+                        <div className={styles.rosterHeader}>
+                            <h3>Team Rosters</h3>
                         </div>
-                    ))}
-                    <h4>Selected Players</h4>
-                    {getSelectedPlayers(homeTeamId).map(player => (
-                        <div key={player.id} onClick={() => removeFromRoster(homeTeamId, player.id)}>
-                            {player.name}
+                        <div className={styles.rosterContent}>
+                            <div>
+                                <h4>Home Roster</h4>
+                                <h5>Available Players</h5>
+                                {getAvailablePlayers(homeTeamId).map(player => (
+                                    <div
+                                        key={player.id}
+                                        className={styles.playerItem}
+                                        onClick={() => addToRoster(homeTeamId, player)}
+                                    >
+                                        {player.name}
+                                    </div>
+                                ))}
+                                <h5>Selected Players</h5>
+                                {getSelectedPlayers(homeTeamId).map(player => (
+                                    <div
+                                        key={player.id}
+                                        className={styles.playerItem}
+                                        onClick={() => removeFromRoster(homeTeamId, player.id)}
+                                    >
+                                        {player.name}
+                                    </div>
+                                ))}
+                                {errors.homeRoster && <span className={styles.error}>{errors.homeRoster}</span>}
+                            </div>
+
+                            <div>
+                                <h4>Away Roster</h4>
+                                <h5>Available Players</h5>
+                                {getAvailablePlayers(awayTeamId).map(player => (
+                                    <div
+                                        key={player.id}
+                                        className={styles.playerItem}
+                                        onClick={() => addToRoster(awayTeamId, player)}
+                                    >
+                                        {player.name}
+                                    </div>
+                                ))}
+                                <h5>Selected Players</h5>
+                                {getSelectedPlayers(awayTeamId).map(player => (
+                                    <div
+                                        key={player.id}
+                                        className={styles.playerItem}
+                                        onClick={() => removeFromRoster(awayTeamId, player.id)}
+                                    >
+                                        {player.name}
+                                    </div>
+                                ))}
+                                {errors.awayRoster && <span className={styles.error}>{errors.awayRoster}</span>}
+                            </div>
                         </div>
-                    ))}
+                    </div>
+                )}
 
-                    {/* AWAY */}
-                    <h3>Away Roster</h3>
-                    <h4>Available Players</h4>
-                    {getAvailablePlayers(awayTeamId).map(player => (
-                        <div key={player.id} onClick={() => addToRoster(awayTeamId, player)}>
-                            {player.name}
-                        </div>
-                    ))}
-                    <h4>Selected Players</h4>
-                    {getSelectedPlayers(awayTeamId).map(player => (
-                        <div key={player.id} onClick={() => removeFromRoster(awayTeamId, player.id)}>
-                            {player.name}
-                        </div>
-                    ))}
-                </>
-            )}
-            {errors.homeRoster && <span style={{color: 'red'}}>{errors.homeRoster}</span>}
-            {errors.awayRoster && <span style={{color: 'red'}}>{errors.awayRoster}</span>}
-
-            {/* Rink Images */}
-            <h3>Rink Image</h3>
-
-            <label>
-                <input
-                    type="radio"
-                    name="rinkImage"
-                    value={rinkImages.rinkUp}
-                    checked={selectedImage === rinkImages.rinkUp}
-                    onChange={(e) => setSelectedImage(e.target.value)}
-                />
-                Up
-                <img src={rinkImages.rinkUp || undefined} alt="Up"/>
-            </label>
-
-            <label>
-                <input
-                    type="radio"
-                    name="rinkImage"
-                    value={rinkImages.rinkDown}
-                    checked={selectedImage === rinkImages.rinkDown}
-                    onChange={(e) => setSelectedImage(e.target.value)}
-                />
-                Down
-                <img src={rinkImages.rinkDown || undefined} alt="Down"/>
-            </label>
-
-            {errors.rinkImage && <span style={{color: 'red'}}>{errors.rinkImage}</span>}
-
-            <Button styleType={"positive"} type="submit">Start Game</Button>
-            <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
-        </form>
+                <div className={styles.buttonGroup}>
+                    <Button styleType={"positive"} type="submit">Start Game</Button>
+                    <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
+                </div>
+            </form>
+        </div>
     );
 };
 

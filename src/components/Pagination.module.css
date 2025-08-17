@@ -1,0 +1,60 @@
+.paginationContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.pageInfo {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0 1rem;
+}
+
+.perPageSelect {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.perPageSelect:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.perPageLabel {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-right: 0.5rem;
+}
+
+.perPageContainer {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 480px) {
+    .buttonGroup {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .perPageContainer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .perPageLabel {
+        margin-right: 0;
+    }
+}

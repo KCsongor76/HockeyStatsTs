@@ -14,6 +14,7 @@ import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
+import styles from "./HandlePlayerPage.module.css"
 
 const HandlePlayerPage = () => {
     const data = useLocation();
@@ -134,14 +135,19 @@ const HandlePlayerPage = () => {
     }, [player.teamId]);
 
     return (
-        <div>
-            <p>Name: {player.name}</p>
-            <p>Current team: {team?.name}</p>
-            <p>Position: {player.position}</p>
-            <p>Jersey number: {player.jerseyNumber}</p>
+        <div className={styles.playerContainer}>
+            <div className={styles.playerHeader}>
+                <h1>Player Details</h1>
+                <div className={styles.playerInfo}>
+                    <p>Name: {player.name}</p>
+                    <p>Current team: {team?.name}</p>
+                    <p>Position: {player.position}</p>
+                    <p>Jersey number: {player.jerseyNumber}</p>
+                </div>
+            </div>
 
             {isEditing ? (
-                <>
+                <div className={styles.editForm}>
                     <Input
                         label="Name:"
                         type="text"
@@ -167,17 +173,24 @@ const HandlePlayerPage = () => {
                     />
 
                     {error && <p style={{color: 'red'}}>{error}</p>}
-                    <Button styleType={"positive"} type="button" onClick={saveHandler}>Save Changes</Button>
-                    <Button styleType={"negative"} type="button" onClick={() => setIsEditing(false)}>Discard Changes</Button>
-                </>
-            ) : <Button styleType={"neutral"} type="button" onClick={() => setIsEditing(true)}>Edit player</Button>}
+                    <div className={styles.buttonGroup}>
+                        <Button styleType={"positive"} type="button" onClick={saveHandler}>Save Changes</Button>
+                        <Button styleType={"negative"} type="button" onClick={() => setIsEditing(false)}>Discard
+                            Changes</Button>
+                    </div>
+                </div>
+            ) : (
+                <div className={styles.buttonGroup}>
+                    <Button styleType={"neutral"} type="button" onClick={() => setIsEditing(true)}>Edit player</Button>
+                </div>
+            )}
 
             <Select
                 label="Season:"
                 value={selectedSeason}
                 onChange={(e) => setSelectedSeason(e.target.value as Season)}
                 options={[
-                    { value: "", label: "All Seasons" },
+                    {value: "", label: "All Seasons"},
                     ...Object.values(Season).map(season => ({
                         value: season,
                         label: season
@@ -191,7 +204,7 @@ const HandlePlayerPage = () => {
                     value={selectedTeamId}
                     onChange={(e) => setSelectedTeamId(e.target.value)}
                     options={[
-                        { value: "", label: "All Teams" },
+                        {value: "", label: "All Teams"},
                         ...availableTeams.map(team => ({
                             value: team.id,
                             label: team.name
@@ -200,18 +213,18 @@ const HandlePlayerPage = () => {
                 />
             )}
 
-            <div>
+            <div className={styles.statsSection}>
                 <h3>Regular Season Players Stats</h3>
                 <PlayerTable pageType="player" player={player} games={filteredGamesRegular}/>
             </div>
 
-            <div>
+            <div className={styles.statsSection}>
                 <h3>Playoff Players Stats</h3>
                 <PlayerTable pageType="player" player={player} games={filteredGamesPlayoff}/>
             </div>
 
-            <div>
-                <div onClick={() => setShowGames(!showGames)}>
+            <div className={styles.statsSection}>
+                <div className={styles.statsHeader} onClick={() => setShowGames(!showGames)}>
                     <h3>Games Played {getFilteredGames().length > 0 && `(${getFilteredGames().length})`}</h3>
                     <span>{showGames ? '▲' : '▼'}</span>
                 </div>
@@ -224,20 +237,22 @@ const HandlePlayerPage = () => {
                 )}
             </div>
 
-            <Button
-                styleType={"positive"}
-                type="button"
-                onClick={() => navigate(`../transfer/:${player.id}`, {state: {player, team}})}
-            >
-                Transfer
-            </Button>
-            <Button
-                styleType={"negative"}
-                type="button"
-                onClick={() => navigate(-1)}
-            >
-                Go back
-            </Button>
+            <div className={styles.buttonGroup}>
+                <Button
+                    styleType={"positive"}
+                    type="button"
+                    onClick={() => navigate(`../transfer/:${player.id}`, {state: {player, team}})}
+                >
+                    Transfer
+                </Button>
+                <Button
+                    styleType={"negative"}
+                    type="button"
+                    onClick={() => navigate(-1)}
+                >
+                    Go back
+                </Button>
+            </div>
         </div>
     );
 };

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {signOut} from "firebase/auth";
-import {auth} from "../firebase";
+import styles from "./HomePage.module.css";
 
 interface HomePageProps {
     isSignedIn: boolean | undefined;
@@ -70,20 +69,21 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
     }, [isSignedIn]);
 
     return (
-        <div>
-            <header>
+        <div className={styles.homeContainer}>
+            <header className={styles.header}>
                 <h1>Hockey Game Tracker</h1>
                 <p>Your comprehensive hockey game management platform</p>
             </header>
 
-            <div>
+            <div className={styles.menuGrid}>
                 {menuItems.map((item, index) => (
                     <div
                         key={index}
+                        className={styles.menuItem}
                         onClick={() => navigate(item.path)}
                     >
-                        <div>{item.icon}</div>
-                        <div>
+                        <div className={styles.icon}>{item.icon}</div>
+                        <div className={styles.content}>
                             <h2>{item.title}</h2>
                             <p>{item.description}</p>
                         </div>

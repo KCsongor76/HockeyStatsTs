@@ -1,11 +1,11 @@
 // PlayerTable.tsx
-import React, { useState } from 'react';
-import styles from "../pages/GamePage.module.css";
+import React, {useState} from 'react';
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Player} from "../OOP/classes/Player";
 import {IGame} from "../OOP/interfaces/IGame";
 import {useNavigate} from "react-router-dom";
 import Button from "./Button";
+import styles from "./PlayerTable.module.css";
 
 interface PlayerTableProps {
     pageType: "player" | "team" | "game";
@@ -17,7 +17,18 @@ interface PlayerTableProps {
 }
 
 type SortDirection = 'asc' | 'desc';
-type SortableField = 'name' | 'jerseyNumber' | 'position' | 'gamesPlayed' | 'goals' | 'assists' | 'points' | 'shots' | 'hits' | 'turnovers' | 'shotPercentage';
+type SortableField =
+    'name'
+    | 'jerseyNumber'
+    | 'position'
+    | 'gamesPlayed'
+    | 'goals'
+    | 'assists'
+    | 'points'
+    | 'shots'
+    | 'hits'
+    | 'turnovers'
+    | 'shotPercentage';
 
 const PlayerTable: React.FC<PlayerTableProps> = ({
                                                      pageType,
@@ -111,7 +122,7 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
         return (
             <th
                 onClick={() => handleSort(field)}
-                style={{ cursor: 'pointer' }}
+                style={{cursor: 'pointer'}}
             >
                 {label}
                 {sortField === field && (
@@ -264,10 +275,12 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
     };
 
     return (
-        <table>
-            {renderTableHead()}
-            {renderTableBody()}
-        </table>
+        <div className={styles.tableContainer}>
+            <table className={styles.table}>
+                {renderTableHead()}
+                {renderTableBody()}
+            </table>
+        </div>
     );
 };
 

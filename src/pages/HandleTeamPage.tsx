@@ -15,6 +15,7 @@ import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
+import styles from "./HandleTeamPage.module.css"
 
 const HandleTeamPage = () => {
     const location = useLocation();
@@ -169,12 +170,14 @@ const HandleTeamPage = () => {
     const playoffTeamStats = Team.getTeamStats(team, playoffGames);
 
     return (
-        <div>
-            <img src={team.logo} alt={team.name} style={{width: '100px', height: '100px'}}/>
-            <h1>{team.name}</h1>
+        <div className={styles.teamContainer}>
+            <div className={styles.teamHeader}>
+                <img src={team.logo} alt={team.name} className={styles.teamLogo}/>
+                <h1>{team.name}</h1>
+            </div>
 
             {isEditing ? (
-                <div>
+                <div className={styles.editForm}>
                     <div>
                         <Input
                             label="Team name:"
@@ -194,7 +197,7 @@ const HandleTeamPage = () => {
                     </div>
 
                     {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
-                    <div>
+                    <div className={styles.buttonGroup}>
                         <Button styleType={"positive"} type="button" onClick={handleSave}>
                             Save Changes
                         </Button>
@@ -204,9 +207,11 @@ const HandleTeamPage = () => {
                     </div>
                 </div>
             ) : (
-                <Button styleType={"neutral"} type="button" onClick={handleEdit}>
-                    Edit Team
-                </Button>
+                <div className={styles.buttonGroup}>
+                    <Button styleType={"neutral"} type="button" onClick={handleEdit}>
+                        Edit Team
+                    </Button>
+                </div>
             )}
 
             <Select
@@ -235,8 +240,8 @@ const HandleTeamPage = () => {
                 ]}
             />
 
-            <div>
-                <div onClick={() => setShowPlayers(!showPlayers)}>
+            <div className={styles.statsSection}>
+                <div className={styles.statsHeader} onClick={() => setShowPlayers(!showPlayers)}>
                     <h3>Players {filteredPlayers.length > 0 && `(${filteredPlayers.length})`}</h3>
                     <span>{showPlayers ? '▲' : '▼'}</span>
                 </div>
@@ -259,7 +264,7 @@ const HandleTeamPage = () => {
                 )}
             </div>
 
-            <div>
+            <div className={styles.statsSection}>
                 <h3>Regular Season Team Stats</h3>
                 <TeamTable stats={regularTeamStats}/>
 
@@ -267,8 +272,8 @@ const HandleTeamPage = () => {
                 <TeamTable stats={playoffTeamStats}/>
             </div>
 
-            <div>
-                <div onClick={() => setShowGames(!showGames)}>
+            <div className={styles.statsSection}>
+                <div className={styles.statsHeader} onClick={() => setShowGames(!showGames)}>
                     <h3>Team Games {getFilteredGames().length > 0 && `(${getFilteredGames().length})`}</h3>
                     <span>{showGames ? '▲' : '▼'}</span>
                 </div>
@@ -281,7 +286,9 @@ const HandleTeamPage = () => {
                 )}
             </div>
 
-            <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
+            <div className={styles.buttonGroup}>
+                <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
+            </div>
         </div>
     );
 };

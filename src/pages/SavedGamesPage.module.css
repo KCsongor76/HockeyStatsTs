@@ -1,0 +1,108 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.gameList {
+    list-style: none;
+    padding: 0;
+}
+
+.gameItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.gameItem:hover {
+    background-color: #e2e8f0;
+}
+
+.gameTeams {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
+.gameScore {
+    font-weight: bold;
+    margin: 0 1rem;
+}
+
+.gameLogo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.gameInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.pagination {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .gameItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .gameTeams {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .gameInfo {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .gameTeams {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .gameScore {
+        margin: 0.5rem 0;
+    }
+}

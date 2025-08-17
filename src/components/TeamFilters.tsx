@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from "./Button";
-import styles from "../pages/GamePage.module.css";
+import styles from "./TeamFilters.module.css";
 
 interface Props {
     teamView: "all" | "home" | "away";
@@ -9,11 +9,11 @@ interface Props {
 
 const TeamFilters = ({teamView, setTeamView}: Props) => {
     return (
-        <>
+        <div className={styles.filterContainer}>
             <Button
                 styleType={"neutral"}
                 type="button"
-                className={teamView === 'all' ? styles.active : ''}
+                className={teamView === 'all' ? styles.activeButton : ''}
                 onClick={() => setTeamView('all')}
             >
                 All Teams
@@ -21,7 +21,7 @@ const TeamFilters = ({teamView, setTeamView}: Props) => {
             <Button
                 styleType={"neutral"}
                 type="button"
-                className={teamView === 'home' ? styles.active : ''}
+                className={teamView === 'home' ? styles.activeButton : ''}
                 onClick={() => setTeamView('home')}
             >
                 Home Team
@@ -29,12 +29,12 @@ const TeamFilters = ({teamView, setTeamView}: Props) => {
             <Button
                 styleType={"neutral"}
                 type="button"
-                className={teamView === 'away' ? styles.active : ''}
+                className={teamView === 'away' ? styles.activeButton : ''}
                 onClick={() => setTeamView('away')}
             >
                 Away Team
             </Button>
-        </>
+        </div>
     );
 };
 

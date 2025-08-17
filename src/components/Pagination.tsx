@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import Button from "./Button";
+import styles from "./Pagination.module.css"
 
 interface PaginationProps {
     pagination: { page: number, perPage: number };
@@ -31,8 +32,8 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
     }, [pagination.page, pagination.perPage]);
 
     return (
-        <div>
-            <div>
+        <div className={styles.paginationContainer}>
+            <div className={styles.buttonGroup}>
                 <Button
                     styleType={"neutral"}
                     type="button"
@@ -41,6 +42,10 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
                 >
                     Previous
                 </Button>
+
+                <span className={styles.pageInfo}>
+                Page {pagination.page} of {totalPages}
+            </span>
 
                 <Button
                     styleType={"neutral"}
@@ -52,19 +57,23 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
                 </Button>
             </div>
 
-            <select
-                value={pagination.perPage}
-                onChange={e => setPagination({
-                    page: 1,
-                    perPage: parseInt(e.target.value)
-                })}
-            >
-                {perPageOptions.map(option => (
-                    <option key={option} value={option}>
-                        {option} per page
-                    </option>
-                ))}
-            </select>
+            <div className={styles.perPageContainer}>
+                <span className={styles.perPageLabel}>Show:</span>
+                <select
+                    className={styles.perPageSelect}
+                    value={pagination.perPage}
+                    onChange={e => setPagination({
+                        page: 1,
+                        perPage: parseInt(e.target.value)
+                    })}
+                >
+                    {perPageOptions.map(option => (
+                        <option key={option} value={option}>
+                            {option} per page
+                        </option>
+                    ))}
+                </select>
+            </div>
         </div>
     );
 };

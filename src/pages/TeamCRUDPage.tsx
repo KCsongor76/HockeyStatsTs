@@ -10,6 +10,7 @@ import Pagination from "../components/Pagination";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
+import styles from "./TeamCRUDPage.module.css"
 
 const TeamCrudPage = () => {
     const loaderData = useLoaderData() as {
@@ -54,58 +55,70 @@ const TeamCrudPage = () => {
     };
 
     return (
-        <div>
-            <Button
-                styleType={"positive"}
-                onClick={() => navigate("create", {state: {teams: teams}})}
-            >
-                Create New Team
-            </Button>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1>Teams Management</h1>
+                <Button
+                    styleType={"positive"}
+                    onClick={() => navigate("create", {state: {teams: teams}})}
+                >
+                    Create New Team
+                </Button>
+            </div>
 
-            <Input
-                label="Search by name"
-                value={filters.name}
-                onChange={(e) => setFilters(prevState => ({...prevState, name: e.target.value}))}
-                placeholder="Search by name"
-            />
+            <div className={styles.filters}>
+                <Input
+                    label="Search by name"
+                    value={filters.name}
+                    onChange={(e) => setFilters(prevState => ({...prevState, name: e.target.value}))}
+                    placeholder="Search by name"
+                />
 
-            <Select
-                label="Filter by season"
-                value={filters.season}
-                onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
-                options={[
-                    { value: "", label: "All Seasons" },
-                    ...Object.values(Season).map(season => ({
-                        value: season,
-                        label: season
-                    }))
-                ]}
-            />
+                <Select
+                    label="Filter by season"
+                    value={filters.season}
+                    onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
+                    options={[
+                        {value: "", label: "All Seasons"},
+                        ...Object.values(Season).map(season => ({
+                            value: season,
+                            label: season
+                        }))
+                    ]}
+                />
 
-            <Select
-                label="Filter by championship"
-                value={filters.championship}
-                onChange={e => setFilters(prevState => ({...prevState, championship: e.target.value}))}
-                options={[
-                    { value: "", label: "All Championships" },
-                    ...Object.values(Championship).map(championship => ({
-                        value: championship,
-                        label: championship
-                    }))
-                ]}
-            />
+                <Select
+                    label="Filter by championship"
+                    value={filters.championship}
+                    onChange={e => setFilters(prevState => ({...prevState, championship: e.target.value}))}
+                    options={[
+                        {value: "", label: "All Championships"},
+                        ...Object.values(Championship).map(championship => ({
+                            value: championship,
+                            label: championship
+                        }))
+                    ]}
+                />
+            </div>
 
-            <ul>
+            <ul className={styles.teamList}>
                 {paginatedTeams.length > 0 ? paginatedTeams.map((team: ITeam) =>
-                    <li key={team.id}>
-                        <p>{team.name}</p>
-                        <Button styleType={"neutral"} onClick={() => navigate(`${team.id}`, {state: {team, games}})}>View</Button>
-                        <Button styleType={"negative"} onClick={() => deleteHandler(team)}>Delete</Button>
+                    <li key={team.id} className={styles.teamItem}>
+                        <div className={styles.teamInfo}>
+                            <p>{team.name}</p>
+                        </div>
+                        <div className={styles.teamActions}>
+                            <Button styleType={"neutral"}
+                                    onClick={() => navigate(`${team.id}`, {state: {team, games}})}>View</Button>
+                            <Button styleType={"negative"} onClick={() => deleteHandler(team)}>Delete</Button>
+                        </div>
                     </li>
                 ) : <p>No teams found</p>}
             </ul>
 
-            <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
+            <div className={styles.pagination}>
+                <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
+            </div>
 
             <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
         </div>

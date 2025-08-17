@@ -1,0 +1,127 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.colorGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.rinkImages {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.rinkOption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid transparent;
+}
+
+.rinkOption.selected {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.rinkOption img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.rosterSection {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+}
+
+.rosterHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.rosterContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.rosterColumn h4 {
+    margin-bottom: 0.5rem;
+}
+
+.playerItem {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    background-color: #e2e8f0;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.playerItem:hover {
+    background-color: #cbd5e1;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .rosterContent {
+        grid-template-columns: 1fr;
+    }
+
+    .colorGroup {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .rinkImages {
+        flex-direction: column;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+}
