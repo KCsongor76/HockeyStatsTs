@@ -4,6 +4,9 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 
 const CreatePlayerPage = () => {
     const location = useLocation()
@@ -67,80 +70,72 @@ const CreatePlayerPage = () => {
 
     return (
         <form onSubmit={submitHandler}>
-            <label>
-                Name:
-                <input
-                    type="text"
-                    value={playerData.name}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, name: e.target.value}))
-                        setErrors(prev => ({...prev, name: ''}))
-                    }}
-                    required
-                />
-            </label>
-            {errors.name && <span>{errors.name}</span>}
+            <Input
+                label="Name:"
+                type="text"
+                value={playerData.name}
+                onChange={(e) => {
+                    setPlayerData(prev => ({...prev, name: e.target.value}))
+                    setErrors(prev => ({...prev, name: ''}))
+                }}
+                required
+                error={errors.name}
+            />
 
-            <label>
-                Jersey number:
-                <input
-                    type="number"
-                    value={playerData.jerseyNumber}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, jerseyNumber: Number(e.target.value)}))
-                        setErrors(prev => ({...prev, jerseyNumber: ''}))
-                    }}
-                    required
-                    min={1}
-                    max={99}
-                />
-            </label>
-            {errors.jerseyNumber && <span>{errors.jerseyNumber}</span>}
+            <Input
+                label="Jersey number:"
+                type="number"
+                value={playerData.jerseyNumber}
+                onChange={(e) => {
+                    setPlayerData(prev => ({...prev, jerseyNumber: Number(e.target.value)}))
+                    setErrors(prev => ({...prev, jerseyNumber: ''}))
+                }}
+                required
+                min={1}
+                max={99}
+                error={errors.jerseyNumber}
+            />
 
-            <label>
-                Position:
-                <select
-                    value={playerData.position}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, position: e.target.value as Position}))
-                    }}
-                >
-                    {Object.values(Position).map((position) => (
-                        <option key={position} value={position}>{position}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Position:"
+                value={playerData.position}
+                onChange={(e) => {
+                    setPlayerData(prev => ({...prev, position: e.target.value as Position}))
+                }}
+                options={Object.values(Position).map(position => ({
+                    value: position,
+                    label: position
+                }))}
+            />
 
-            <label>
-                Free Agent
-                <input
-                    type="checkbox"
-                    checked={isFreeAgent}
-                    onChange={() => setIsFreeAgent(!isFreeAgent)}
-                />
-            </label>
+            <Input
+                label="Free Agent"
+                type="checkbox"
+                checked={isFreeAgent}
+                onChange={() => setIsFreeAgent(!isFreeAgent)}
+            />
 
             {!isFreeAgent && (
-                <label>
-                    Team:
-                    <select
-                        value={playerData.teamId}
-                        onChange={(e) => {
-                            setPlayerData(prev => ({...prev, teamId: e.target.value}))
-                        }}
-                    >
-                        {teams
-                            .filter(team => team.id !== "free-agent")
-                            .map((team) => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
-                    </select>
-                </label>
+                <Select
+                    label="Team:"
+                    value={playerData.teamId}
+                    onChange={(e) => {
+                        setPlayerData(prev => ({...prev, teamId: e.target.value}))
+                    }}
+                    options={teams
+                        .filter(team => team.id !== "free-agent")
+                        .map(team => ({
+                            value: team.id,
+                            label: team.name
+                        }))
+                    }
+                />
             )}
-            {errors.general && <span>{errors.general}</span>}
 
-            <button type="submit">Create player</button>
-            <button type="button" onClick={() => navigate(-1)}>Go Back</button>
+            {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
+
+            <Button styleType={"positive"} type="submit">Create player</Button>
+            <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
         </form>
     );
 };

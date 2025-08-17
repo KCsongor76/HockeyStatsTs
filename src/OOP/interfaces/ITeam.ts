@@ -15,5 +15,5 @@ export interface ITeam {
         secondary: string;
     }
     players: IPlayer[]
-    roster?: IPlayer[]
+    roster: IPlayer[]
 }

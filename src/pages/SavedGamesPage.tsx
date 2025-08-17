@@ -8,6 +8,7 @@ import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
+import Select from "../components/Select";
 
 interface SavedGamesPageProps {
     playerGames?: IGame[];
@@ -56,7 +57,6 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                 setIsLoading(true);
                 setError(null);
 
-                // Only fetch data if we don't have playerGames provided as props
                 if (!playerGames) {
                     const [teamsData, gamesData] = await Promise.all([
                         TeamService.getAllTeams(),
@@ -93,76 +93,74 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         <div>
             {showFilters && (
                 <>
-                    <label>
-                        Home team:
-                        <select
-                            value={homeTeamId}
-                            onChange={(e) => setHomeTeamId(e.target.value)}
-                        >
-                            {teams.map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
-                        </select>
-                    </label>
+                    <Select
+                        label="Home team:"
+                        value={homeTeamId}
+                        onChange={(e) => setHomeTeamId(e.target.value)}
+                        options={teams.map(team => ({
+                            value: team.id,
+                            label: team.name
+                        }))}
+                    />
 
-                    <label>
-                        Away team:
-                        <select
-                            value={awayTeamId}
-                            onChange={(e) => setAwayTeamId(e.target.value)}
-                        >
-                            {teams.map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
-                        </select>
-                    </label>
+                    <Select
+                        label="Away team:"
+                        value={awayTeamId}
+                        onChange={(e) => setAwayTeamId(e.target.value)}
+                        options={teams.map(team => ({
+                            value: team.id,
+                            label: team.name
+                        }))}
+                    />
 
-                    <label>
-                        Championship:
-                        <select
-                            value={championship}
-                            onChange={(e) => setChampionship(e.target.value as Championship)}
-                        >
-                            <option key="" value="">All Championships</option>
-                            {Object.values(Championship).map(championship => (
-                                <option key={championship} value={championship}>{championship}</option>
-                            ))}
-                        </select>
-                    </label>
+                    <Select
+                        label="Championship:"
+                        value={championship}
+                        onChange={(e) => setChampionship(e.target.value as Championship)}
+                        options={[
+                            { value: "", label: "All Championships" },
+                            ...Object.values(Championship).map(championship => ({
+                                value: championship,
+                                label: championship
+                            }))
+                        ]}
+                    />
 
-                    <label>
-                        Season:
-                        <select
-                            value={season}
-                            onChange={(e) => setSeason(e.target.value as Season)}
-                        >
-                            <option key="" value="">All Seasons</option>
-                            {Object.values(Season).map(season => (
-                                <option key={season} value={season}>{season}</option>
-                            ))}
-                        </select>
-                    </label>
+                    <Select
+                        label="Season:"
+                        value={season}
+                        onChange={(e) => setSeason(e.target.value as Season)}
+                        options={[
+                            { value: "", label: "All Seasons" },
+                            ...Object.values(Season).map(season => ({
+                                value: season,
+                                label: season
+                            }))
+                        ]}
+                    />
 
-                    <label>
-                        GameType:
-                        <select
-                            value={gameType}
-                            onChange={(e) => setGameType(e.target.value as GameType)}
-                        >
-                            <option key="" value="">All GameTypes</option>
-                            {Object.values(GameType).map(gameType => (
-                                <option key={gameType} value={gameType}>{gameType}</option>
-                            ))}
-                        </select>
+                    <Select
+                        label="GameType:"
+                        value={gameType}
+                        onChange={(e) => setGameType(e.target.value as GameType)}
+                        options={[
+                            { value: "", label: "All GameTypes" },
+                            ...Object.values(GameType).map(gameType => ({
+                                value: gameType,
+                                label: gameType
+                            }))
+                        ]}
+                    />
 
-                        <select
-                            value={sortOrder}
-                            onChange={(e) => setSortOrder(e.target.value)}
-                        >
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
-                        </select>
-                    </label>
+                    <Select
+                        label="Sort order:"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                        options={[
+                            { value: "newest", label: "Newest First" },
+                            { value: "oldest", label: "Oldest First" }
+                        ]}
+                    />
                 </>
             )}
 
@@ -188,7 +186,6 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
 
                             <span>Type: {game.type}</span>
                             <span>Season: {game.season || "Not specified"}</span>
-                            {/*<span>Championship: {game.championship}</span>*/}
                         </li>
                     ))
                 ) : <p>No games found.</p>}

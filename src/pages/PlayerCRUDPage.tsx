@@ -9,6 +9,9 @@ import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Position} from "../OOP/enums/Position";
 import Pagination from "../components/Pagination";
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 
 const PlayerCrudPage = () => {
     const loaderData = useLoaderData() as {
@@ -23,9 +26,7 @@ const PlayerCrudPage = () => {
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
     const navigate = useNavigate();
 
-    // Update the filteredPlayers filter logic to include the season filter
     const filteredPlayers = players.filter(player => {
-        // Get all games where this player participated (based on teamId)
         const playerGames = games.filter(game =>
             game.teams.home.id === player.teamId ||
             game.teams.away.id === player.teamId
@@ -49,91 +50,96 @@ const PlayerCrudPage = () => {
     const deleteHandler = async (player: IPlayer) => {
         if (window.confirm(`Delete ${player.name}?`)) {
             await PlayerService.deletePlayer(player.teamId, player.id);
-            // Update local state to remove deleted player
             setPlayers(prev => prev.filter(p => p.id !== player.id));
         }
     };
 
     return (
         <div>
-            <button onClick={() => navigate("create", {state: {teams: teams}})}>Create New Player</button>
+            <Button styleType={"positive"} onClick={() => navigate("create", {state: {teams: teams}})}>Create New Player</Button>
 
-            <label>
-                Search by name
-                <input
-                    type="text"
-                    name="nameSearch"
-                    value={filters.search}
-                    onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
-                    placeholder={"Search by name"}
-                />
-            </label>
+            <Input
+                label="Search by name"
+                type="text"
+                name="nameSearch"
+                value={filters.search}
+                onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
+                placeholder="Search by name"
+            />
 
-            <label>
-                Filter by jersey number
-                <input
-                    type="number"
-                    name="numberFilter"
-                    value={filters.jerseyNr}
-                    onChange={e => setFilters(prevState => ({...prevState, jerseyNr: e.target.value}))}
-                    placeholder={"Search by jersey number"}
-                    min={1}
-                    max={99}
-                />
-            </label>
+            <Input
+                label="Filter by jersey number"
+                type="number"
+                name="numberFilter"
+                value={filters.jerseyNr}
+                onChange={e => setFilters(prevState => ({...prevState, jerseyNr: e.target.value}))}
+                placeholder="Search by jersey number"
+                min={1}
+                max={99}
+            />
 
-            <label>
-                Filter by team
-                <select
-                    value={filters.team}
-                    onChange={e => setFilters(prevState => ({...prevState, team: e.target.value}))}
-                >
-                    <option key="All Teams" value="">All Teams</option>
-                    {teams.map((team) => (
-                        <option key={team.id} value={team.id}>{team.name}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Filter by team"
+                value={filters.team}
+                onChange={e => setFilters(prevState => ({...prevState, team: e.target.value}))}
+                options={[
+                    { value: "", label: "All Teams" },
+                    ...teams.map(team => ({
+                        value: team.id,
+                        label: team.name
+                    }))
+                ]}
+            />
 
-            <label>
-                Filter by position
-                <select
-                    value={filters.position}
-                    onChange={e => setFilters(prevState => ({...prevState, position: e.target.value}))}
-                >
-                    <option key="All Positions" value="">All Positions</option>
-                    {Object.values(Position).map((position) => (
-                        <option key={position} value={position}>{position}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Filter by position"
+                value={filters.position}
+                onChange={e => setFilters(prevState => ({...prevState, position: e.target.value}))}
+                options={[
+                    { value: "", label: "All Positions" },
+                    ...Object.values(Position).map(position => ({
+                        value: position,
+                        label: position
+                    }))
+                ]}
+            />
 
-            <label>
-                Filter by season
-                <select
-                    value={filters.season}
-                    onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
-                >
-                    <option key="All Seasons" value="">All Seasons</option>
-                    {Object.values(Season).map((season) => (
-                        <option key={season} value={season}>{season}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Filter by season"
+                value={filters.season}
+                onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
+                options={[
+                    { value: "", label: "All Seasons" },
+                    ...Object.values(Season).map(season => ({
+                        value: season,
+                        label: season
+                    }))
+                ]}
+            />
 
             <ul>
                 {paginatedPlayers.length > 0 ? paginatedPlayers.map((player: IPlayer) =>
                     <li key={player.id}>
                         <p>{player.name}</p>
-                        <button onClick={() => navigate(`${player.id}`, {state: {player, games}})}>View</button>
-                        <button onClick={() => deleteHandler(player)}>Delete</button>
+                        <Button
+                            styleType={"neutral"}
+                            onClick={() => navigate(`${player.id}`, {state: {player, games}})}
+                        >
+                            View
+                        </Button>
+                        <Button
+                            styleType={"negative"}
+                            onClick={() => deleteHandler(player)}
+                        >
+                            Delete
+                        </Button>
                     </li>
                 ) : <p>No teams found</p>}
             </ul>
 
             <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
 
-            <button onClick={() => navigate(-1)}>Go Back</button>
+            <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
         </div>
     );
 };

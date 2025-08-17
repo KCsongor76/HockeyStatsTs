@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import Button from "./Button";
 
 interface PaginationProps {
     pagination: { page: number, perPage: number };
@@ -32,21 +33,23 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
     return (
         <div>
             <div>
-                <button
+                <Button
+                    styleType={"neutral"}
                     type="button"
                     disabled={pagination.page === 1}
                     onClick={goToPreviousPage}
                 >
                     Previous
-                </button>
+                </Button>
 
-                <button
+                <Button
+                    styleType={"neutral"}
                     type="button"
                     disabled={pagination.page >= totalPages}
                     onClick={goToNextPage}
                 >
                     Next
-                </button>
+                </Button>
             </div>
 
             <select

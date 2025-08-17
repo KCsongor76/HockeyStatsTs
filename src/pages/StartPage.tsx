@@ -7,6 +7,9 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {GameType} from "../OOP/enums/GameType";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../firebase";
+import Button from "../components/Button";
+import Select from "../components/Select";
+import Input from "../components/Input";
 
 const StartPage = () => {
     const loaderData = useLoaderData();
@@ -127,111 +130,98 @@ const StartPage = () => {
 
     return (
         <form onSubmit={submitHandler}>
-            <label>
-                Season:
-                <select value={season} onChange={e => setSeason(e.target.value as Season)}>
-                    {Object.values(Season).map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Season:"
+                value={season}
+                onChange={e => setSeason(e.target.value as Season)}
+                options={Object.values(Season).map(s => ({
+                    value: s,
+                    label: s
+                }))}
+            />
 
-            <label>
-                Championship:
-                <select
-                    value={championship}
-                    onChange={e => setChampionship(e.target.value as Championship)}
-                >
-                    {Object.values(Championship).map((ch) => (
-                        <option key={ch} value={ch}>{ch}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Championship:"
+                value={championship}
+                onChange={e => setChampionship(e.target.value as Championship)}
+                options={Object.values(Championship).map(ch => ({
+                    value: ch,
+                    label: ch
+                }))}
+            />
 
-            <label>
-                Home team:
-                <select
-                    value={homeTeamId}
-                    onChange={e => setHomeTeamId(e.target.value)}
-                >
-                    {teams.filter(t => t.championships.includes(championship))
-                        .map(team => (
-                            <option key={team.id} value={team.id}>{team.name}</option>
-                        ))}
-                </select>
-            </label>
-            {errors.homeTeamId && <span>{errors.homeTeamId}</span>}
+            <Select
+                label="Home team:"
+                value={homeTeamId}
+                onChange={e => setHomeTeamId(e.target.value)}
+                options={teams.filter(t => t.championships.includes(championship))
+                    .map(team => ({
+                        value: team.id,
+                        label: team.name
+                    }))
+                }
+                error={errors.homeTeamId}
+            />
 
-            <label>
-                Away team:
-                <select
-                    value={awayTeamId}
-                    onChange={e => setAwayTeamId(e.target.value)}
-                >
-                    {teams.filter(t => t.championships.includes(championship))
-                        .map(team => (
-                            <option key={team.id} value={team.id}>{team.name}</option>
-                        ))}
-                </select>
-            </label>
-            {errors.awayTeamId && <span>{errors.awayTeamId}</span>}
-            {errors.sameTeams && <span>{errors.sameTeams}</span>}
+            <Select
+                label="Away team:"
+                value={awayTeamId}
+                onChange={e => setAwayTeamId(e.target.value)}
+                options={teams.filter(t => t.championships.includes(championship))
+                    .map(team => ({
+                        value: team.id,
+                        label: team.name
+                    }))
+                }
+                error={errors.awayTeamId}
+            />
+            {errors.sameTeams && <span style={{color: 'red'}}>{errors.sameTeams}</span>}
 
-            <label>
-                Game type:
-                <select
-                    value={gameType}
-                    onChange={e => setGameType(e.target.value as GameType)}
-                >
-                    {Object.values(GameType).map((gt) => (
-                        <option key={gt} value={gt}>{gt}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Game type:"
+                value={gameType}
+                onChange={e => setGameType(e.target.value as GameType)}
+                options={Object.values(GameType).map(gt => ({
+                    value: gt,
+                    label: gt
+                }))}
+            />
 
-            {/* Colors */}
-            <label>
-                Home Primary color
-                <input
-                    type="color"
-                    value={homeColors.primary}
-                    onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
-                />
-            </label>
+            <Input
+                label="Home Primary color"
+                type="color"
+                value={homeColors.primary}
+                onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
+            />
 
-            <label>
-                Home Secondary color
-                <input
-                    type="color"
-                    value={homeColors.secondary}
-                    onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
-                />
-            </label>
-            {errors.homeColors && <span>{errors.homeColors}</span>}
+            <Input
+                label="Home Secondary color"
+                type="color"
+                value={homeColors.secondary}
+                onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
+                error={errors.homeColors}
+            />
 
-            <label>
-                Away Primary color
-                <input
-                    type="color"
-                    value={awayColors.primary}
-                    onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
-                />
-            </label>
+            <Input
+                label="Away Primary color"
+                type="color"
+                value={awayColors.primary}
+                onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
+            />
 
-            <label>
-                Away Secondary color
-                <input
-                    type="color"
-                    value={awayColors.secondary}
-                    onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
-                />
-            </label>
-            {errors.awayColors && <span>{errors.awayColors}</span>}
-            {errors.sameColors && <span>{errors.sameColors}</span>}
+            <Input
+                label="Away Secondary color"
+                type="color"
+                value={awayColors.secondary}
+                onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
+                error={errors.awayColors}
+            />
+            {errors.sameColors && <span style={{color: 'red'}}>{errors.sameColors}</span>}
 
-            <button type="button" onClick={() => setShowRosters(!showRosters)}>
+            <Button styleType={showRosters ? "negative" : "positive"} type="button"
+                    onClick={() => setShowRosters(!showRosters)}>
                 {showRosters ? 'Hide Rosters' : 'Show Rosters'}
-            </button>
+            </Button>
 
             {showRosters && (
                 <>
@@ -266,8 +256,8 @@ const StartPage = () => {
                     ))}
                 </>
             )}
-            {errors.homeRoster && <span>{errors.homeRoster}</span>}
-            {errors.awayRoster && <span>{errors.awayRoster}</span>}
+            {errors.homeRoster && <span style={{color: 'red'}}>{errors.homeRoster}</span>}
+            {errors.awayRoster && <span style={{color: 'red'}}>{errors.awayRoster}</span>}
 
             {/* Rink Images */}
             <h3>Rink Image</h3>
@@ -295,12 +285,11 @@ const StartPage = () => {
                 Down
                 <img src={rinkImages.rinkDown || undefined} alt="Down"/>
             </label>
-            {errors.rinkImage && <span>{errors.rinkImage}</span>}
 
-            <button type="submit">Start Game</button>
-            <button type="button" onClick={() => navigate('/')}>
-                Go Back
-            </button>
+            {errors.rinkImage && <span style={{color: 'red'}}>{errors.rinkImage}</span>}
+
+            <Button styleType={"positive"} type="submit">Start Game</Button>
+            <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
         </form>
     );
 };
@@ -314,5 +303,5 @@ export const loader = async () => {
         getDownloadURL(ref(storage, "rink-images/icerink_up.jpg")),
     ]);
     const teams = teamsData.filter(t => t.id !== "free-agent")
-    return {teams, rinkDown, rinkUp}
-};
+    return {teams, rinkDown, rinkUp};
+}

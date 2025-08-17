@@ -8,6 +8,8 @@ import {IGameAction} from "../OOP/interfaces/IGameAction";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Position} from "../OOP/enums/Position";
 import ActionDetailsModal from "../modals/ActionDetailsModal";
+import PlayerTable from "../components/PlayerTable";
+import Button from "../components/Button";
 
 const SavedGameDetailPage = () => {
     const locationData = useLocation();
@@ -17,32 +19,13 @@ const SavedGameDetailPage = () => {
     const [selectedActionTypes, setSelectedActionTypes] = useState<ActionType[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
     const [selectedAction, setSelectedAction] = useState<IGameAction | null>(null); // New state for action details
-    const [skatersSortConfig, setSkatersSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-    const [goaliesSortConfig, setGoaliesSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
-    const getAvailablePeriods = () => {
-        const availablePeriods = new Set<number>();
-        game.actions.forEach(action => {
-            availablePeriods.add(action.period);
-        })
-        const periodsArray: number[] = [];
-        availablePeriods.forEach((period) => {
-            periodsArray.push(period);
-        })
-        return periodsArray;
-    }
+    const getAvailablePeriodsAndActionTypes = () => ({
+        availablePeriods: Array.from(new Set(game.actions.map(a => a.period))),
+        availableActionTypes: Array.from(new Set(game.actions.map(a => a.type)))
+    });
 
-    const getAvailableActionTypes = () => {
-        const availableActionTypes = new Set<ActionType>();
-        game.actions.forEach(action => {
-            availableActionTypes.add(action.type);
-        })
-        const actionTypesArray: ActionType[] = [];
-        availableActionTypes.forEach((actionType) => {
-            actionTypesArray.push(actionType);
-        })
-        return actionTypesArray;
-    }
+    const {availablePeriods, availableActionTypes} = getAvailablePeriodsAndActionTypes();
 
     const getFilteredPlayers = () => {
         if (!game) return [];
@@ -56,70 +39,14 @@ const SavedGameDetailPage = () => {
         return allPlayers;
     }
 
-    // todo:
-    const getPlayerStats = (player: IPlayer) => {
-        let goals = 0;
-        let assists = 0;
-        let shots = 0;
-        let hits = 0;
-        let turnovers = 0;
-
-        game.actions.forEach(action => {
-            if (action.player.id === player.id) {
-                switch (action.type) {
-                    case ActionType.GOAL:
-                        goals++;
-                        shots++;
-                        break;
-                    case ActionType.SHOT:
-                        shots++;
-                        break;
-                    case ActionType.HIT:
-                        hits++
-                        break;
-                    case ActionType.TURNOVER:
-                        turnovers++
-                        break;
-                }
-            } else {
-                if (action.assists?.some(p => p.id === player.id)) {
-                    assists++;
-                }
-            }
-        })
-
-        let shotPercentage;
-        if (player.position !== Position.GOALIE) {
-            // player is skater
-            shotPercentage = shots > 0 ? goals / shots : 0;
-        } else {
-            // player is goalie
-            if (player.teamId === game.teams.home.id) {
-                shotPercentage = (game.score.away.shots - game.score.away.goals) / game.score.away.shots;
-            } else {
-                shotPercentage = (game.score.home.shots - game.score.home.goals) / game.score.home.shots;
-            }
-        }
-        shotPercentage *= 100
-        const points = goals + assists;
-        return {goals, assists, points, shots, turnovers, hits, shotPercentage}
-    }
-
     const getFilteredActions = () => {
         if (!game) return [];
 
         return game.actions.filter(action => {
-            // Team filter
             if (teamView === 'home' && action.team.id !== game.teams.home.id) return false;
             if (teamView === 'away' && action.team.id !== game.teams.away.id) return false;
-
-            // Period filter
             if (selectedPeriods.length > 0 && !selectedPeriods.includes(action.period)) return false;
-
-            // Action type filter
             if (selectedActionTypes.length > 0 && !selectedActionTypes.includes(action.type)) return false;
-
-            // Player filter
             if (selectedPlayer) {
                 if (action.player.id !== selectedPlayer) {
                     // For goals, check assists too
@@ -131,45 +58,6 @@ const SavedGameDetailPage = () => {
             }
 
             return true;
-        });
-    };
-
-    const getSortedSkaters = () => {
-        const skaters = getFilteredPlayers().filter(p => p.position !== Position.GOALIE);
-        if (!skatersSortConfig) return skaters;
-
-        return [...skaters].sort((a, b) => {
-            const statsA = getPlayerStats(a);
-            const statsB = getPlayerStats(b);
-            const key = skatersSortConfig.key as keyof typeof statsA;
-
-            if (statsA[key] < statsB[key]) {
-                return skatersSortConfig.direction === 'asc' ? -1 : 1;
-            }
-            if (statsA[key] > statsB[key]) {
-                return skatersSortConfig.direction === 'asc' ? 1 : -1;
-            }
-            return 0;
-        });
-    };
-
-    // Get sorted goalies
-    const getSortedGoalies = () => {
-        const goalies = getFilteredPlayers().filter(p => p.position === Position.GOALIE);
-        if (!goaliesSortConfig) return goalies;
-
-        return [...goalies].sort((a, b) => {
-            const statsA = getPlayerStats(a);
-            const statsB = getPlayerStats(b);
-            const key = goaliesSortConfig.key as keyof typeof statsA;
-
-            if (statsA[key] < statsB[key]) {
-                return goaliesSortConfig.direction === 'asc' ? -1 : 1;
-            }
-            if (statsA[key] > statsB[key]) {
-                return goaliesSortConfig.direction === 'asc' ? 1 : -1;
-            }
-            return 0;
         });
     };
 
@@ -198,23 +86,6 @@ const SavedGameDetailPage = () => {
         );
     };
 
-    // New sorting functions
-    const handleSkatersSort = (key: string) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (skatersSortConfig && skatersSortConfig.key === key && skatersSortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSkatersSortConfig({key, direction});
-    };
-
-    const handleGoaliesSort = (key: string) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (goaliesSortConfig && goaliesSortConfig.key === key && goaliesSortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setGoaliesSortConfig({key, direction});
-    };
-
     const handleIconClick = (action: IGameAction) => {
         setSelectedAction(action);
     };
@@ -240,54 +111,59 @@ const SavedGameDetailPage = () => {
 
             <div>
                 <h3>Team View</h3>
-                <button
+                <Button
+                    styleType={"neutral"}
                     type="button"
                     className={teamView === 'all' ? styles.active : ''}
                     onClick={() => setTeamView('all')}
                 >
                     All Teams
-                </button>
-                <button
+                </Button>
+                <Button
+                    styleType={"neutral"}
                     type="button"
                     className={teamView === 'home' ? styles.active : ''}
                     onClick={() => setTeamView('home')}
                 >
                     Home Team
-                </button>
-                <button
+                </Button>
+                <Button
+                    styleType={"neutral"}
                     type="button"
                     className={teamView === 'away' ? styles.active : ''}
                     onClick={() => setTeamView('away')}
                 >
                     Away Team
-                </button>
+                </Button>
 
                 <h3>Periods</h3>
-                {getAvailablePeriods().length > 0 ?
-                    getAvailablePeriods().map(period => (
-                        <button
+                {availablePeriods.length > 0 ?
+                    availablePeriods.map(period => (
+                        <Button
+                            styleType={"neutral"}
                             key={period}
                             type="button"
                             className={selectedPeriods.includes(period) ? styles.active : ''}
                             onClick={() => togglePeriod(period)}
                         >
                             {period}
-                        </button>
+                        </Button>
                     )) :
                     <p>No available period data yet.</p>
                 }
 
                 <h3>Action Types</h3>
-                {getAvailableActionTypes().length > 0 ?
-                    getAvailableActionTypes().map(action => (
-                        <button
+                {availableActionTypes.length > 0 ?
+                    availableActionTypes.map(action => (
+                        <Button
+                            styleType={"neutral"}
                             key={action}
                             type="button"
                             className={selectedActionTypes.includes(action) ? styles.active : ''}
                             onClick={() => toggleActionType(action)}
                         >
                             {action}
-                        </button>
+                        </Button>
                     )) :
                     <p>No action types yet.</p>
                 }
@@ -296,6 +172,7 @@ const SavedGameDetailPage = () => {
             <div className={styles.rinkContainer}>
                 <img src={game.selectedImage} alt="rink"/>
                 <div className={styles.iconContainer}>
+                    {/*todo: colors from game setup?*/}
                     {getFilteredActions().map((action, index) => (
                         <Icon
                             key={`second-${index}`}
@@ -313,110 +190,22 @@ const SavedGameDetailPage = () => {
             <div>
                 <h2>Player Statistics</h2>
                 <h3>Skaters</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th onClick={() => handleSkatersSort('name')}>
-                            Name {skatersSortConfig?.key === 'name' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('jerseyNumber')}>
-                            Jersey# {skatersSortConfig?.key === 'jerseyNumber' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('goals')}>
-                            Goals {skatersSortConfig?.key === 'goals' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('assists')}>
-                            Assists {skatersSortConfig?.key === 'assists' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('points')}>
-                            Points {skatersSortConfig?.key === 'points' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('shots')}>
-                            Shots {skatersSortConfig?.key === 'shots' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('hits')}>
-                            Hits {skatersSortConfig?.key === 'hits' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('turnovers')}>
-                            Turnovers {skatersSortConfig?.key === 'turnovers' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSkatersSort('shotPercentage')}>
-                            Shot% {skatersSortConfig?.key === 'shotPercentage' && (skatersSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {getSortedSkaters().map(player => (
-                        <tr key={player.id}
-                            className={selectedPlayer === player.id ? styles.selectedRow : ''}
-                            onClick={() => togglePlayer(player.id)}
-                        >
-                            <td>{player.name}</td>
-                            <td>{player.jerseyNumber}</td>
-                            <td>{getPlayerStats(player).goals}</td>
-                            <td>{getPlayerStats(player).assists}</td>
-                            <td>{getPlayerStats(player).points}</td>
-                            <td>{getPlayerStats(player).shots}</td>
-                            <td>{getPlayerStats(player).hits}</td>
-                            <td>{getPlayerStats(player).turnovers}</td>
-                            <td>{getPlayerStats(player).shotPercentage.toFixed(2)}%</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <PlayerTable
+                    pageType="game"
+                    players={getFilteredPlayers().filter(p => p.position !== Position.GOALIE)}
+                    games={[game]}
+                    selectedPlayer={selectedPlayer}
+                    togglePlayer={togglePlayer}
+                />
 
                 <h3>Goalies</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th onClick={() => handleGoaliesSort('name')}>
-                            Name {goaliesSortConfig?.key === 'name' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('jerseyNumber')}>
-                            Jersey# {goaliesSortConfig?.key === 'jerseyNumber' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('goals')}>
-                            Goals {goaliesSortConfig?.key === 'goals' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('assists')}>
-                            Assists {goaliesSortConfig?.key === 'assists' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('points')}>
-                            Points {goaliesSortConfig?.key === 'points' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('shots')}>
-                            Shots {goaliesSortConfig?.key === 'shots' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('hits')}>
-                            Hits {goaliesSortConfig?.key === 'hits' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('turnovers')}>
-                            Turnovers {goaliesSortConfig?.key === 'turnovers' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleGoaliesSort('shotPercentage')}>
-                            Save% {goaliesSortConfig?.key === 'shotPercentage' && (goaliesSortConfig.direction === 'asc' ? '↑' : '↓')}
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {getSortedGoalies().map(player => (
-                        <tr key={player.id}
-                            className={selectedPlayer === player.id ? styles.selectedRow : ''}
-                            onClick={() => togglePlayer(player.id)}
-                        >
-                            <td>{player.name}</td>
-                            <td>{player.jerseyNumber}</td>
-                            <td>{getPlayerStats(player).goals}</td>
-                            <td>{getPlayerStats(player).assists}</td>
-                            <td>{getPlayerStats(player).points}</td>
-                            <td>{getPlayerStats(player).shots}</td>
-                            <td>{getPlayerStats(player).hits}</td>
-                            <td>{getPlayerStats(player).turnovers}</td>
-                            <td>{getPlayerStats(player).shotPercentage.toFixed(2)}%</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <PlayerTable
+                    pageType="game"
+                    players={getFilteredPlayers().filter(p => p.position === Position.GOALIE)}
+                    games={[game]}
+                    selectedPlayer={selectedPlayer}
+                    togglePlayer={togglePlayer}
+                />
             </div>
 
             <ActionDetailsModal

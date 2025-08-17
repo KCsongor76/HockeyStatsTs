@@ -4,6 +4,8 @@ import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import {PlayerService} from "../OOP/services/PlayerService";
+import Button from "../components/Button";
+import Select from "../components/Select";
 
 const TransferPlayerPage = () => {
     const location = useLocation();
@@ -14,7 +16,6 @@ const TransferPlayerPage = () => {
     const [selectedTeamId, setSelectedTeamId] = useState<string>("");
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
-
 
     const freeAgentHandler = async () => {
         if (window.confirm(`Set ${player.name} as free agent?`)) {
@@ -51,7 +52,6 @@ const TransferPlayerPage = () => {
         } catch (error) {
             setErrors({general: 'Transfer failed. Please try again.'});
         }
-
     };
 
     useEffect(() => {
@@ -67,34 +67,39 @@ const TransferPlayerPage = () => {
             <p>Player: {player.name}</p>
             <p>Current Team: {team.name}</p>
             <form onSubmit={submitHandler}>
-                <label>
-                    Transfer to:
-                    <select
-                        value={selectedTeamId}
-                        onChange={(e) => setSelectedTeamId(e.target.value)}
-                    >
-                        {teams.filter(t => t.id !== team.id && t.id !== "free-agent")
-                            .map(t => (
-                                <option key={t.id} value={t.id}>{t.name}</option>
-                            ))}
-                    </select>
-                </label>
+                <Select
+                    label="Transfer to:"
+                    value={selectedTeamId}
+                    onChange={(e) => setSelectedTeamId(e.target.value)}
+                    options={teams.filter(t => t.id !== team.id && t.id !== "free-agent")
+                        .map(t => ({
+                            value: t.id,
+                            label: t.name
+                        }))
+                    }
+                    error={errors.team}
+                />
 
-                {errors.team && <span>{errors.team}</span>}
-                {errors.jersey && <span>{errors.jersey}</span>}
-                {errors.general && <span>{errors.general}</span>}
+                {errors.jersey && <span style={{color: 'red'}}>{errors.jersey}</span>}
+                {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
 
                 {!isFreeAgent && (
-                    <button type="button" onClick={freeAgentHandler}>
+                    <Button
+                        styleType={"neutral"}
+                        type="button" onClick={freeAgentHandler}>
                         Set to free agent
-                    </button>
+                    </Button>
                 )}
-                <button type="submit">
+                <Button
+                    styleType={"positive"}
+                    type="submit">
                     Transfer
-                </button>
-                <button type="button" onClick={() => navigate(-1)}>
+                </Button>
+                <Button
+                    styleType={"negative"}
+                    type="button" onClick={() => navigate(-1)}>
                     Cancel
-                </button>
+                </Button>
             </form>
         </div>
     );

@@ -7,6 +7,9 @@ import {IGame} from "../OOP/interfaces/IGame";
 import {GameService} from "../OOP/services/GameService";
 import {TeamService} from "../OOP/services/TeamService";
 import Pagination from "../components/Pagination";
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 
 const TeamCrudPage = () => {
     const loaderData = useLoaderData() as {
@@ -19,32 +22,17 @@ const TeamCrudPage = () => {
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
     const navigate = useNavigate();
 
-    const filteredTeams = teams.filter(team => {
-        // Name filter
-        if (filters.name && !team.name.toLowerCase().includes(filters.name.toLowerCase())) {
-            return false;
-        }
+    const seasonTeams = filters.season
+        ? new Set(games
+            .filter(g => g.season === filters.season)
+            .flatMap(g => [g.teams.home.id, g.teams.away.id]))
+        : null;
 
-        // Season filter
-        if (filters.season) {
-            const seasonTeams = new Set<string>();
-            games.forEach(game => {
-                if (game.season === filters.season) {
-                    seasonTeams.add(game.teams.home.id);
-                    seasonTeams.add(game.teams.away.id);
-                }
-            });
-            if (!seasonTeams.has(team.id)) return false;
-        }
-
-        // Championship filter
-        if (filters.championship) {
-            const hasChampionship = team.championships?.some(ch => ch === filters.championship) ?? false;
-            if (!hasChampionship) return false;
-        }
-
-        return true;
-    });
+    const filteredTeams = teams.filter(team =>
+        (!filters.name || team.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+        (!filters.season || seasonTeams!.has(team.id)) &&
+        (!filters.championship || team.championships?.includes(filters.championship as Championship))
+    );
 
     const totalPages = Math.ceil(filteredTeams.length / pagination.perPage);
     const paginatedTeams = filteredTeams.slice(
@@ -67,58 +55,59 @@ const TeamCrudPage = () => {
 
     return (
         <div>
-            <button onClick={() => navigate("create", {state: {teams: teams}})}>Create New Team</button>
+            <Button
+                styleType={"positive"}
+                onClick={() => navigate("create", {state: {teams: teams}})}
+            >
+                Create New Team
+            </Button>
 
-            <label>
-                Search by name
-                <input
-                    type="text"
-                    name="nameSearch"
-                    value={filters.name}
-                    onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
-                    placeholder={"Search by name"}
-                />
-            </label>
+            <Input
+                label="Search by name"
+                value={filters.name}
+                onChange={(e) => setFilters(prevState => ({...prevState, name: e.target.value}))}
+                placeholder="Search by name"
+            />
 
-            <label>
-                Filter by season
-                <select
-                    value={filters.season}
-                    onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
-                >
-                    <option key="All Seasons" value="">All Seasons</option>
-                    {Object.values(Season).map((season) => (
-                        <option key={season} value={season}>{season}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Filter by season"
+                value={filters.season}
+                onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
+                options={[
+                    { value: "", label: "All Seasons" },
+                    ...Object.values(Season).map(season => ({
+                        value: season,
+                        label: season
+                    }))
+                ]}
+            />
 
-            <label>
-                Filter by championship
-                <select
-                    value={filters.championship}
-                    onChange={e => setFilters(prevState => ({...prevState, championship: e.target.value}))}
-                >
-                    <option key="All Seasons" value="">All Championships</option>
-                    {Object.values(Championship).map((championship) => (
-                        <option key={championship} value={championship}>{championship}</option>
-                    ))}
-                </select>
-            </label>
+            <Select
+                label="Filter by championship"
+                value={filters.championship}
+                onChange={e => setFilters(prevState => ({...prevState, championship: e.target.value}))}
+                options={[
+                    { value: "", label: "All Championships" },
+                    ...Object.values(Championship).map(championship => ({
+                        value: championship,
+                        label: championship
+                    }))
+                ]}
+            />
 
             <ul>
                 {paginatedTeams.length > 0 ? paginatedTeams.map((team: ITeam) =>
                     <li key={team.id}>
                         <p>{team.name}</p>
-                        <button onClick={() => navigate(`${team.id}`, {state: {team, games}})}>View</button>
-                        <button onClick={() => deleteHandler(team)}>Delete</button>
+                        <Button styleType={"neutral"} onClick={() => navigate(`${team.id}`, {state: {team, games}})}>View</Button>
+                        <Button styleType={"negative"} onClick={() => deleteHandler(team)}>Delete</Button>
                     </li>
                 ) : <p>No teams found</p>}
             </ul>
 
             <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
 
-            <button onClick={() => navigate(-1)}>Go Back</button>
+            <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
         </div>
     );
 };

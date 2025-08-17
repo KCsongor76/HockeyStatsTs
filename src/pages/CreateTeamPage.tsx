@@ -4,10 +4,10 @@ import {Team} from "../OOP/classes/Team";
 import {Championship} from "../OOP/enums/Championship";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
+import Button from "../components/Button";
+import Input from "../components/Input";
 
 const CreateTeamPage = () => {
-    // todo: Team -> TeamService?
-
     const location = useLocation()
     const teams = location.state.teams as ITeam[];
     const [name, setName] = useState<string>("");
@@ -84,7 +84,6 @@ const CreateTeamPage = () => {
             };
             await TeamService.createTeam(newTeamData);
 
-            // Handle successful creation (redirect or show success message)
             console.log("Team created successfully");
             alert("Team created successfully!");
             navigate("../")
@@ -99,74 +98,70 @@ const CreateTeamPage = () => {
         <form onSubmit={submitHandler}>
             {errors.general && <div className="error">{errors.general}</div>}
 
-            <label>
-                Team Name:
-                <input
-                    type="text"
-                    name="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-                {errors.name && <span className="error">{errors.name}</span>}
-            </label>
+            <Input
+                label="Team Name:"
+                type="text"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                error={errors.name}
+            />
 
-            <label>
-                Team Logo:
-                <input
-                    type="file"
-                    name="logo"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    required
-                />
-                {errors.logo && <span className="error">{errors.logo}</span>}
-            </label>
+            <Input
+                label="Team Logo:"
+                type="file"
+                name="logo"
+                accept="image/*"
+                onChange={handleLogoChange}
+                required
+                error={errors.logo}
+            />
 
-            <label>
-                Team Home Colors:
-                <label>Primary</label>
-                <input
+            <div>
+                <label>Team Home Colors:</label>
+                <Input
+                    label="Primary"
                     type="color"
                     name="homePrimary"
                     value={homeColor.primary}
                     onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
                 />
 
-                <label>Secondary</label>
-                <input
+                <Input
+                    label="Secondary"
                     type="color"
                     name="homeSecondary"
                     value={homeColor.secondary}
                     onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
                 />
                 {errors.colors && <span className="error">{errors.colors}</span>}
-            </label>
+            </div>
 
-            <label>
-                Team Away Colors:
-                <label>Primary</label>
-                <input
+            <div>
+                <label>Team Away Colors:</label>
+                <Input
+                    label="Primary"
                     type="color"
                     name="awayPrimary"
                     value={awayColor.primary}
                     onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
                 />
 
-                <label>Secondary</label>
-                <input
+                <Input
+                    label="Secondary"
                     type="color"
                     name="awaySecondary"
                     value={awayColor.secondary}
                     onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
                 />
-            </label>
+            </div>
 
-            <label>
-                Championships:
+            <div>
+                <label>Championships:</label>
                 {Object.values(Championship).map((championship) => (
                     <div key={championship}>
-                        <input
+                        <Input
                             type="checkbox"
                             id={`champ-${championship}`}
                             checked={championships.includes(championship)}
@@ -176,10 +171,10 @@ const CreateTeamPage = () => {
                     </div>
                 ))}
                 {errors.championships && <span className="error">{errors.championships}</span>}
-            </label>
+            </div>
 
-            <button type="submit">Create Team</button>
-            <button type="button" onClick={() => navigate("../")}>Go Back</button>
+            <Button styleType={"positive"} type="submit">Create Team</Button>
+            <Button styleType={"negative"} type="button" onClick={() => navigate("../")}>Go Back</Button>
         </form>
     );
 };

@@ -4,6 +4,9 @@ import {Championship} from "../enums/Championship";
 import {IPlayer} from "../interfaces/IPlayer";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../../firebase";
+import {IGame} from "../interfaces/IGame";
+import {GameType} from "../enums/GameType";
+import {PlayoffPeriod, RegularPeriod} from "../enums/Period";
 
 export class Team implements ITeam {
     id: string;
@@ -13,7 +16,7 @@ export class Team implements ITeam {
     homeColor: { primary: string; secondary: string };
     awayColor: { primary: string; secondary: string };
     players: IPlayer[];
-    roster?: IPlayer[];
+    roster: IPlayer[];
 
     constructor(data: Partial<ITeam>) {
         this.id = data.id || '';
@@ -23,7 +26,7 @@ export class Team implements ITeam {
         this.homeColor = data.homeColor || {primary: '', secondary: ''};
         this.awayColor = data.awayColor || {primary: '', secondary: ''};
         this.players = data.players || [];
-        this.roster = data.roster;
+        this.roster = data.roster || [];
     }
 
     toPlainObject(): ITeam {
@@ -35,6 +38,7 @@ export class Team implements ITeam {
             awayColor: this.awayColor,
             championships: this.championships,
             players: this.players,
+            roster: this.roster,
         };
     }
 
@@ -114,4 +118,95 @@ export class Team implements ITeam {
         const exists = await this.checkLogoExists(fileName);
         return exists ? "Logo file name is already taken" : null;
     }
+
+    static getTeamStats = (team: ITeam, games: IGame[]) => {
+        let gamesPlayed = 0;
+        let wins = 0;
+        let otWins = 0;
+        let losses = 0;
+        let otLosses = 0;
+        let goalsFor = 0;
+        let goalsAgainst = 0;
+        let shots = 0;
+        let turnovers = 0;
+        let hits = 0;
+
+        games.forEach(game => {
+            const isHomeTeam = game.teams.home.id === team.id;
+            const isAwayTeam = game.teams.away.id === team.id;
+
+            if (!isHomeTeam && !isAwayTeam) return;
+
+            gamesPlayed++;
+
+            const teamScore = isHomeTeam ? game.score.home : game.score.away;
+            const opponentScore = isHomeTeam ? game.score.away : game.score.home;
+
+            goalsFor += teamScore.goals;
+            goalsAgainst += opponentScore.goals;
+            shots += teamScore.shots;
+            turnovers += teamScore.turnovers;
+            hits += teamScore.hits;
+
+            if (game.type === GameType.REGULAR) {
+                let highestPeriod = RegularPeriod.FIRST;
+                game.actions.forEach(action => {
+                    if (action.period.valueOf() > highestPeriod.valueOf()) {
+                        highestPeriod = action.period;
+                    }
+                });
+                if (teamScore.goals > opponentScore.goals) {
+                    if (highestPeriod.valueOf() === RegularPeriod.OT.valueOf() || highestPeriod.valueOf() === RegularPeriod.SO.valueOf()) {
+                        otWins++;
+                    } else {
+                        wins++;
+                    }
+                } else {
+                    if (highestPeriod.valueOf() === RegularPeriod.OT.valueOf() || highestPeriod.valueOf() === RegularPeriod.SO.valueOf()) {
+                        otLosses++;
+                    } else {
+                        losses++;
+                    }
+                }
+            } else {
+                let highestPeriod = PlayoffPeriod.FIRST;
+                game.actions.forEach(action => {
+                    if (action.period.valueOf() > highestPeriod.valueOf()) {
+                        highestPeriod = action.period;
+                    }
+                });
+                if (teamScore.goals > opponentScore.goals) {
+                    if (highestPeriod.valueOf() > PlayoffPeriod.THIRD.valueOf()) {
+                        otWins++;
+                    } else {
+                        wins++;
+                    }
+                } else {
+                    if (highestPeriod.valueOf() > PlayoffPeriod.THIRD.valueOf()) {
+                        otLosses++;
+                    } else {
+                        losses++;
+                    }
+                }
+            }
+        });
+
+        const goalDifference = goalsFor - goalsAgainst;
+        const shotPercentage = shots > 0 ? (goalsFor / shots) * 100 : 0;
+
+        return {
+            gamesPlayed,
+            wins,
+            otWins,
+            losses,
+            otLosses,
+            goalsFor,
+            goalsAgainst,
+            goalDifference,
+            shots,
+            hits,
+            turnovers,
+            shotPercentage
+        };
+    };
 }
