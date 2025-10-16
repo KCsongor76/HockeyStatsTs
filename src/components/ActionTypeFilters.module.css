@@ -13,6 +13,7 @@
 
 @media (max-width: 768px) {
     .filterContainer {
-        gap: 0.3rem;
+        flex-direction: column;
+        width: 100%;
     }
 }

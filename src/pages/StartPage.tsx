@@ -11,8 +11,14 @@ import Button from "../components/Button";
 import Select from "../components/Select";
 import Input from "../components/Input";
 import styles from "./StartPage.module.css"
+import axios from "axios";
 
-const StartPage = () => {
+interface StartPageProps {
+    isUpload?: boolean;
+    onUploadSuccess?: (data: any) => void; // Add this prop
+}
+
+const StartPage = ({isUpload = false, onUploadSuccess}: StartPageProps) => {
     const loaderData = useLoaderData();
     const teamsFromLoader = loaderData.teams as ITeam[]
     const [teams, setTeams] = useState<ITeam[]>(teamsFromLoader.map(t => ({...t, roster: t.roster || []})));
@@ -28,6 +34,9 @@ const StartPage = () => {
     const [selectedImage, setSelectedImage] = useState(rinkImages.rinkUp);
     const [showRosters, setShowRosters] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [videoFile, setVideoFile] = useState<File | null>(null);
+    const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+    const [uploadError, setUploadError] = useState<string>('');
     const navigate = useNavigate();
 
     const updateTeamRoster = (teamId: string, newRoster: any[]) => {
@@ -50,6 +59,70 @@ const StartPage = () => {
             teamId,
             (teams.find(t => t.id === teamId)?.roster || []).filter(p => p.id !== playerId)
         );
+    };
+
+    const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setVideoFile(e.target.files[0]);
+            setUploadStatus('idle');
+            setUploadError('');
+        }
+    };
+
+    const handleUpload = async () => {
+        if (!videoFile) {
+            setUploadError('Please select a video file');
+            return;
+        }
+
+        const homeTeam = teams.find(t => t.id === homeTeamId);
+        const awayTeam = teams.find(t => t.id === awayTeamId);
+
+        if (!homeTeam || !awayTeam) {
+            setUploadError('Please select both home and away teams');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("video", videoFile);
+        formData.append("team_home", JSON.stringify(homeTeam));
+        formData.append("team_away", JSON.stringify(awayTeam));
+
+        try {
+            setUploadStatus('uploading');
+            setUploadError('');
+
+            const res = await axios.post("http://localhost:5000/upload-game", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (res.data.status === "processed") {
+                setUploadStatus('success');
+                // Store the detected actions and team info for later use
+                console.log("Detected data:", res.data);
+
+                // Call the onUploadSuccess callback if provided
+                if (onUploadSuccess) {
+                    onUploadSuccess(res.data);
+                }
+
+                // You might want to store this data to use when starting the game
+                localStorage.setItem('uploadedGameData', JSON.stringify({
+                    actions: res.data.actions,
+                    teams: res.data.teams,
+                    puck_positions: res.data.puck_positions // Add this line
+                }));
+            } else {
+                setUploadStatus('error');
+                setUploadError('Upload failed');
+            }
+        } catch (err: any) {
+            console.error(err);
+            setUploadStatus('error');
+            setUploadError(err.response?.data?.error || 'Upload failed. Please try again.');
+        }
     };
 
     const submitHandler = (e: React.FormEvent) => {
@@ -128,6 +201,8 @@ const StartPage = () => {
 
         checkForSavedGame();
     }, [navigate]);
+
+    const isStartGameDisabled = isUpload && uploadStatus !== 'success';
 
     return (
         <div className={styles.container}>
@@ -226,6 +301,43 @@ const StartPage = () => {
                     {errors.sameColors && <span className={styles.error}>{errors.sameColors}</span>}
                 </div>
 
+                {/* Video Upload Section */}
+                {isUpload && (
+                    <div style={{
+                        marginBottom: '1.5rem',
+                        padding: '1rem',
+                        backgroundColor: '#f8fafc',
+                        borderRadius: '0.5rem'
+                    }}>
+                        <h3>Upload Game Video</h3>
+                        <Input
+                            label="Game Video:"
+                            type="file"
+                            accept="video/*"
+                            onChange={handleVideoChange}
+                        />
+                        <Button
+                            styleType="positive"
+                            type="button"
+                            onClick={handleUpload}
+                            disabled={!videoFile || uploadStatus === 'uploading'}
+                        >
+                            {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Video'}
+                        </Button>
+
+                        {uploadStatus === 'success' && (
+                            <div style={{color: 'green', marginTop: '0.5rem'}}>
+                                ✓ Video uploaded and processed successfully!
+                            </div>
+                        )}
+                        {uploadStatus === 'error' && (
+                            <div style={{color: 'red', marginTop: '0.5rem'}}>
+                                {uploadError}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <div className={styles.rinkImages}>
                     <label
                         className={`${styles.rinkOption} ${selectedImage === rinkImages.rinkUp ? styles.selected : ''}`}>
@@ -280,7 +392,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => addToRoster(homeTeamId, player)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 <h5>Selected Players</h5>
@@ -290,7 +402,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => removeFromRoster(homeTeamId, player.id)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 {errors.homeRoster && <span className={styles.error}>{errors.homeRoster}</span>}
@@ -305,7 +417,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => addToRoster(awayTeamId, player)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 <h5>Selected Players</h5>
@@ -315,7 +427,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => removeFromRoster(awayTeamId, player.id)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 {errors.awayRoster && <span className={styles.error}>{errors.awayRoster}</span>}
@@ -325,7 +437,13 @@ const StartPage = () => {
                 )}
 
                 <div className={styles.buttonGroup}>
-                    <Button styleType={"positive"} type="submit">Start Game</Button>
+                    <Button
+                        styleType={"positive"}
+                        type="submit"
+                        disabled={isStartGameDisabled}
+                    >
+                        Start Game
+                    </Button>
                     <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
                 </div>
             </form>

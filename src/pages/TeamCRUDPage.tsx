@@ -102,17 +102,45 @@ const TeamCrudPage = () => {
             </div>
 
             <ul className={styles.teamList}>
-                {paginatedTeams.length > 0 ? paginatedTeams.map((team: ITeam) =>
-                    <li key={team.id} className={styles.teamItem}>
-                        <div className={styles.teamInfo}>
-                            <p>{team.name}</p>
-                        </div>
-                        <div className={styles.teamActions}>
-                            <Button styleType={"neutral"}
-                                    onClick={() => navigate(`${team.id}`, {state: {team, games}})}>View</Button>
-                            <Button styleType={"negative"} onClick={() => deleteHandler(team)}>Delete</Button>
-                        </div>
-                    </li>
+                {paginatedTeams.length > 0 ? (
+                    <>
+                        {/* Free Agent item - always shown first */}
+                        {paginatedTeams.filter(t => t.id === "free-agent").map((team: ITeam) => (
+                            <li key={team.id} className={styles.teamItem}>
+                                <div className={styles.teamInfo}>
+                                    <p>{team.name}</p>
+                                </div>
+                                <div className={styles.teamActions}>
+                                    <Button styleType={"neutral"}
+                                            onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
+                                        View
+                                    </Button>
+                                    {/* No delete button for free agents */}
+                                </div>
+                            </li>
+                        ))}
+
+                        {/* Regular teams */}
+                        {paginatedTeams
+                            .filter(t => t.id !== "free-agent")
+                            .map((team: ITeam) => (
+                                <li key={team.id} className={styles.teamItem}>
+                                    <div className={styles.teamInfo}>
+                                        <p>{team.name}</p>
+                                    </div>
+                                    <div className={styles.teamActions}>
+                                        <Button styleType={"neutral"}
+                                                onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
+                                            View
+                                        </Button>
+                                        <Button styleType={"negative"} onClick={() => deleteHandler(team)}>
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </li>
+                            ))
+                        }
+                    </>
                 ) : <p>No teams found</p>}
             </ul>
 

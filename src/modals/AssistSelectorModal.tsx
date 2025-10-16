@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import Button from '../components/Button';
 import {IPlayer} from '../OOP/interfaces/IPlayer';
 import {ITeam} from '../OOP/interfaces/ITeam';
 import styles from './AssistSelectorModal.module.css';
@@ -44,10 +45,16 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect}: 
                         ))}
                 </div>
                 <div className={styles.modalActions}>
-                    <button onClick={onClose}>Cancel</button>
-                    <button onClick={handleConfirm} disabled={selectedAssists.length > 2}>
+                    <Button styleType="negative" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button
+                        styleType="positive"
+                        onClick={handleConfirm}
+                        disabled={selectedAssists.length > 2}
+                    >
                         Confirm ({selectedAssists.length}/2)
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
-import { ActionType } from '../OOP/enums/ActionType';
+import {ActionType} from '../OOP/enums/ActionType';
 import styles from './ConfirmationModal.module.css';
+import Button from "../components/Button";
 
 interface Props {
     isOpen: boolean;
@@ -17,7 +18,7 @@ interface Props {
     onConfirm: () => void;
 }
 
-const ConfirmationModal = ({ isOpen, action, position, onClose, onConfirm }: Props) => {
+const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm}: Props) => {
     if (!isOpen) return null;
 
     return (
@@ -55,8 +56,12 @@ const ConfirmationModal = ({ isOpen, action, position, onClose, onConfirm }: Pro
                 </div>
 
                 <div className={styles.modalActions}>
-                    <button onClick={onClose}>Cancel</button>
-                    <button onClick={onConfirm}>Confirm</button>
+                    <Button styleType="negative" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button styleType="positive" onClick={onConfirm}>
+                        Confirm
+                    </Button>
                 </div>
             </div>
         </div>

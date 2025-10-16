@@ -23,10 +23,13 @@ import {loader as startPageLoader} from "./pages/StartPage";
 import {TeamService} from "./OOP/services/TeamService";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
+import UploadGamePage from "./pages/UploadGamePage";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [isSignedIn, setIsSignedIn] = useState<boolean | undefined>(undefined);
+
+    // todo: add placeholder player to every team
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -58,8 +61,9 @@ function App() {
             children: [
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
                 {path: "start", element: <StartPage/>, loader: startPageLoader},
+                {path: "upload", element: <UploadGamePage/>,  loader: startPageLoader},
                 {path: "game", element: <GamePage/>},
-                {path: "previous_games", element: <SavedGamesPage/>},
+                {path: "previous_games", element: <SavedGamesPage showFilters={true}/>},
                 {path: "previous_games/:gameId", element: <SavedGameDetailPage/>},
                 {
                     path: "handleTeams",
@@ -98,9 +102,10 @@ function App() {
             errorElement: <ErrorPage/>,
             children: [
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
-                {path: "start", element: <StartPage/>,},
+                {path: "start", element: <StartPage/>, loader: startPageLoader},
+                {path: "upload", element: <UploadGamePage/>, loader: startPageLoader},
                 {path: "game", element: <GamePage/>},
-                {path: "previous_games", element: <SavedGamesPage/>},
+                {path: "previous_games", element: <SavedGamesPage showFilters={true} />},
                 {path: "previous_games/:gameId", element: <SavedGameDetailPage/>},
                 {path: "admin", element: <AuthPage/>},
                 {path: "*", element: <Navigate to="/admin" replace/>}, // Redirect unauthorized users

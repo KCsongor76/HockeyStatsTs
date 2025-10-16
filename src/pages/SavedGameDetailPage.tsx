@@ -9,7 +9,7 @@ import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Position} from "../OOP/enums/Position";
 import ActionDetailsModal from "../modals/ActionDetailsModal";
 import PlayerTable from "../components/PlayerTable";
-import Button from "../components/Button";
+
 import GameScoreData from "../components/GameScoreData";
 import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
@@ -98,7 +98,7 @@ const SavedGameDetailPage = () => {
         <div>
             <GameScoreData game={game} score={game.score}/>
 
-            <div>
+            <div className={styles.filterContainer}>
                 <h3>Team View</h3>
                 <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
 

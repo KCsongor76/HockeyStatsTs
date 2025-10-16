@@ -31,6 +31,11 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
 
     const navigate = useNavigate();
 
+    const formatDate = (timestamp: string) => {
+        const date = new Date(timestamp);
+        return date.toISOString().split('T')[0];
+    };
+
     const filteredGames = games.filter(game => {
         return (
             (!homeTeamId || game.teams.home.id === homeTeamId) &&
@@ -88,8 +93,6 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         return <div>{error}</div>;
     }
 
-    if (games.length === 0 || filteredGames.length === 0) return <div>No games available.</div>;
-
     return (
         <div className={styles.container}>
             {showFilters && (
@@ -98,20 +101,24 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         label="Home team:"
                         value={homeTeamId}
                         onChange={(e) => setHomeTeamId(e.target.value)}
-                        options={teams.map(team => ({
-                            value: team.id,
-                            label: team.name
-                        }))}
+                        options={[
+                            {value: "", label: "All Teams"},
+                            ...teams.map(team => ({
+                                value: team.id,
+                                label: team.name
+                            }))]}
                     />
 
                     <Select
                         label="Away team:"
                         value={awayTeamId}
                         onChange={(e) => setAwayTeamId(e.target.value)}
-                        options={teams.map(team => ({
-                            value: team.id,
-                            label: team.name
-                        }))}
+                        options={[
+                            {value: "", label: "All Teams"},
+                            ...teams.map(team => ({
+                                value: team.id,
+                                label: team.name
+                            }))]}
                     />
 
                     <Select
@@ -174,7 +181,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                             onClick={() => navigate(`/previous_games/${game.id}`, {state: game})}
                         >
                             <div className={styles.gameTeams}>
-                                <div>
+                                <div className={styles.gameTeam}>
                                     <img
                                         src={game.teams.home.logo}
                                         alt={game.teams.home.logo}
@@ -184,10 +191,10 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                                 </div>
 
                                 <span className={styles.gameScore}>
-                                {game.score.home.goals} - {game.score.away.goals}
-                            </span>
+                                    {game.score.home.goals} - {game.score.away.goals}
+                                </span>
 
-                                <div>
+                                <div className={styles.gameTeam}>
                                     <img
                                         src={game.teams.away.logo}
                                         alt={game.teams.away.logo}
@@ -198,9 +205,10 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                             </div>
 
                             <div className={styles.gameInfo}>
-                                <span>{game.timestamp}</span>
+                                <span>{formatDate(game.timestamp)}</span>
                                 <span>Type: {game.type}</span>
                                 <span>Season: {game.season || "Not specified"}</span>
+                                {/*<span>Championship: {game.championship || "Not specified"}</span>*/}
                             </div>
                         </li>
                     ))

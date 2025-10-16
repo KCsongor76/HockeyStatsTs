@@ -5,6 +5,7 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {GameType} from "../OOP/enums/GameType";
 import {RegularPeriod, PlayoffPeriod} from "../OOP/enums/Period";
 import styles from "./ActionSelectorModal.module.css";
+import Button from "../components/Button";
 
 interface Props {
     isOpen: boolean;
@@ -98,7 +99,6 @@ const ActionSelectorModal = ({
                                         x={50}
                                         y={50}
                                     />
-                                    <span>{type}</span>
                                 </div>
                             ))}
                         </div>
@@ -121,7 +121,6 @@ const ActionSelectorModal = ({
                                         x={50}
                                         y={50}
                                     />
-                                    <span>{type}</span>
                                 </div>
                             ))}
                         </div>
@@ -129,7 +128,9 @@ const ActionSelectorModal = ({
                 </div>
 
                 <div className={styles.modalActions}>
-                    <button onClick={onClose}>Cancel</button>
+                    <Button styleType="negative" onClick={onClose}>
+                        Cancel
+                    </Button>
                 </div>
             </div>
         </div>

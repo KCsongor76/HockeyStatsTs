@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import Button from "./Button";
 import styles from "./Pagination.module.css"
 
@@ -13,6 +13,7 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagination}) => {
     const perPageOptions = [10, 25, 50, 100];
+    const isFirstRender = useRef(true);
 
     const goToPreviousPage = () => {
         if (pagination.page > 1) {
@@ -27,6 +28,12 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
     };
 
     useEffect(() => {
+        // Skip scroll on first render
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
         // scroll automatically to the bottom on page change or team per page change
         window.scrollTo(0, document.body.scrollHeight);
     }, [pagination.page, pagination.perPage]);

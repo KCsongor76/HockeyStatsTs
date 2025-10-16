@@ -36,6 +36,9 @@ interface GameSetup {
     awayColors: { primary: string; secondary: string };
 }
 
+// todo: table component, why doesn't get here automatic left-right scrolling, when display width is so small? (because on SavedGameDetailPage, here it doesn't)
+// todo: Period: not number, Period
+
 const GamePage = () => {
     const location = useLocation();
     const [gameSetup, setGameSetup] = useState<GameSetup | null>(null);
@@ -268,30 +271,33 @@ const GamePage = () => {
         }
     };
 
-    // Load saved game if exists
+    // In GamePage.tsx, modify the useEffect:
     useEffect(() => {
-        const locationState = location.state;
-        if (locationState) {
-            // Check if location state is a saved game object
-            if ('setup' in locationState) {
-                // Saved game structure
-                setGameSetup(locationState.setup);
-                setHomeScore(locationState.homeScore);
-                setAwayScore(locationState.awayScore);
-                setActions(locationState.actions);
-            } else {
-                // New game structure
-                setGameSetup(locationState as GameSetup);
-            }
-        } else {
-            // No location state, check localStorage
-            const savedGame = localStorage.getItem('unfinishedGame');
-            if (savedGame) {
+        // First check localStorage for saved game
+        const savedGame = localStorage.getItem('unfinishedGame');
+        if (savedGame) {
+            try {
                 const parsed = JSON.parse(savedGame);
                 setGameSetup(parsed.setup);
                 setHomeScore(parsed.homeScore);
                 setAwayScore(parsed.awayScore);
                 setActions(parsed.actions);
+                return; // Exit early if we loaded from localStorage
+            } catch (err) {
+                console.error("Failed to parse saved game", err);
+            }
+        }
+
+        // Then check location state
+        const locationState = location.state;
+        if (locationState) {
+            if ('setup' in locationState) {
+                setGameSetup(locationState.setup);
+                setHomeScore(locationState.homeScore);
+                setAwayScore(locationState.awayScore);
+                setActions(locationState.actions);
+            } else {
+                setGameSetup(locationState as GameSetup);
             }
         }
     }, [location.state, navigate]);
@@ -320,8 +326,7 @@ const GamePage = () => {
     }
 
     return (
-        <div>
-
+        <div className={styles.gameContainer}>
             {/* First rink with clickable area */}
             <div className={styles.rinkContainer}>
                 <img
