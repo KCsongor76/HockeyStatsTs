@@ -1,6 +1,7 @@
 import React from 'react';
-import { IPlayer } from '../OOP/interfaces/IPlayer';
-import { ITeam } from '../OOP/interfaces/ITeam';
+import Button from '../components/Button';
+import {IPlayer} from '../OOP/interfaces/IPlayer';
+import {ITeam} from '../OOP/interfaces/ITeam';
 import styles from './PlayerSelectorModal.module.css';
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
     onSelect: (player: IPlayer) => void;
 }
 
-const PlayerSelectorModal = ({ isOpen, team, onClose, onSelect }: Props) => {
+const PlayerSelectorModal = ({isOpen, team, onClose, onSelect}: Props) => {
     if (!isOpen || !team) return null;
 
     return (
@@ -32,7 +33,9 @@ const PlayerSelectorModal = ({ isOpen, team, onClose, onSelect }: Props) => {
                     ))}
                 </div>
                 <div className={styles.modalActions}>
-                    <button onClick={onClose}>Cancel</button>
+                    <Button styleType="negative" onClick={onClose}>
+                        Cancel
+                    </Button>
                 </div>
             </div>
         </div>

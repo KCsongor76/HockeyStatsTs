@@ -98,7 +98,7 @@ const SavedGameDetailPage = () => {
         <div>
             <GameScoreData game={game} score={game.score}/>
 
-            <div>
+            <div className={styles.filterContainer}>
                 <h3>Team View</h3>
                 <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
 

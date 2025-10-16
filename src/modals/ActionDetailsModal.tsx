@@ -2,6 +2,7 @@ import React from 'react';
 import {IGameAction} from "../OOP/interfaces/IGameAction";
 import {ActionType} from "../OOP/enums/ActionType";
 import styles from "./ActionDetailsModal.module.css";
+import Button from '../components/Button';
 
 interface Props {
     isOpen: boolean;
@@ -52,7 +53,7 @@ const ActionDetailsModal: React.FC<Props> = ({isOpen, onClose, action}) => {
 
                 <div className={styles.detailRow}>
                     <strong>Time:</strong>
-                    <span>{action.time}</span>
+                    <span>{Math.floor(action.time / 60)}:{String(action.time % 60).padStart(2, '0')}</span>
                 </div>
 
                 <div className={styles.detailRow}>
@@ -60,9 +61,9 @@ const ActionDetailsModal: React.FC<Props> = ({isOpen, onClose, action}) => {
                     <span>X: {action.x.toFixed(1)}%, Y: {action.y.toFixed(1)}%</span>
                 </div>
 
-                <button className={styles.closeButton} onClick={onClose}>
+                <Button styleType="neutral" onClick={onClose} className={styles.closeButton}>
                     Close
-                </button>
+                </Button>
             </div>
         </div>
     );

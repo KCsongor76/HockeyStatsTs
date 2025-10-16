@@ -280,7 +280,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => addToRoster(homeTeamId, player)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 <h5>Selected Players</h5>
@@ -290,7 +290,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => removeFromRoster(homeTeamId, player.id)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 {errors.homeRoster && <span className={styles.error}>{errors.homeRoster}</span>}
@@ -305,7 +305,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => addToRoster(awayTeamId, player)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 <h5>Selected Players</h5>
@@ -315,7 +315,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => removeFromRoster(awayTeamId, player.id)}
                                     >
-                                        {player.name}
+                                        #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
                                 {errors.awayRoster && <span className={styles.error}>{errors.awayRoster}</span>}

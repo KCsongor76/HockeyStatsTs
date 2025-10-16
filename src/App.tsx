@@ -24,6 +24,8 @@ import {TeamService} from "./OOP/services/TeamService";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
 
+// todo: add placeholder player to every team
+
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [isSignedIn, setIsSignedIn] = useState<boolean | undefined>(undefined);
