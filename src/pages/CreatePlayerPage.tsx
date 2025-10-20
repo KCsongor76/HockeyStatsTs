@@ -111,12 +111,23 @@ const CreatePlayerPage = () => {
                     }))}
                 />
 
-                <Input
-                    label="Free Agent"
-                    type="checkbox"
-                    checked={isFreeAgent}
-                    onChange={() => setIsFreeAgent(!isFreeAgent)}
-                />
+                {/* Fixed checkbox with proper styling */}
+                <div className={styles.formGroup}>
+                    <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
+                        <input
+                            type="checkbox"
+                            checked={isFreeAgent}
+                            onChange={() => setIsFreeAgent(!isFreeAgent)}
+                            style={{
+                                width: 'auto',
+                                marginRight: '0.5rem'
+                            }}
+                        />
+                        <span style={{fontWeight: 500, color: '#374151', fontSize: '0.875rem'}}>
+                            Free Agent
+                        </span>
+                    </label>
+                </div>
 
                 {!isFreeAgent && (
                     <Select

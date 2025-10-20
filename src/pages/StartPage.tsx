@@ -12,6 +12,12 @@ import Select from "../components/Select";
 import Input from "../components/Input";
 import styles from "./StartPage.module.css"
 
+// todo: unfinished game alert is shown twice when clicking ok (user has to click OK twice, should be only once), it works ok when clicking cancel
+// todo: have the same page orientation as under 768px (roster can stay the same, get rink images and buttons to middle)
+// todo: roster: have colored ticks or X-es on the roster selection, also add a counter, which shows how many forwards, defenders and goalies are selected,
+//  also implement here the roster selection constraint logic, minimum/maximum players
+
+
 const StartPage = () => {
     const loaderData = useLoaderData();
     const teamsFromLoader = loaderData.teams as ITeam[]

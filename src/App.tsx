@@ -25,6 +25,8 @@ import {adminUids} from "./admin";
 import {auth} from "./firebase";
 
 // todo: add placeholder player to every team
+// todo: clear all games - be aware for older apps of mine
+// todo: fix championship enum logic? (clears with only new games?)
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);

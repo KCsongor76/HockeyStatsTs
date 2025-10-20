@@ -7,6 +7,8 @@ interface MainNavigationProps {
     isSignedIn: boolean | undefined;
 }
 
+// todo: navigation is not shown-available-clickable under 768px
+
 const MainNavigation = ({ isSignedIn }: MainNavigationProps) => {
     const navigate = useNavigate();
 

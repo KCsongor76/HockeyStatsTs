@@ -219,7 +219,7 @@ const HandleTeamPage = () => {
                 value={selectedSeason || "All"}
                 onChange={e => setSelectedSeason(e.target.value as Season | 'All')}
                 options={[
-                    { value: "All", label: "All Seasons" },
+                    {value: "All", label: "All Seasons"},
                     ...Object.values(Season).map(season => ({
                         value: season,
                         label: season
@@ -232,7 +232,7 @@ const HandleTeamPage = () => {
                 value={selectedChampionship || "All"}
                 onChange={e => setSelectedChampionship(e.target.value as Championship | 'All')}
                 options={[
-                    { value: "All", label: "All Championships" },
+                    {value: "All", label: "All Championships"},
                     ...Object.values(Championship).map(champion => ({
                         value: champion,
                         label: champion
@@ -257,6 +257,8 @@ const HandleTeamPage = () => {
                                 <div>
                                     <h3>Playoff Players Stats</h3>
                                     <PlayerTable pageType="team" players={filteredPlayers} games={playoffGames}/>
+                                    {/* Add distinctive line under playoff stats table */}
+                                    <hr style={{margin: '2rem 0', border: '2px solid #ccc'}}/>
                                 </div>
                             </>
                         )}

@@ -15,6 +15,9 @@ import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
 import ActionTypeFilters from "../components/ActionTypeFilters";
 
+// todo: have same styling as GamePage
+// todo: iconColors: have a toggle for game/default colors to be shown (2 toggles, one separate for both team)
+
 const SavedGameDetailPage = () => {
     const locationData = useLocation();
     const game = locationData.state as IGame;

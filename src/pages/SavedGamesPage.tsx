@@ -16,6 +16,9 @@ interface SavedGamesPageProps {
     showFilters?: boolean;
 }
 
+// todo: better styling
+// todo: filter?
+
 const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     const [teams, setTeams] = useState<ITeam[]>([]);
     const [games, setGames] = useState<IGame[]>(playerGames || []);

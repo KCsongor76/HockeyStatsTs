@@ -18,6 +18,10 @@ interface Props {
     gameType: GameType;
 }
 
+// todo: period selector: use the period name, not number
+// todo: given gameType, have the periods
+// todo: given period, have the time constraint
+
 const ActionSelectorModal = ({
                                  isOpen,
                                  onClose,

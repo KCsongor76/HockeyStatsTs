@@ -6,6 +6,8 @@ interface HomePageProps {
     isSignedIn: boolean | undefined;
 }
 
+// todo: responsive styling: 4/2/1 or 2/2/1 columns
+
 const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
     const navigate = useNavigate();
 

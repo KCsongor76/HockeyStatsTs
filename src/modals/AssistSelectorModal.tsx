@@ -12,6 +12,8 @@ interface Props {
     onSelect: (assists: IPlayer[]) => void;
 }
 
+// todo: Modals (PlayerSelectorModal, AssistSelectorModal, ConfirmationModal) - have additional "Go Back" functionality, not just cancel
+
 const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect}: Props) => {
     const [selectedAssists, setSelectedAssists] = useState<IPlayer[]>([]);
     if (!isOpen || !team) return null;
