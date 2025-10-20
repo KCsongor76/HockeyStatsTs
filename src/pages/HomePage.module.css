@@ -10,13 +10,16 @@
 }
 
 .menuGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: center;
+    gap: 1rem;
 }
 
 .menuItem {
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 1.5rem;
     padding: 1.5rem;
@@ -52,30 +55,4 @@
 .content p {
     color: #64748b;
     font-size: 0.9rem;
-}
-
-@media (max-width: 768px) {
-    .homeContainer {
-        padding: 1.5rem;
-    }
-
-    .menuGrid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 480px) {
-    .homeContainer {
-        padding: 1rem;
-    }
-
-    .menuItem {
-        flex-direction: column;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    .icon {
-        margin-bottom: 0.5rem;
-    }
 }
