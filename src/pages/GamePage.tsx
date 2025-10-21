@@ -39,6 +39,7 @@ interface GameSetup {
 // todo: table component, why doesn't get here automatic left-right scrolling, when display width is so small? (because on SavedGameDetailPage, here it doesn't)
 // todo: Period: not number, Period
 // todo: when we click finalize game, have a window.confirm that asks for confirmation, which also states that the user will be redirected to startPage/PreviousGamesPage
+// todo: if any navigation gets fired, have a window.confirm
 
 const GamePage = () => {
     const location = useLocation();
