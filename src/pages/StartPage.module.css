@@ -2,13 +2,18 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center all content */
 }
 
 .formGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: 1fr; /* Single column by default */
     gap: 1.5rem;
     margin-bottom: 1.5rem;
+    width: 100%; /* Take full width */
+    max-width: 500px; /* Limit width for better readability */
 }
 
 .colorGroup {
@@ -20,6 +25,8 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    justify-content: center; /* Center the rink images */
+    width: 100%;
 }
 
 .rinkOption {
@@ -30,6 +37,7 @@
     padding: 0.5rem;
     border-radius: 0.5rem;
     border: 2px solid transparent;
+    text-align: center;
 }
 
 .rinkOption.selected {
@@ -50,6 +58,7 @@
     padding: 1rem;
     background-color: #f8fafc;
     border-radius: 0.5rem;
+    width: 100%; /* Take full width */
 }
 
 .rosterHeader {
@@ -76,6 +85,9 @@
     background-color: #e2e8f0;
     border-radius: 0.25rem;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .playerItem:hover {
@@ -86,12 +98,54 @@
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
+    justify-content: center; /* Center the buttons */
+    width: 100%;
 }
 
 .error {
     color: #ef4444;
     font-size: 0.875rem;
     margin-top: 0.25rem;
+}
+
+/* Position counters */
+.positionCounters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.counterItem {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #e2e8f0;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* Add colored indicators for roster status */
+.playerStatus {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.playerStatus.available {
+    background-color: #10b981; /* Green for available */
+    color: white;
+}
+
+.playerStatus.selected {
+    background-color: #ef4444; /* Red for selected (to remove) */
+    color: white;
 }
 
 @media (max-width: 768px) {
@@ -108,20 +162,37 @@
     }
 }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0.75rem;
-    }
-
+@media (min-width: 769px) {
+    /* Keep single column layout for all screen sizes as requested */
     .formGrid {
         grid-template-columns: 1fr;
     }
 
     .rinkImages {
+        justify-content: center;
+    }
+
+    .buttonGroup {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
+    }
+
+    .rinkImages {
         flex-direction: column;
+        align-items: center;
     }
 
     .buttonGroup {
         flex-direction: column;
+        align-items: center;
+    }
+
+    .positionCounters {
+        justify-content: center;
     }
 }

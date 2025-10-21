@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TeamService} from "../OOP/services/TeamService";
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {ITeam} from "../OOP/interfaces/ITeam";
@@ -54,6 +54,10 @@ const PlayerCrudPage = () => {
             setPlayers(prev => prev.filter(p => p.id !== player.id));
         }
     };
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <div className={styles.container}>

@@ -21,7 +21,7 @@ const PlayerSelectorModal = ({isOpen, team, onClose, onSelect, onGoBack}: Props)
             <div className={styles.modal}>
                 <h3>Select Player ({team.name})</h3>
                 <div className={styles.rosterGrid}>
-                    {team.players.map(player => (
+                    {team.roster.map(player => (
                         <div
                             key={player.id}
                             className={styles.playerCard}

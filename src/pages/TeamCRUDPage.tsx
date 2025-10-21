@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
@@ -53,6 +53,10 @@ const TeamCrudPage = () => {
             }
         }
     };
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <div className={styles.container}>

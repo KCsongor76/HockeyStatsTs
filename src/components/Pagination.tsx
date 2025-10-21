@@ -18,25 +18,27 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
     const goToPreviousPage = () => {
         if (pagination.page > 1) {
             setPagination(p => ({...p, page: p.page - 1}));
+            window.scrollTo(0, 0); // Scroll to top when changing pages
         }
     };
 
     const goToNextPage = () => {
         if (pagination.page < totalPages) {
             setPagination(p => ({...p, page: p.page + 1}));
+            window.scrollTo(0, 0); // Scroll to top when changing pages
         }
     };
 
-    useEffect(() => {
-        // Skip scroll on first render
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-
-        // scroll automatically to the bottom on page change or team per page change
-        window.scrollTo(0, document.body.scrollHeight);
-    }, [pagination.page, pagination.perPage]);
+    // useEffect(() => {
+    //     // Skip scroll on first render
+    //     if (isFirstRender.current) {
+    //         isFirstRender.current = false;
+    //         return;
+    //     }
+    //
+    //     // scroll automatically to the bottom on page change or team per page change
+    //     window.scrollTo(0, document.body.scrollHeight);
+    // }, [pagination.page, pagination.perPage]);
 
     return (
         <div className={styles.paginationContainer}>
@@ -51,8 +53,8 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
                 </Button>
 
                 <span className={styles.pageInfo}>
-                Page {pagination.page} of {totalPages}
-            </span>
+                    Page {pagination.page} of {totalPages}
+                </span>
 
                 <Button
                     styleType={"neutral"}
@@ -69,10 +71,13 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
                 <select
                     className={styles.perPageSelect}
                     value={pagination.perPage}
-                    onChange={e => setPagination({
-                        page: 1,
-                        perPage: parseInt(e.target.value)
-                    })}
+                    onChange={e => {
+                        setPagination({
+                            page: 1,
+                            perPage: parseInt(e.target.value)
+                        });
+                        window.scrollTo(0, 0); // Scroll to top when changing items per page
+                    }}
                 >
                     {perPageOptions.map(option => (
                         <option key={option} value={option}>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {TeamService} from "../OOP/services/TeamService";
 import {Season} from "../OOP/enums/Season";
@@ -11,12 +11,6 @@ import Button from "../components/Button";
 import Select from "../components/Select";
 import Input from "../components/Input";
 import styles from "./StartPage.module.css"
-
-// todo: unfinished game alert is shown twice when clicking ok (user has to click OK twice, should be only once), it works ok when clicking cancel
-// todo: have the same page orientation as under 768px (roster can stay the same, get rink images and buttons to middle)
-// todo: roster: have colored ticks or X-es on the roster selection, also add a counter, which shows how many forwards, defenders and goalies are selected,
-//  also implement here the roster selection constraint logic, minimum/maximum players
-
 
 const StartPage = () => {
     const loaderData = useLoaderData();
@@ -36,6 +30,15 @@ const StartPage = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
 
+    // Helper function to count players by position
+    const getPositionCounts = (roster: any[]) => {
+        return {
+            forwards: roster.filter(p => p.position === 'Forward').length,
+            defenders: roster.filter(p => p.position === 'Defender').length,
+            goalies: roster.filter(p => p.position === 'Goalie').length
+        };
+    };
+
     const updateTeamRoster = (teamId: string, newRoster: any[]) => {
         setTeams(prev =>
             prev.map(team =>
@@ -45,16 +48,49 @@ const StartPage = () => {
     };
 
     const addToRoster = (teamId: string, player: any) => {
-        updateTeamRoster(
-            teamId,
-            [...(teams.find(t => t.id === teamId)?.roster || []), player]
-        );
+        const team = teams.find(t => t.id === teamId);
+        if (!team) return;
+
+        const currentRoster = team.roster || [];
+        const positionCounts = getPositionCounts(currentRoster);
+
+        // Check roster constraints before adding
+        if (player.position === 'Goalie' && positionCounts.goalies >= 2) {
+            setErrors(prev => ({...prev, [`${teamId}Roster`]: 'Maximum 2 goalies allowed'}));
+            return;
+        }
+        if (player.position === 'Defender' && positionCounts.defenders >= 6) {
+            setErrors(prev => ({...prev, [`${teamId}Roster`]: 'Maximum 6 defenders allowed'}));
+            return;
+        }
+        if (player.position === 'Forward' && positionCounts.forwards >= 12) {
+            setErrors(prev => ({...prev, [`${teamId}Roster`]: 'Maximum 12 forwards allowed'}));
+            return;
+        }
+
+        // Clear any previous roster errors for this team
+        setErrors(prev => {
+            const newErrors = {...prev};
+            delete newErrors[`${teamId}Roster`];
+            return newErrors;
+        });
+
+        updateTeamRoster(teamId, [...currentRoster, player]);
     };
 
     const removeFromRoster = (teamId: string, playerId: string) => {
+        const currentRoster = teams.find(t => t.id === teamId)?.roster || [];
+
+        // Clear any previous roster errors for this team
+        setErrors(prev => {
+            const newErrors = {...prev};
+            delete newErrors[`${teamId}Roster`];
+            return newErrors;
+        });
+
         updateTeamRoster(
             teamId,
-            (teams.find(t => t.id === teamId)?.roster || []).filter(p => p.id !== playerId)
+            currentRoster.filter(p => p.id !== playerId)
         );
     };
 
@@ -67,15 +103,30 @@ const StartPage = () => {
         if (!awayTeamId) newErrors.awayTeamId = "Away team must be selected";
         if (homeTeamId && awayTeamId && homeTeamId === awayTeamId) newErrors.sameTeams = "Home and away teams cannot be the same";
 
-        // Validate colors (not same within team)
+        // Validate colors (different within a team)
         if (homeColors.primary.toLowerCase() === homeColors.secondary.toLowerCase()) newErrors.homeColors = "Home team's primary and secondary colors cannot be the same";
         if (awayColors.primary.toLowerCase() === awayColors.secondary.toLowerCase()) newErrors.awayColors = "Away team's primary and secondary colors cannot be the same";
-        // Validate colors (not same across teams)
+        // Validate colors (different across teams)
         if (homeColors.primary.toLowerCase() === awayColors.primary.toLowerCase() && homeColors.secondary.toLowerCase() === awayColors.secondary.toLowerCase()) newErrors.sameColors = "Home and away team colors cannot be identical";
 
-        // Validate rosters
-        if (getSelectedPlayers(homeTeamId).length < 1) newErrors.homeRoster = "Home team must have at least one player in the roster";
-        if (getSelectedPlayers(awayTeamId).length < 1) newErrors.awayRoster = "Away team must have at least one player in the roster";
+        // Validate rosters with position constraints
+        const homeRoster = getSelectedPlayers(homeTeamId);
+        const awayRoster = getSelectedPlayers(awayTeamId);
+
+        const homeCounts = getPositionCounts(homeRoster);
+        const awayCounts = getPositionCounts(awayRoster);
+
+        if (homeRoster.length < 1) newErrors.homeRoster = "Home team must have at least one player in the roster";
+        if (awayRoster.length < 1) newErrors.awayRoster = "Away team must have at least one player in the roster";
+
+        // Check minimum requirements
+        // if (homeCounts.goalies !== 2) newErrors.homeRoster = "Home team must have 2 goalies";
+        // if (homeCounts.defenders + homeCounts.forwards < 15) newErrors.homeRoster = "Home team must have at least 15 skaters";
+        // if (homeCounts.defenders + homeCounts.forwards > 20) newErrors.homeRoster = "Home team must have at most 20 skaters";
+
+        // if (awayCounts.goalies !== 2) newErrors.awayRoster = "Away team must have 2 goalies";
+        // if (awayCounts.defenders + awayCounts.forwards < 15) newErrors.awayRoster = "Away team must have at least 15 skaters";
+        // if (awayCounts.defenders + awayCounts.forwards > 20) newErrors.awayRoster = "Away team must have at most 20 skaters";
 
         // Validate rink image
         if (!selectedImage) newErrors.rinkImage = "You must select a rink image";
@@ -88,8 +139,8 @@ const StartPage = () => {
 
         const homeTeamData = teams.filter(t => t.id === homeTeamId)[0] as ITeam
         const awayTeamData = teams.filter(t => t.id === awayTeamId)[0] as ITeam
-        const homeTeam = {...homeTeamData, roster: getSelectedPlayers(homeTeamData.id)} as ITeam
-        const awayTeam = {...awayTeamData, roster: getSelectedPlayers(awayTeamData.id)} as ITeam
+        const homeTeam = {...homeTeamData, roster: homeRoster} as ITeam
+        const awayTeam = {...awayTeamData, roster: awayRoster} as ITeam
 
         const setup = {
             season,
@@ -119,21 +170,47 @@ const StartPage = () => {
         return teams.find(t => t.id === teamId)?.roster || [];
     };
 
+    const hasCheckedForSavedGame = useRef(false);
+
     useEffect(() => {
+        if (hasCheckedForSavedGame.current) return;
+
         const checkForSavedGame = () => {
             const savedGame = localStorage.getItem('unfinishedGame');
             console.log(JSON.parse(savedGame as string))
             if (savedGame) {
                 if (window.confirm('An unfinished game was found. Do you want to continue?')) {
+                    hasCheckedForSavedGame.current = true;
                     navigate('/game', {state: JSON.parse(savedGame as string)});
                 } else {
                     localStorage.removeItem('unfinishedGame');
+                    hasCheckedForSavedGame.current = true;
                 }
             }
         };
 
         checkForSavedGame();
     }, [navigate]);
+
+    // Render position counters for a team
+    // const renderPositionCounters = (teamId: string) => {
+    //     const roster = getSelectedPlayers(teamId);
+    //     const counts = getPositionCounts(roster);
+    //
+    //     return (
+    //         <div className={styles.positionCounters}>
+    //             <div className={styles.counterItem}>
+    //                 <span>Forwards: {counts.forwards}/6-12</span>
+    //             </div>
+    //             <div className={styles.counterItem}>
+    //                 <span>Defenders: {counts.defenders}/4-6</span>
+    //             </div>
+    //             <div className={styles.counterItem}>
+    //                 <span>Goalies: {counts.goalies}/1-2</span>
+    //             </div>
+    //         </div>
+    //     );
+    // };
 
     return (
         <div className={styles.container}>
@@ -279,6 +356,7 @@ const StartPage = () => {
                         <div className={styles.rosterContent}>
                             <div>
                                 <h4>Home Roster</h4>
+                                {/*{renderPositionCounters(homeTeamId)}*/}
                                 <h5>Available Players</h5>
                                 {getAvailablePlayers(homeTeamId).map(player => (
                                     <div
@@ -286,6 +364,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => addToRoster(homeTeamId, player)}
                                     >
+                                        <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
                                         #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
@@ -296,6 +375,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => removeFromRoster(homeTeamId, player.id)}
                                     >
+                                        <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
                                         #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
@@ -304,6 +384,7 @@ const StartPage = () => {
 
                             <div>
                                 <h4>Away Roster</h4>
+                                {/*{renderPositionCounters(awayTeamId)}*/}
                                 <h5>Available Players</h5>
                                 {getAvailablePlayers(awayTeamId).map(player => (
                                     <div
@@ -311,6 +392,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => addToRoster(awayTeamId, player)}
                                     >
+                                        <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
                                         #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}
@@ -321,6 +403,7 @@ const StartPage = () => {
                                         className={styles.playerItem}
                                         onClick={() => removeFromRoster(awayTeamId, player.id)}
                                     >
+                                        <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
                                         #{player.jerseyNumber} - {player.name} ({player.position})
                                     </div>
                                 ))}

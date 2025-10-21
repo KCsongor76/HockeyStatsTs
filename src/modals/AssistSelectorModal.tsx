@@ -32,7 +32,7 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
                 <h3>Select Assists ({team.name})</h3>
                 <p>Select 0-2 players</p>
                 <div className={styles.rosterGrid}>
-                    {team.players
+                    {team.roster
                         .filter(player => player.id !== excludedPlayer?.id)
                         .map(player => (
                             <div
