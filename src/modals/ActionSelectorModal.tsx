@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {ActionType} from "../OOP/enums/ActionType";
 import Icon from "../components/Icon";
 import {ITeam} from "../OOP/interfaces/ITeam";
@@ -18,10 +18,6 @@ interface Props {
     gameType: GameType;
 }
 
-// todo: period selector: use the period name, not number
-// todo: given gameType, have the periods
-// todo: given period, have the time constraint
-
 const ActionSelectorModal = ({
                                  isOpen,
                                  onClose,
@@ -36,15 +32,78 @@ const ActionSelectorModal = ({
     const [minutes, setMinutes] = useState<number>(0);
     const [seconds, setSeconds] = useState<number>(0);
 
-    if (!isOpen) return null;
+    // Get available periods based on game type
+    const getPeriods = () => {
+        if (gameType === GameType.REGULAR) {
+            return Object.entries(RegularPeriod)
+                .filter(([key, value]) => typeof value === 'number')
+                .map(([key, value]) => ({
+                    value: value as number,
+                    label: key.charAt(0) + key.slice(1).toLowerCase().replace(/_/g, ' ')
+                }));
+        } else {
+            return Object.entries(PlayoffPeriod)
+                .filter(([key, value]) => typeof value === 'number')
+                .map(([key, value]) => ({
+                    value: value as number,
+                    label: key.replace(/_/g, '')
+                }));
+        }
+    };
 
-    const periods = gameType === GameType.REGULAR
-        ? Object.values(RegularPeriod).filter(v => typeof v === 'number') as number[]
-        : Object.values(PlayoffPeriod).filter(v => typeof v === 'number') as number[];
+    // Get time constraints based on period
+    const getTimeConstraints = (period: number) => {
+        if (gameType === GameType.REGULAR) {
+            switch (period) {
+                case RegularPeriod.FIRST:
+                case RegularPeriod.SECOND:
+                case RegularPeriod.THIRD:
+                    return { maxMinutes: 19, maxSeconds: 59 };
+                case RegularPeriod.OT:
+                    return { maxMinutes: 4, maxSeconds: 59 };
+                case RegularPeriod.SO:
+                    return { maxMinutes: 0, maxSeconds: 0 };
+                default:
+                    return { maxMinutes: 19, maxSeconds: 59 };
+            }
+        } else {
+            switch (period) {
+                case PlayoffPeriod.FIRST:
+                case PlayoffPeriod.SECOND:
+                case PlayoffPeriod.THIRD:
+                    return { maxMinutes: 19, maxSeconds: 59 };
+                default: // All overtime periods
+                    return { maxMinutes: 19, maxSeconds: 59 };
+            }
+        }
+    };
+
+    const periods = getPeriods();
+    const timeConstraints = getTimeConstraints(period);
+
+    // Reset time when period changes
+    useEffect(() => {
+        setMinutes(0);
+        setSeconds(0);
+    }, [period]);
+
+    if (!isOpen) return null;
 
     const handleActionSelect = (type: ActionType, team: ITeam) => {
         const timeInSeconds = minutes * 60 + seconds;
         onSelect(type, team, period, timeInSeconds);
+    };
+
+    const handleMinutesChange = (value: number) => {
+        if (value >= 0 && value <= timeConstraints.maxMinutes) {
+            setMinutes(value);
+        }
+    };
+
+    const handleSecondsChange = (value: number) => {
+        if (value >= 0 && value <= timeConstraints.maxSeconds) {
+            setSeconds(value);
+        }
     };
 
     return (
@@ -60,7 +119,7 @@ const ActionSelectorModal = ({
                             onChange={(e) => setPeriod(Number(e.target.value))}
                         >
                             {periods.map(p => (
-                                <option key={p} value={p}>{p}</option>
+                                <option key={p.value} value={p.value}>{p.label}</option>
                             ))}
                         </select>
                     </div>
@@ -70,17 +129,19 @@ const ActionSelectorModal = ({
                         <input
                             type="number"
                             min="0"
-                            max="20"
+                            max={timeConstraints.maxMinutes}
                             value={minutes}
-                            onChange={(e) => setMinutes(Number(e.target.value))}
+                            onChange={(e) => handleMinutesChange(Number(e.target.value))}
+                            disabled={timeConstraints.maxMinutes === 0}
                         />
                         <span>:</span>
                         <input
                             type="number"
                             min="0"
-                            max="59"
+                            max={timeConstraints.maxSeconds}
                             value={seconds.toString().padStart(2, '0')}
-                            onChange={(e) => setSeconds(Number(e.target.value))}
+                            onChange={(e) => handleSecondsChange(Number(e.target.value))}
+                            disabled={timeConstraints.maxSeconds === 0}
                         />
                     </div>
                 </div>

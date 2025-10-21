@@ -16,13 +16,10 @@ interface Props {
     position?: { x: number, y: number } | null;
     onClose: () => void;
     onConfirm: () => void;
+    onGoBack?: () => void;
 }
 
-// todo: show period and time
-// todo: Modals (PlayerSelectorModal, AssistSelectorModal, ConfirmationModal) - have additional "Go Back" functionality, not just cancel
-
-
-const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm}: Props) => {
+const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm, onGoBack}: Props) => {
     if (!isOpen) return null;
 
     return (
@@ -66,7 +63,7 @@ const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm}: Props
                     </div>
                 )}
 
-                {action.time && (
+                {action.time != null && (
                     <div className={styles.detailRow}>
                         <span>Time:</span>
                         <span>{Math.floor(action.time / 60).toString().padStart(2, '0')} : {(action.time % 60).toString().padStart(2, '0')}</span>
@@ -74,6 +71,11 @@ const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm}: Props
                 )}
 
                 <div className={styles.modalActions}>
+                    {onGoBack && (
+                        <Button styleType="negative" onClick={onGoBack}>
+                            Go Back
+                        </Button>
+                    )}
                     <Button styleType="negative" onClick={onClose}>
                         Cancel
                     </Button>

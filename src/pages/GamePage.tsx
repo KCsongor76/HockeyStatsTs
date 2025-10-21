@@ -95,6 +95,18 @@ const GamePage = () => {
         setModalStep('confirm');
     };
 
+    const goBackToActionSelector = () => {
+        setModalStep('action');
+    };
+
+    const goBackToPlayerSelector = () => {
+        setModalStep('player');
+    };
+
+    const goBackToAssistSelector = () => {
+        setModalStep('assist');
+    };
+
     const updateScores = (action: IGameAction) => {
         if (!gameSetup) return;
 
@@ -445,6 +457,7 @@ const GamePage = () => {
                 team={currentAction.team}
                 onClose={resetModalFlow}
                 onSelect={handlePlayerSelect}
+                onGoBack={goBackToActionSelector} // Add this
             />
 
             <AssistSelectorModal
@@ -453,6 +466,7 @@ const GamePage = () => {
                 excludedPlayer={currentAction.player}
                 onClose={resetModalFlow}
                 onSelect={handleAssistSelect}
+                onGoBack={goBackToPlayerSelector} // Add this
             />
 
             <ConfirmationModal
@@ -461,6 +475,7 @@ const GamePage = () => {
                 position={selectedPosition}
                 onClose={resetModalFlow}
                 onConfirm={confirmAction}
+                onGoBack={currentAction.type === ActionType.GOAL ? goBackToAssistSelector : goBackToPlayerSelector} // Add this
             />
 
             <ActionDetailsModal

@@ -53,7 +53,7 @@ const ActionDetailsModal: React.FC<Props> = ({isOpen, onClose, action}) => {
 
                 <div className={styles.detailRow}>
                     <strong>Time:</strong>
-                    <span>{Math.floor(action.time / 60)}:{String(action.time % 60).padStart(2, '0')}</span>
+                    <span>{Math.floor(action.time / 60).toString().padStart(2, '0')} : {(action.time % 60).toString().padStart(2, '0')}</span>
                 </div>
 
                 <div className={styles.detailRow}>
