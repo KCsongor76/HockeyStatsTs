@@ -63,7 +63,7 @@ function App() {
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
                 {path: "start", element: <StartPage/>, loader: startPageLoader},
                 {path: "game", element: <GamePage/>},
-                {path: "previous_games", element: <SavedGamesPage/>},
+                {path: "previous_games", element: <SavedGamesPage showFilters={true}/>},
                 {path: "previous_games/:gameId", element: <SavedGameDetailPage/>},
                 {
                     path: "handleTeams",
@@ -104,7 +104,7 @@ function App() {
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
                 {path: "start", element: <StartPage/>,},
                 {path: "game", element: <GamePage/>},
-                {path: "previous_games", element: <SavedGamesPage/>},
+                {path: "previous_games", element: <SavedGamesPage showFilters={true}/>},
                 {path: "previous_games/:gameId", element: <SavedGameDetailPage/>},
                 {path: "admin", element: <AuthPage/>},
                 {path: "*", element: <Navigate to="/admin" replace/>}, // Redirect unauthorized users

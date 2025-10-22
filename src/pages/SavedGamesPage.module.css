@@ -35,22 +35,32 @@
 
 .gameTeams {
     width: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-evenly;
     gap: 1rem;
-    flex-grow: 1;
 }
 
 .gameTeam {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 80px;
+}
+
+.gameTeam span {
+    margin-top: 0.5rem;
+    font-weight: 500;
+    max-width: 150px;
+    word-wrap: break-word;
 }
 
 .gameScore {
     font-weight: bold;
-    margin: 0 1rem;
-
+    font-size: 1.25rem;
+    margin: 0.5rem 0;
 }
 
 .gameLogo {
@@ -60,43 +70,19 @@
 }
 
 .gameInfo {
-    width: 100%;
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
+    flex-direction: column;
+    align-items: center;
     gap: 0.25rem;
     color: #64748b;
     font-size: 0.875rem;
+    text-align: center;
 }
 
 .pagination {
     margin-top: 1.5rem;
     display: flex;
     justify-content: center;
-}
-
-@media (max-width: 800px) {
-    .container {
-        padding: 1rem;
-    }
-
-    .gameItem {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .gameTeams {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .gameInfo {
-        width: 100%;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-    }
 }
 
 @media (max-width: 600px) {
@@ -109,11 +95,24 @@
     }
 
     .gameTeams {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
         gap: 0.5rem;
     }
 
-    .gameScore {
-        margin: 0.5rem 0;
+    .gameTeam {
+        min-height: auto;
+    }
+
+    .gameTeam:first-child {
+        order: 1;
+    }
+
+    .gameInfo {
+        order: 2;
+    }
+
+    .gameTeam:last-child {
+        order: 3;
     }
 }

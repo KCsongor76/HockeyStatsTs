@@ -16,9 +16,6 @@ interface SavedGamesPageProps {
     showFilters?: boolean;
 }
 
-// todo: better styling
-// todo: filter?
-
 const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     const [teams, setTeams] = useState<ITeam[]>([]);
     const [games, setGames] = useState<IGame[]>(playerGames || []);
@@ -96,7 +93,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         return <div>{error}</div>;
     }
 
-    if (games.length === 0 || filteredGames.length === 0) return <div>No games available.</div>; // TODO: -?
+    if (games.length === 0 || filteredGames.length === 0) return <div>No games available.</div>;
 
     return (
         <div className={styles.container}>
@@ -189,31 +186,29 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                                 <div className={styles.gameTeam}>
                                     <img
                                         src={game.teams.home.logo}
-                                        alt={game.teams.home.logo}
+                                        alt={game.teams.home.name}
                                         className={styles.gameLogo}
                                     />
                                     <span>{game.teams.home.name}</span>
                                 </div>
 
-                                <span className={styles.gameScore}>
-                                    {game.score.home.goals} - {game.score.away.goals}
-                                </span>
+                                <div className={styles.gameInfo}>
+                                    <span className={styles.gameScore}>
+                                        {game.score.home.goals} - {game.score.away.goals}
+                                    </span>
+                                    <span>{formatDate(game.timestamp)}</span>
+                                    <span>Type: {game.type}</span>
+                                    <span>Season: {game.season || "Not specified"}</span>
+                                </div>
 
                                 <div className={styles.gameTeam}>
                                     <img
                                         src={game.teams.away.logo}
-                                        alt={game.teams.away.logo}
+                                        alt={game.teams.away.name}
                                         className={styles.gameLogo}
                                     />
                                     <span>{game.teams.away.name}</span>
                                 </div>
-                            </div>
-
-                            <div className={styles.gameInfo}>
-                                <span>{formatDate(game.timestamp)}</span>
-                                <span>Type: {game.type}</span>
-                                <span>Season: {game.season || "Not specified"}</span>
-                                {/*/!*<span>Championship: {game.championship || "Not specified"}</span>*!/ TODO:*/}
                             </div>
                         </li>
                     ))
