@@ -15,9 +15,6 @@ import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
 import ActionTypeFilters from "../components/ActionTypeFilters";
 
-// todo: have same styling as GamePage
-// todo: iconColors: have a toggle for game/default colors to be shown (2 toggles, one separate for both team)
-
 const SavedGameDetailPage = () => {
     const locationData = useLocation();
     const game = locationData.state as IGame;
@@ -25,7 +22,11 @@ const SavedGameDetailPage = () => {
     const [selectedPeriods, setSelectedPeriods] = useState<number[]>([]);
     const [selectedActionTypes, setSelectedActionTypes] = useState<ActionType[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
-    const [selectedAction, setSelectedAction] = useState<IGameAction | null>(null); // New state for action details
+    const [selectedAction, setSelectedAction] = useState<IGameAction | null>(null);
+
+    // New state for color toggles
+    const [useHomeTeamColors, setUseHomeTeamColors] = useState<boolean>(true);
+    const [useAwayTeamColors, setUseAwayTeamColors] = useState<boolean>(true);
 
     const getAvailablePeriodsAndActionTypes = () => ({
         availablePeriods: Array.from(new Set(game.actions.map(a => a.period))),
@@ -97,6 +98,37 @@ const SavedGameDetailPage = () => {
         setSelectedAction(action);
     };
 
+    // Get icon colors based on toggle states
+    const getIconColors = (action: IGameAction) => {
+        const isHomeTeam = action.team.id === game.teams.home.id;
+
+        if (isHomeTeam && !useHomeTeamColors) {
+            // Default colors for home team
+            return {
+                backgroundColor: '#3b82f6', // blue
+                color: '#ffffff' // white
+            };
+        }
+
+        if (!isHomeTeam && !useAwayTeamColors) {
+            // Default colors for away team
+            return {
+                backgroundColor: '#ef4444', // red
+                color: '#ffffff' // white
+            };
+        }
+
+        // Use game colors
+        return {
+            backgroundColor: isHomeTeam
+                ? game.teams.home.homeColor.primary
+                : game.teams.away.awayColor.primary,
+            color: isHomeTeam
+                ? game.teams.home.homeColor.secondary
+                : game.teams.away.awayColor.secondary
+        };
+    };
+
     return (
         <div>
             <GameScoreData game={game} score={game.score}/>
@@ -104,6 +136,26 @@ const SavedGameDetailPage = () => {
             <div className={styles.filterContainer}>
                 <h3>Team View</h3>
                 <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
+
+                <h3>Icon Colors</h3>
+                <div style={{display: 'flex', gap: '1rem', marginBottom: '1rem'}}>
+                    <div>
+                        <Button
+                            styleType={useHomeTeamColors ? 'positive' : 'neutral'}
+                            onClick={() => setUseHomeTeamColors(!useHomeTeamColors)}
+                        >
+                            {useHomeTeamColors ? 'Home: Game Colors' : 'Home: Default Colors'}
+                        </Button>
+                    </div>
+                    <div>
+                        <Button
+                            styleType={useAwayTeamColors ? 'positive' : 'neutral'}
+                            onClick={() => setUseAwayTeamColors(!useAwayTeamColors)}
+                        >
+                            {useAwayTeamColors ? 'Away: Game Colors' : 'Away: Default Colors'}
+                        </Button>
+                    </div>
+                </div>
 
                 <h3>Periods</h3>
                 <PeriodFilters
@@ -123,17 +175,20 @@ const SavedGameDetailPage = () => {
             <div className={styles.rinkContainer}>
                 <img src={game.selectedImage} alt="rink"/>
                 <div className={styles.iconContainer}>
-                    {getFilteredActions().map((action, index) => (
-                        <Icon
-                            key={`second-${index}`}
-                            actionType={action.type}
-                            backgroundColor={action.team.id === game.teams.home.id ? game.teams.home.homeColor.primary : game.teams.away.awayColor.primary}
-                            color={action.team.id === game.teams.home.id ? game.teams.home.homeColor.secondary : game.teams.away.awayColor.secondary}
-                            x={action.x}
-                            y={action.y}
-                            onClick={() => handleIconClick(action)}
-                        />
-                    ))}
+                    {getFilteredActions().map((action, index) => {
+                        const colors = getIconColors(action);
+                        return (
+                            <Icon
+                                key={`second-${index}`}
+                                actionType={action.type}
+                                backgroundColor={colors.backgroundColor}
+                                color={colors.color}
+                                x={action.x}
+                                y={action.y}
+                                onClick={() => handleIconClick(action)}
+                            />
+                        );
+                    })}
                 </div>
             </div>
 
