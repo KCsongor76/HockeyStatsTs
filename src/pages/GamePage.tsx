@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
-import { useBlocker } from 'react-router-dom';
+import {useBlocker} from 'react-router-dom';
 import {Season} from "../OOP/enums/Season";
 import {Championship} from "../OOP/enums/Championship";
 import {GameType} from "../OOP/enums/GameType";
@@ -37,8 +37,6 @@ interface GameSetup {
     awayColors: { primary: string; secondary: string };
 }
 
-// todo: table component, why doesn't get here automatic left-right scrolling, when display width is so small? (because on SavedGameDetailPage, here it doesn't)
-
 const GamePage = () => {
     const location = useLocation();
     const [gameSetup, setGameSetup] = useState<GameSetup | null>(null);
@@ -67,7 +65,7 @@ const GamePage = () => {
     const navigate = useNavigate();
     const [isFinalizing, setIsFinalizing] = useState(false);
     const blocker = useBlocker(
-        ({ currentLocation, nextLocation }) =>
+        ({currentLocation, nextLocation}) =>
             !isFinalizing && actions.length > 0 && currentLocation.pathname !== nextLocation.pathname
     );
 
@@ -386,63 +384,68 @@ const GamePage = () => {
     }
 
     return (
-        <div className={styles.gameContainer}>
+        <>
+            <div className={styles.gameContainer}>
 
-            {/* First rink with clickable area */}
-            <div className={styles.rinkContainer}>
-                <img
-                    src={gameSetup.rinkImage}
-                    alt="rink"
-                    onClick={handleRinkClick}
-                    className={styles.clickableRink}
-                />
-                {showDetails && <div className={styles.iconContainer}>
-                    {actions.map((action, index) => (
-                        <Icon
-                            key={index}
-                            actionType={action.type}
-                            backgroundColor={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.primary : gameSetup.awayColors.primary}
-                            color={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.secondary : gameSetup.awayColors.secondary}
-                            x={action.x}
-                            y={action.y}
-                            onClick={() => handleIconClick(action)}
-                        />
-                    ))}
-                </div>}
+                {/* First rink with clickable area */}
+                <div className={styles.rinkContainer}>
+                    <img
+                        src={gameSetup.rinkImage}
+                        alt="rink"
+                        onClick={handleRinkClick}
+                        className={styles.clickableRink}
+                    />
+                    {showDetails && <div className={styles.iconContainer}>
+                        {actions.map((action, index) => (
+                            <Icon
+                                key={index}
+                                actionType={action.type}
+                                backgroundColor={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.primary : gameSetup.awayColors.primary}
+                                color={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.secondary : gameSetup.awayColors.secondary}
+                                x={action.x}
+                                y={action.y}
+                                onClick={() => handleIconClick(action)}
+                            />
+                        ))}
+                    </div>}
+                </div>
+
+                {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
+
+                <div>
+                    <Button styleType={"positive"} type="button" onClick={saveGameLocally}>Save Game Locally</Button>
+                    <Button styleType={"positive"} type="button" onClick={finalizeGame}>Finalize Game</Button>
+                    <Button
+                        styleType={showDetails ? "negative" : "positive"}
+                        type="button"
+                        onClick={() => setShowDetails(!showDetails)}
+                    >
+                        {showDetails ? 'Hide Details' : 'Show Details'}
+                    </Button>
+                </div>
             </div>
 
-            {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
-
-            <div>
-                <Button styleType={"positive"} type="button" onClick={saveGameLocally}>Save Game Locally</Button>
-                <Button styleType={"positive"} type="button" onClick={finalizeGame}>Finalize Game</Button>
-                <Button
-                    styleType={showDetails ? "negative" : "positive"}
-                    type="button"
-                    onClick={() => setShowDetails(!showDetails)}
-                >
-                    {showDetails ? 'Hide Details' : 'Show Details'}
-                </Button>
-            </div>
 
             {showDetails && (
                 <>
-                    <h3>Team View</h3>
-                    <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
+                    <div className={styles.gameContainer}>
+                        <h3>Team View</h3>
+                        <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
 
-                    <h3>Periods</h3>
-                    <PeriodFilters
-                        availablePeriods={availablePeriods}
-                        selectedPeriods={selectedPeriods}
-                        togglePeriod={togglePeriod}
-                    />
+                        <h3>Periods</h3>
+                        <PeriodFilters
+                            availablePeriods={availablePeriods}
+                            selectedPeriods={selectedPeriods}
+                            togglePeriod={togglePeriod}
+                        />
 
-                    <h3>Action Types</h3>
-                    <ActionTypeFilters
-                        availableActionTypes={availableActionTypes}
-                        selectedActionTypes={selectedActionTypes}
-                        toggleActionType={toggleActionType}
-                    />
+                        <h3>Action Types</h3>
+                        <ActionTypeFilters
+                            availableActionTypes={availableActionTypes}
+                            selectedActionTypes={selectedActionTypes}
+                            toggleActionType={toggleActionType}
+                        />
+                    </div>
 
                     {/* Second rink */}
                     <div className={styles.rinkContainer}>
@@ -462,7 +465,7 @@ const GamePage = () => {
                         </div>
                     </div>
 
-                    <div>
+                    <div className={styles.gameContainer}>
                         <h2>Player Statistics</h2>
                         <h3>Skaters</h3>
                         {currentGame && (
@@ -531,7 +534,7 @@ const GamePage = () => {
                 onClose={() => setSelectedAction(null)}
                 action={selectedAction}
             />
-        </div>
+        </>
     );
 };
 

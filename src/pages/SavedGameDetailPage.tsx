@@ -192,7 +192,7 @@ const SavedGameDetailPage = () => {
                 </div>
             </div>
 
-            <div>
+            <div className={styles.gameContainer}>
                 <h2>Player Statistics</h2>
                 <h3>Skaters</h3>
                 {game && (
