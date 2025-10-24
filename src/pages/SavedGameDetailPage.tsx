@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {IGame} from "../OOP/interfaces/IGame";
 import styles from "./GamePage.module.css";
 import {ActionType} from "../OOP/enums/ActionType";
@@ -14,6 +14,7 @@ import GameScoreData from "../components/GameScoreData";
 import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
 import ActionTypeFilters from "../components/ActionTypeFilters";
+import {GameService} from "../OOP/services/GameService";
 
 const SavedGameDetailPage = () => {
     const locationData = useLocation();
@@ -34,6 +35,7 @@ const SavedGameDetailPage = () => {
     });
 
     const {availablePeriods, availableActionTypes} = getAvailablePeriodsAndActionTypes();
+    const navigate = useNavigate();
 
     const getFilteredPlayers = () => {
         if (!game) return [];
@@ -129,6 +131,21 @@ const SavedGameDetailPage = () => {
         };
     };
 
+    const deleteHandler = async () => {
+        if (window.confirm("Are you sure you want to delete this game?")) {
+            try {
+                await GameService.deleteGame(game)
+                alert("Game successfully deleted!")
+                navigate("previous_games")
+            } catch (error) {
+                console.error(error);
+                alert("Unsuccessful deletion.")
+            }
+        } else {
+            alert("Deletion canceled.")
+        }
+    }
+
     return (
         <div>
             <GameScoreData game={game} score={game.score}/>
@@ -215,6 +232,8 @@ const SavedGameDetailPage = () => {
                         togglePlayer={togglePlayer}
                     />
                 )}
+
+                <Button styleType={"negative"} onClick={deleteHandler}>Delete Game</Button>
             </div>
 
             <ActionDetailsModal

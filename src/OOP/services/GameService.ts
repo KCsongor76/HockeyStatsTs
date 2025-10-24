@@ -1,7 +1,6 @@
 import {addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc} from "firebase/firestore";
 import {db} from "../../firebase";
 import {IGame} from "../interfaces/IGame";
-// import {Game} from "../classes/Game";
 
 // todo: arrow functions, atomic operations, batch writes?
 

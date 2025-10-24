@@ -4,5 +4,5 @@ export enum ActionType {
     ASSIST = "Assist",
     TURNOVER = "Turnover",
     HIT = "Hit",
-    FaceOff = "FaceOff",
+    FACEOFF = "FaceOff",
 }
