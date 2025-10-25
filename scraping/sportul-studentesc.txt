@@ -1,0 +1,53 @@
+jersey_number | player_name | position
+45 | Cosmin Agapie | goalie
+30 | Cristian Asandei | goalie
+1 | Mihai Alexandru Mocanu | goalie
+33 | Gabriel Moinescu | goalie
+50 | George Prodan | goalie
+39 | Toma Boholt | defender
+73 | Andrei Brebenel | defender
+12 | Stefanita Bucatos | defender
+33 | Mihai Constantin | defender
+5 | Florin David | defender
+75 | Paul Diaconita | defender
+86 | Ionut Dinu | defender
+44 | Joseph Finfer | defender
+6 | Nandor Kiss | defender
+66 | Liviu Moraru | defender
+51 | Alexandru Panait | defender
+46 | Leonard Pascaru | defender
+23 | Andrei Prisacaru | defender
+69 | Mihnea Singiorzan | defender
+19 | Stefan Stanescu | defender
+28 | Dávid-Dániel Tankó | defender
+13 | Alexandru Voicu | defender
+5 | Mihai Adamoiu | forward
+63 | Aristotel Agapie | forward
+13 | Matei Gabriel Alexandrescu | forward
+16 | Gergö Benedek | forward
+88 | Robert Daniel Bica | forward
+15 | Gabriel Caval | forward
+94 | Iulian Chitac | forward
+14 | Igor David | forward
+10 | Ioan Dobrescu | forward
+7 | Róbert Fetés | forward
+10 | Marian Ghita | forward
+44 | Vlad Grigori | forward
+96 | Robert Iordan | forward
+99 | Iani Dan Jugurica | forward
+9 | Theodor Lupu | forward
+11 | Marian Manolica | forward
+87 | Bogdan Marinica | forward
+22 | Horia Mazilu | forward
+17 | Radu Niculae | forward
+77 | Cristian Popa | forward
+91 | Claudiu Radu | forward
+27 | Robert Giovani Rusu | forward
+67 | Cristian Sandor | forward
+8 | Zoltán Sándor | forward
+71 | Cezar Sendrea | forward
+72 | Tamás Solymosi | forward
+25 | Gabriel Spiridon | forward
+3 | Andrei Bogdan Stefan | forward
+33 | Cristian Vasilache | forward
+21 | Matei Virlanuta | forward

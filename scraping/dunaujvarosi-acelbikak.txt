@@ -1,0 +1,24 @@
+jersey_number | player_name | position
+31 | János Bejo | goalie
+55 | Botond Szücs | goalie
+73 | Márton Balázsi | defender
+65 | Dávid Bánki | defender
+27 | Yegor Kudin | defender
+61 | Alexander Mikulovich | defender
+16 | Nikola Murgic | defender
+82 | Kamill Pinczés | defender
+80 | Márk Pozsár | defender
+37 | Patrik Szécsi | defender
+79 | Vertti Vuoksiala | defender
+47 | Maxim Askarov | forward
+95 | Istvan Cseh | forward
+19 | Dávid Csémi | forward
+93 | Mirko Djumic | forward
+17 | Zsombor Keresztes | forward
+72 | Zsombor Kuminka | forward
+13 | Donte Lawson | forward
+11 | Oliver Pinczes | forward
+15 | Oliver Strenk | forward
+52 | Srdjan Subotic | forward
+43 | Bendeguz Vadocz | forward
+28 | Bogdan Zorin | forward

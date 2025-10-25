@@ -136,7 +136,7 @@ const SavedGameDetailPage = () => {
             try {
                 await GameService.deleteGame(game)
                 alert("Game successfully deleted!")
-                navigate("previous_games")
+                navigate(-1)
             } catch (error) {
                 console.error(error);
                 alert("Unsuccessful deletion.")

@@ -1,0 +1,23 @@
+jersey_number | player_name | position
+42 | Tamás Antek | goalie
+56 | Zoltán Hetényi | goalie
+74 | Martin Szeles | goalie
+34 | Rajmund Bukor | defender
+41 | Dominik Dobmayer | defender
+6 | Bence Haranghy | defender
+22 | Phil Kiss | defender
+52 | Mate Miklos Martonffy | defender
+4 | Yegor Mazhuga | defender
+23 | Nikita Ustinenko | defender
+76 | Taras Yeliseyev | defender
+47 | Kirils Galoha | forward
+58 | Alpar Kovacs | forward
+29 | Brúnó Kreisz | forward
+87 | Kirill Krutov | forward
+13 | Vladislav Kuleshov | forward
+16 | Gergö Mihalik | forward
+10 | Zétény Molnár | forward
+11 | Yevgeni Mozer | forward
+12 | Anton Shenfeld | forward
+21 | Petar Simic | forward
+26 | Donát Szita | forward

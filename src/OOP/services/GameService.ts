@@ -25,16 +25,11 @@ export class GameService {
         return querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()} as IGame));
     }
 
-    // static getAllGames = async (): Promise<Game[]> => {
-    //     const querySnapshot = await getDocs(this.collectionRef);
-    //     return querySnapshot.docs.map(doc =>
-    //         Game.fromPlain({id: doc.id, ...doc.data()} as IGame)
-    //     );
-    // }
-
     static deleteGame = async (game: IGame) => {
         const id = game.id;
         const docRef = doc(this.collectionRef, id);
         await deleteDoc(docRef);
+        // todo: when deleting game, make sure that all the stats get deleted from teams/players also
+        // todo: also, have shallow delete?
     }
 }

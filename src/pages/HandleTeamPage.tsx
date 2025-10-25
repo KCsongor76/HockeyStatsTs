@@ -29,6 +29,7 @@ const HandleTeamPage = () => {
     const [showPlayers, setShowPlayers] = useState<boolean>(false);
     const [showGames, setShowGames] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [championships, setChampionships] = useState<Championship[]>(team.championships || []);
     const navigate = useNavigate();
 
     const getFilteredGames = (type?: GameType) => {
@@ -79,6 +80,7 @@ const HandleTeamPage = () => {
     const handleDiscard = () => {
         setName(team.name);
         setLogoFile(null);
+        setChampionships(team.championships || []);
         setIsEditing(false);
         setErrors({});
     };
@@ -114,6 +116,14 @@ const HandleTeamPage = () => {
         }
     };
 
+    const toggleChampionship = (championship: Championship) => {
+        setChampionships(prev =>
+            prev.includes(championship)
+                ? prev.filter(c => c !== championship)
+                : [...prev, championship]
+        );
+    };
+
     const handleSave = async () => {
         try {
             const nameError = await TeamService.isNameTaken(name, team.id)
@@ -122,6 +132,13 @@ const HandleTeamPage = () => {
 
             if (nameError) {
                 setErrors(prev => ({...prev, name: nameError}));
+                return;
+            }
+
+            // Validate championships
+            const championshipsError = Team.validateChampionships(championships);
+            if (championshipsError) {
+                setErrors(prev => ({...prev, championships: championshipsError}));
                 return;
             }
 
@@ -143,7 +160,8 @@ const HandleTeamPage = () => {
             const updatedTeam = new Team({
                 ...team,
                 name,
-                logo: logoUrl
+                logo: logoUrl,
+                championships
             });
 
             await TeamService.updateTeam(team.id, updatedTeam);
@@ -194,6 +212,23 @@ const HandleTeamPage = () => {
                             onChange={handleLogoChange}
                             error={errors.logo}
                         />
+
+                        {/* Championship Selection */}
+                        <div className={styles.championshipGroup}>
+                            <label>Championships:</label>
+                            {Object.values(Championship).map((championship) => (
+                                <div key={championship} className={styles.championshipItem}>
+                                    <Input
+                                        type="checkbox"
+                                        id={`champ-${championship}`}
+                                        checked={championships.includes(championship)}
+                                        onChange={() => toggleChampionship(championship)}
+                                    />
+                                    <label htmlFor={`champ-${championship}`}>{championship}</label>
+                                </div>
+                            ))}
+                            {errors.championships && <span style={{color: 'red'}}>{errors.championships}</span>}
+                        </div>
                     </div>
 
                     {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}

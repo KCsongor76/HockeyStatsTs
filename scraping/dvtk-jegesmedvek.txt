@@ -1,0 +1,26 @@
+jersey_number | player_name | position
+36 | David Pratak | goalie
+39 | Károly Tóth | goalie
+8 | Márkó Csollák | defender
+7 | Vilmos Czina | defender
+23 | Lauri Kärmeniemi | defender
+9 | Dominik Orosz | defender
+55 | Zeno Balazs Szaboki | defender
+18 | Boldizsar Szalay | defender
+28 | Simon Szathmary | defender
+6 | Bence Szirányi | defender
+53 | Roland Vokla | defender
+73 | Hunor Alpar Csiki | forward
+89 | Hunor Czecze | forward
+63 | Colin Doyle | forward
+88 | Marton Farkas | forward
+77 | Noah Kinloch-Varga | forward
+86 | Dávid Lövei | forward
+98 | Miklos Makai | forward
+27 | Henrik Marklund | forward
+71 | Márk Miskolczi | forward
+21 | Jason Pineo | forward
+51 | Kristóf Rétfalvi | forward
+66 | Gergö Toth | forward
+7 | David Trajcsik | forward
+10 | Henrik Vörös | forward
