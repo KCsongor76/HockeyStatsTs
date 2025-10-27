@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from backend.OOP.Position import Position
+from .Position import Position
 
 
 class Player:

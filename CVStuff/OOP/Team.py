@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 
-from backend.OOP.Championship import Championship
-from backend.OOP.Player import Player
+from .Championship import Championship
+from .Player import Player
 
 
 class Team:

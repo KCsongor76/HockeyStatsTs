@@ -6,11 +6,11 @@ import re
 import matplotlib.pyplot as plt
 from scipy import ndimage
 
-from backend.OOP.ActionType import ActionType
-from backend.OOP.GameAction import GameAction
-from backend.OOP.Player import Player
-from backend.OOP.Position import Position
-from backend.OOP.Team import Team
+from OOP.ActionType import ActionType
+from OOP.Position import Position
+from OOP.Team import Team
+from OOP.GameAction import GameAction
+from OOP.Player import Player
 
 
 class HockeyActionDetector:

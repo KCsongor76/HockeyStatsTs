@@ -5,11 +5,11 @@ import cv2
 import json
 import hashlib
 
-from backend.tracker import Tracker
+from tracker import Tracker
 from ml_model import HockeyActionDetector
 
 
-from backend.OOP.Team import Team
+from OOP.Team import Team
 
 UPLOAD_FOLDER = "uploads"
 
@@ -20,6 +20,11 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
+app.config['EXCLUDE_PATTERNS'] = [
+    '**/anaconda3/**',
+    '**/site-packages/**',
+    '**/__pycache__/**',
+]
 
 def read_video(video_path):
     cap = cv2.VideoCapture(video_path)
@@ -204,5 +209,5 @@ def upload_game():
     })
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, use_reloader=False)

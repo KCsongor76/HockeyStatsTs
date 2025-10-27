@@ -5,11 +5,11 @@ import cv2
 import json
 import hashlib
 
-from backend.tracker import Tracker
+from tracker import Tracker
 from ml_model import HockeyActionDetector
 
 
-from backend.OOP.Team import Team
+from OOP.Team import Team
 
 UPLOAD_FOLDER = "uploads"
 

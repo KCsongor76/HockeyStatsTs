@@ -1,8 +1,8 @@
 from typing import Optional, List, Dict, Any
 
-from backend.OOP.ActionType import ActionType
-from backend.OOP.Player import Player
-from backend.OOP.Team import Team
+from .ActionType import ActionType
+from .Player import Player
+from .Team import Team
 
 
 class GameAction:
