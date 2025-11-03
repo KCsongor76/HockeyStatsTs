@@ -1,4 +1,5 @@
 jersey_number | player_name | position
+wN1VkJynDH67ocds4swq
 1 | Bogdan Enache | goalie
 23 | Adrian Ionescu | goalie
 22 | Bence Norbert Pál | goalie

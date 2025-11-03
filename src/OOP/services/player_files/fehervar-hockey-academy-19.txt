@@ -1,4 +1,5 @@
 jersey_number | player_name | position
+EOPeBtW4s8KiIvXx5nhT
 72 | David Csibi | goalie
 39 | Martin Hajdu | goalie
 76 | Levente Hegedüs | goalie

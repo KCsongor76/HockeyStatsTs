@@ -1,4 +1,5 @@
 jersey_number | player_name | position
+pC32o7RJFrExQCOE5NNj
 33 | Örs Adorjan | goalie
 50 | Daniel Antal | goalie
 51 | Catalin Capsa | goalie

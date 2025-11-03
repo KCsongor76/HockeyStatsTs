@@ -25,6 +25,7 @@ export class PlayerService {
         allPlayers.sort((a, b) => {
             const positionOrder = {'Goalie': 0, 'Defender': 1, 'Forward': 2};
             const aOrder = positionOrder[a.position as keyof typeof positionOrder] ?? 3;
+            // @ts-ignore
             const bOrder = positionOrder[b.position as keyof typeof positionOrder] ?? 3;
             return aOrder !== bOrder ? aOrder - bOrder : a.name.localeCompare(b.name);
         });

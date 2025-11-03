@@ -1,4 +1,5 @@
 jersey_number | player_name | position
+jxxXvabyOAdVZFXczll5
 72 | Levente Ambrus | goalie
 34 | David-Örs Mag | goalie
 35 | Bogdan Popa | goalie

@@ -20,6 +20,8 @@ const CreatePlayerPage = () => {
     });
     const [isFreeAgent, setIsFreeAgent] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [uploadStatus, setUploadStatus] = useState<string>('');
+    const [isUploading, setIsUploading] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const validateForm = (): boolean => {
@@ -69,9 +71,163 @@ const CreatePlayerPage = () => {
         }
     }
 
+    const mapPositionString = (positionStr: string): Position => {
+        const lowerPosition = positionStr.toLowerCase();
+        switch (lowerPosition) {
+            case 'goalie':
+            case 'goalkeeper':
+                return Position.GOALIE;
+            case 'defender':
+            case 'defence':
+                return Position.DEFENDER;
+            case 'forward':
+            case 'attacker':
+                return Position.FORWARD;
+            default:
+                throw new Error(`Unknown position: ${positionStr}`);
+        }
+    }
+
+    const parsePlayerFile = (content: string): { teamId: string; players: Array<{ jerseyNumber: number; name: string; position: Position }> } => {
+        const lines = content.split('\n').filter(line => line.trim() !== '');
+
+        if (lines.length < 3) {
+            throw new Error('Invalid file format. File must have at least 3 lines.');
+        }
+
+        // First line: header (jersey_number | player_name | position)
+        const header = lines[0];
+
+        // Second line: team ID
+        const teamId = lines[1].trim();
+
+        // Remaining lines: player data
+        const playerLines = lines.slice(2);
+        const players = playerLines.map(line => {
+            const parts = line.split('|').map(part => part.trim());
+            if (parts.length !== 3) {
+                throw new Error(`Invalid player data format: ${line}`);
+            }
+
+            const jerseyNumber = parseInt(parts[0]);
+            if (isNaN(jerseyNumber) || jerseyNumber < 1 || jerseyNumber > 99) {
+                throw new Error(`Invalid jersey number: ${parts[0]}`);
+            }
+
+            const name = parts[1];
+            const position = mapPositionString(parts[2]);
+
+            return { jerseyNumber, name, position };
+        });
+
+        return { teamId, players };
+    }
+
+
+
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Check if file is text file
+        if (!file.name.toLowerCase().endsWith('.txt')) {
+            setUploadStatus('Error: Please upload a .txt file');
+            return;
+        }
+
+        setIsUploading(true);
+        setUploadStatus('');
+
+        try {
+            const content = await readFileAsText(file);
+            const { teamId, players } = parsePlayerFile(content);
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            // Upload each player
+            for (const playerData of players) {
+                try {
+                    // Check if jersey number is available
+                    // const isAvailable = await PlayerService.isJerseyNumberAvailable(teamId, playerData.jerseyNumber);
+                    const isAvailable = true
+                    if (isAvailable) {
+                        const player: IPlayer = {
+                            id: "",
+                            name: playerData.name,
+                            position: playerData.position,
+                            jerseyNumber: playerData.jerseyNumber,
+                            teamId: teamId
+                        };
+
+                        await PlayerService.createPlayer(teamId, player);
+                        successCount++;
+                    } else {
+                        console.warn(`Jersey number ${playerData.jerseyNumber} is already taken for player ${playerData.name}`);
+                        errorCount++;
+                    }
+                } catch (error) {
+                    console.error(`Failed to create player ${playerData.name}:`, error);
+                    errorCount++;
+                }
+            }
+
+            setUploadStatus(`Upload completed: ${successCount} players added successfully, ${errorCount} failed.`);
+
+            if (successCount > 0) {
+                setTimeout(() => {
+                    navigate("/handlePlayers");
+                }, 200);
+            }
+
+        } catch (error) {
+            console.error('Error processing file:', error);
+            setUploadStatus(`Error: ${error instanceof Error ? error.message : 'Failed to process file'}`);
+        } finally {
+            setIsUploading(false);
+            // Clear file input
+            event.target.value = '';
+        }
+    }
+
+    const readFileAsText = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target?.result as string;
+                resolve(content);
+            };
+            reader.onerror = (e) => reject(new Error('Failed to read file'));
+            reader.readAsText(file);
+        });
+    }
+
     return (
         <div className={styles.formContainer}>
             <h1 className={styles.formTitle}>Create New Player</h1>
+
+            {/* File Upload Section */}
+            <div className={styles.uploadSection}>
+                <h2>Upload Players from File</h2>
+                <Input
+                    label="Upload player file (.txt):"
+                    type="file"
+                    accept=".txt"
+                    onChange={handleFileUpload}
+                    // disabled={isUploading}
+                />
+                {isUploading && <p>Uploading players...</p>}
+                {uploadStatus && (
+                    <p className={uploadStatus.includes('Error') ? styles.errorText : styles.successText}>
+                        {uploadStatus}
+                    </p>
+                )}
+            </div>
+
+            <hr className={styles.divider} />
+
+            {/* Manual Player Creation Form */}
+            <h2>Create Player Manually</h2>
             <form onSubmit={submitHandler}>
                 <Input
                     label="Name:"
