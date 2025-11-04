@@ -1,4 +1,3 @@
-// OOP/classes/Team.ts
 import {ITeam} from "../interfaces/ITeam";
 import {Championship} from "../enums/Championship";
 import {IPlayer} from "../interfaces/IPlayer";

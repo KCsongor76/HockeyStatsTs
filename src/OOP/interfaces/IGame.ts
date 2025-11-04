@@ -13,6 +13,7 @@ export interface IGame {
     actions: IGameAction[];
     timestamp: string;
     score: { home: IScoreData; away: IScoreData };
+    colors: {home: {primary: string, secondary: string}, away: {primary: string, secondary: string}};
     teams: { home: ITeam, away: ITeam };
     selectedImage: string;
 }

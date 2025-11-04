@@ -179,3 +179,23 @@
     background: #c53030;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
+
+@media (max-width: 600px) {
+    .actionsRow {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .actionItem {
+        padding: 10px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .timeSelector {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+}

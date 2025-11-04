@@ -6,6 +6,7 @@ import {GameType} from "../OOP/enums/GameType";
 import {RegularPeriod, PlayoffPeriod} from "../OOP/enums/Period";
 import styles from "./ActionSelectorModal.module.css";
 import Button from "../components/Button";
+import ExampleIcon from "../components/ExampleIcon";
 
 interface Props {
     isOpen: boolean;
@@ -39,14 +40,14 @@ const ActionSelectorModal = ({
                 .filter(([key, value]) => typeof value === 'number')
                 .map(([key, value]) => ({
                     value: value as number,
-                    label: key.charAt(0) + key.slice(1).toLowerCase().replace(/_/g, ' ')
+                    label: key
                 }));
         } else {
             return Object.entries(PlayoffPeriod)
                 .filter(([key, value]) => typeof value === 'number')
                 .map(([key, value]) => ({
                     value: value as number,
-                    label: key.replace(/_/g, '')
+                    label: key
                 }));
         }
     };
@@ -157,13 +158,12 @@ const ActionSelectorModal = ({
                                     className={styles.actionItem}
                                     onClick={() => handleActionSelect(type, homeTeam)}
                                 >
-                                    <Icon
+                                    <ExampleIcon
                                         actionType={type}
                                         backgroundColor={homeColors.primary}
                                         color={homeColors.secondary}
-                                        x={50}
-                                        y={50}
                                     />
+                                    <span>{type}</span>
                                 </div>
                             ))}
                         </div>
@@ -179,13 +179,12 @@ const ActionSelectorModal = ({
                                     className={styles.actionItem}
                                     onClick={() => handleActionSelect(type, awayTeam)}
                                 >
-                                    <Icon
+                                    <ExampleIcon
                                         actionType={type}
                                         backgroundColor={awayColors.primary}
                                         color={awayColors.secondary}
-                                        x={50}
-                                        y={50}
                                     />
+                                    <span>{type}</span>
                                 </div>
                             ))}
                         </div>

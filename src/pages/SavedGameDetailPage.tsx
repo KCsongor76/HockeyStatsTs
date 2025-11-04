@@ -107,16 +107,16 @@ const SavedGameDetailPage = () => {
         if (isHomeTeam && !useHomeTeamColors) {
             // Default colors for home team
             return {
-                backgroundColor: '#3b82f6', // blue
-                color: '#ffffff' // white
+                backgroundColor: game.colors.home.primary,
+                color: game.colors.home.secondary
             };
         }
 
         if (!isHomeTeam && !useAwayTeamColors) {
             // Default colors for away team
             return {
-                backgroundColor: '#ef4444', // red
-                color: '#ffffff' // white
+                backgroundColor: game.colors.away.primary,
+                color: game.colors.away.secondary
             };
         }
 
@@ -161,7 +161,7 @@ const SavedGameDetailPage = () => {
                             styleType={useHomeTeamColors ? 'positive' : 'neutral'}
                             onClick={() => setUseHomeTeamColors(!useHomeTeamColors)}
                         >
-                            {useHomeTeamColors ? 'Home: Game Colors' : 'Home: Default Colors'}
+                            {useHomeTeamColors ? 'Home-currently: Default Colors' : 'Home-currently: Game Colors'}
                         </Button>
                     </div>
                     <div>
@@ -169,7 +169,7 @@ const SavedGameDetailPage = () => {
                             styleType={useAwayTeamColors ? 'positive' : 'neutral'}
                             onClick={() => setUseAwayTeamColors(!useAwayTeamColors)}
                         >
-                            {useAwayTeamColors ? 'Away: Game Colors' : 'Away: Default Colors'}
+                            {useAwayTeamColors ? 'Away-currently: Default Colors' : 'Away-currently: Game Colors'}
                         </Button>
                     </div>
                 </div>
@@ -179,6 +179,7 @@ const SavedGameDetailPage = () => {
                     availablePeriods={availablePeriods}
                     selectedPeriods={selectedPeriods}
                     togglePeriod={togglePeriod}
+                    gameType={game.type}
                 />
 
                 <h3>Action Types</h3>
@@ -234,6 +235,7 @@ const SavedGameDetailPage = () => {
                 )}
 
                 <Button styleType={"negative"} onClick={deleteHandler}>Delete Game</Button>
+                <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
             </div>
 
             <ActionDetailsModal
@@ -242,6 +244,12 @@ const SavedGameDetailPage = () => {
                 action={selectedAction}
             />
 
+            <div>
+                <h3>List of placeholder actions</h3>
+                {game.actions.map((action, index) => (
+                    <li key={index}>{action.type}</li>
+                ))}
+            </div>
         </div>
     );
 };

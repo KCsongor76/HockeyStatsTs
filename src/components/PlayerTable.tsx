@@ -1,4 +1,3 @@
-// PlayerTable.tsx
 import React, {useState} from 'react';
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Player} from "../OOP/classes/Player";

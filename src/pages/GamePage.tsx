@@ -56,6 +56,8 @@ const GamePage = () => {
         time?: number
     }>({});
 
+    console.log(currentAction)
+
     const [teamView, setTeamView] = useState<'all' | 'home' | 'away'>('all');
     const [selectedPeriods, setSelectedPeriods] = useState<number[]>([]);
     const [selectedActionTypes, setSelectedActionTypes] = useState<ActionType[]>([]);
@@ -99,13 +101,28 @@ const GamePage = () => {
 
     const goBackToActionSelector = () => {
         setModalStep('action');
+        // Remove player and assists fields when going back to action selector
+        setCurrentAction(prev => {
+            const {player, assists, ...rest} = prev;
+            return rest;
+        });
     };
 
     const goBackToPlayerSelector = () => {
         setModalStep('player');
+        // Remove player and assists fields when going back to player selector
+        setCurrentAction(prev => {
+            const {player, assists, ...rest} = prev;
+            return rest;
+        });
     };
 
     const goBackToAssistSelector = () => {
+        // Remove assists field when going back to assist selector
+        setCurrentAction(prev => {
+            const {assists, ...rest} = prev;
+            return rest;
+        });
         setModalStep('assist');
     };
 
@@ -259,7 +276,10 @@ const GamePage = () => {
 
     const finalizeGame = async () => {
         if (!gameSetup) return;
-
+        if (currentGame?.score?.home?.goals === currentGame?.score?.away?.goals) {
+            alert("Can't finalize a tie game!")
+            return
+        }
         const confirmMessage = 'Are you sure you want to finalize the game? This action cannot be undone and you will be redirected to the start page.';
 
         if (window.confirm(confirmMessage)) {
@@ -273,6 +293,7 @@ const GamePage = () => {
                     actions: actions,
                     timestamp: new Date().toISOString(),
                     score: {home: homeScore, away: awayScore},
+                    colors: {home: gameSetup.homeColors, away: gameSetup.awayColors},
                     teams: {
                         home: gameSetup.homeTeam,
                         away: gameSetup.awayTeam
@@ -336,6 +357,7 @@ const GamePage = () => {
                     home: gameSetup.homeTeam,
                     away: gameSetup.awayTeam
                 },
+                colors: {home: gameSetup.homeColors, away: gameSetup.awayColors},
                 selectedImage: gameSetup.rinkImage
             });
         }
@@ -437,6 +459,7 @@ const GamePage = () => {
                             availablePeriods={availablePeriods}
                             selectedPeriods={selectedPeriods}
                             togglePeriod={togglePeriod}
+                            gameType={gameSetup.gameType}
                         />
 
                         <h3>Action Types</h3>
@@ -508,7 +531,7 @@ const GamePage = () => {
                 team={currentAction.team}
                 onClose={resetModalFlow}
                 onSelect={handlePlayerSelect}
-                onGoBack={goBackToActionSelector} // Add this
+                onGoBack={goBackToActionSelector}
             />
 
             <AssistSelectorModal
@@ -517,7 +540,7 @@ const GamePage = () => {
                 excludedPlayer={currentAction.player}
                 onClose={resetModalFlow}
                 onSelect={handleAssistSelect}
-                onGoBack={goBackToPlayerSelector} // Add this
+                onGoBack={goBackToPlayerSelector}
             />
 
             <ConfirmationModal

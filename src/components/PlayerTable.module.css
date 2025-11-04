@@ -1,6 +1,6 @@
 .tableContainer {
     width: 100%;
-    max-width: 750px;
+    /*max-width: 750px;*/
     overflow-x: auto;
     margin-bottom: 2rem;
 }

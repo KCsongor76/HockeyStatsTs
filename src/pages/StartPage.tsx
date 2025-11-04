@@ -11,6 +11,8 @@ import Button from "../components/Button";
 import Select from "../components/Select";
 import Input from "../components/Input";
 import styles from "./StartPage.module.css"
+import ExampleIcon from "../components/ExampleIcon";
+import {ActionType} from "../OOP/enums/ActionType";
 
 const StartPage = () => {
     const loaderData = useLoaderData();
@@ -29,6 +31,51 @@ const StartPage = () => {
     const [showRosters, setShowRosters] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
+
+    // Helper function to get team by ID
+    const getTeamById = (id: string): ITeam | undefined => {
+        return teams.find(t => t.id === id);
+    };
+
+    // Update colors when teams change
+    useEffect(() => {
+        if (homeTeamId) {
+            const homeTeam = getTeamById(homeTeamId);
+            if (homeTeam) {
+                setHomeColors({
+                    primary: homeTeam.homeColor.primary,
+                    secondary: homeTeam.homeColor.secondary
+                });
+            }
+        }
+    }, [homeTeamId, teams]);
+
+    useEffect(() => {
+        if (awayTeamId) {
+            const awayTeam = getTeamById(awayTeamId);
+            if (awayTeam) {
+                setAwayColors({
+                    primary: awayTeam.awayColor.primary,
+                    secondary: awayTeam.awayColor.secondary
+                });
+            }
+        }
+    }, [awayTeamId, teams]);
+
+    // Update teams when championship changes
+    useEffect(() => {
+        const championshipTeams = teams.filter(t => t.championships.includes(championship));
+
+        // Update home team if current selection is not in the new championship
+        if (homeTeamId && !championshipTeams.some(t => t.id === homeTeamId)) {
+            setHomeTeamId(championshipTeams[0]?.id || '');
+        }
+
+        // Update away team if current selection is not in the new championship
+        if (awayTeamId && !championshipTeams.some(t => t.id === awayTeamId)) {
+            setAwayTeamId(championshipTeams[1]?.id || '');
+        }
+    }, [championship, teams, homeTeamId, awayTeamId]);
 
     // Helper function to count players by position
     const getPositionCounts = (roster: any[]) => {
@@ -52,41 +99,11 @@ const StartPage = () => {
         if (!team) return;
 
         const currentRoster = team.roster || [];
-        const positionCounts = getPositionCounts(currentRoster);
-
-        // Check roster constraints before adding
-        if (player.position === 'Goalie' && positionCounts.goalies >= 2) {
-            setErrors(prev => ({...prev, [`${teamId}Roster`]: 'Maximum 2 goalies allowed'}));
-            return;
-        }
-        if (player.position === 'Defender' && positionCounts.defenders >= 6) {
-            setErrors(prev => ({...prev, [`${teamId}Roster`]: 'Maximum 6 defenders allowed'}));
-            return;
-        }
-        if (player.position === 'Forward' && positionCounts.forwards >= 12) {
-            setErrors(prev => ({...prev, [`${teamId}Roster`]: 'Maximum 12 forwards allowed'}));
-            return;
-        }
-
-        // Clear any previous roster errors for this team
-        setErrors(prev => {
-            const newErrors = {...prev};
-            delete newErrors[`${teamId}Roster`];
-            return newErrors;
-        });
-
         updateTeamRoster(teamId, [...currentRoster, player]);
     };
 
     const removeFromRoster = (teamId: string, playerId: string) => {
         const currentRoster = teams.find(t => t.id === teamId)?.roster || [];
-
-        // Clear any previous roster errors for this team
-        setErrors(prev => {
-            const newErrors = {...prev};
-            delete newErrors[`${teamId}Roster`];
-            return newErrors;
-        });
 
         updateTeamRoster(
             teamId,
@@ -116,17 +133,22 @@ const StartPage = () => {
         const homeCounts = getPositionCounts(homeRoster);
         const awayCounts = getPositionCounts(awayRoster);
 
-        if (homeRoster.length < 1) newErrors.homeRoster = "Home team must have at least one player in the roster";
-        if (awayRoster.length < 1) newErrors.awayRoster = "Away team must have at least one player in the roster";
+        const minSkatersLength = 15
+        let maxSkatersLength = 0
+        if (championship === Championship.ERSTE_LEAGUE) {
+            maxSkatersLength = 19
+        } else {
+            maxSkatersLength = 20
+        }
 
-        // Check minimum requirements
-        // if (homeCounts.goalies !== 2) newErrors.homeRoster = "Home team must have 2 goalies";
-        // if (homeCounts.defenders + homeCounts.forwards < 15) newErrors.homeRoster = "Home team must have at least 15 skaters";
-        // if (homeCounts.defenders + homeCounts.forwards > 20) newErrors.homeRoster = "Home team must have at most 20 skaters";
+        if (homeCounts.goalies !== 2) newErrors.homeRoster = "Home team must have exactly 2 goalies!"
+        if (awayCounts.goalies !== 2) newErrors.awayRoster = "Away team must have exactly 2 goalies!"
 
-        // if (awayCounts.goalies !== 2) newErrors.awayRoster = "Away team must have 2 goalies";
-        // if (awayCounts.defenders + awayCounts.forwards < 15) newErrors.awayRoster = "Away team must have at least 15 skaters";
-        // if (awayCounts.defenders + awayCounts.forwards > 20) newErrors.awayRoster = "Away team must have at most 20 skaters";
+        if (homeCounts.defenders + homeCounts.forwards < minSkatersLength) newErrors.homeRoster = `Home team must have at least ${minSkatersLength} skaters in the roster`;
+        if (awayCounts.defenders + awayCounts.forwards < minSkatersLength) newErrors.awayRoster = `Away team must have at least ${minSkatersLength} skaters in the roster`;
+
+        if (homeCounts.defenders + homeCounts.forwards > maxSkatersLength) newErrors.homeRoster = `Home team must have at most ${maxSkatersLength} skaters in the roster`;
+        if (awayCounts.defenders + awayCounts.forwards > maxSkatersLength) newErrors.awayRoster = `Away team must have at most ${maxSkatersLength} skaters in the roster`;
 
         // Validate rink image
         if (!selectedImage) newErrors.rinkImage = "You must select a rink image";
@@ -161,13 +183,16 @@ const StartPage = () => {
     const getAvailablePlayers = (teamId: string) => {
         const team = teams.find(t => t.id === teamId);
         if (!team) return [];
-        return team.players.filter(
-            player => !(team.roster || []).some(rp => rp.id === player.id)
-        );
+        return team.players
+            .filter(player => !(team.roster || []).some(rp => rp.id === player.id))
+            .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
     };
 
     const getSelectedPlayers = (teamId: string) => {
-        return teams.find(t => t.id === teamId)?.roster || [];
+        return teams
+            .find(t => t.id === teamId)?.roster
+            .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
+            || [];
     };
 
     const hasCheckedForSavedGame = useRef(false);
@@ -191,26 +216,6 @@ const StartPage = () => {
 
         checkForSavedGame();
     }, [navigate]);
-
-    // Render position counters for a team
-    // const renderPositionCounters = (teamId: string) => {
-    //     const roster = getSelectedPlayers(teamId);
-    //     const counts = getPositionCounts(roster);
-    //
-    //     return (
-    //         <div className={styles.positionCounters}>
-    //             <div className={styles.counterItem}>
-    //                 <span>Forwards: {counts.forwards}/6-12</span>
-    //             </div>
-    //             <div className={styles.counterItem}>
-    //                 <span>Defenders: {counts.defenders}/4-6</span>
-    //             </div>
-    //             <div className={styles.counterItem}>
-    //                 <span>Goalies: {counts.goalies}/1-2</span>
-    //             </div>
-    //         </div>
-    //     );
-    // };
 
     return (
         <div className={styles.container}>
@@ -288,6 +293,12 @@ const StartPage = () => {
                             onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
                             error={errors.homeColors}
                         />
+
+                        <ExampleIcon
+                            actionType={ActionType.GOAL}
+                            backgroundColor={homeColors.primary}
+                            color={homeColors.secondary}
+                        />
                     </div>
 
                     <div className={styles.colorGroup}>
@@ -304,6 +315,12 @@ const StartPage = () => {
                             value={awayColors.secondary}
                             onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
                             error={errors.awayColors}
+                        />
+
+                        <ExampleIcon
+                            actionType={ActionType.GOAL}
+                            backgroundColor={awayColors.primary}
+                            color={awayColors.secondary}
                         />
                     </div>
                     {errors.sameColors && <span className={styles.error}>{errors.sameColors}</span>}
@@ -356,9 +373,9 @@ const StartPage = () => {
                         <div className={styles.rosterContent}>
                             <div>
                                 <h4>Home Roster</h4>
-                                {/*{renderPositionCounters(homeTeamId)}*/}
                                 <h5>Available Players</h5>
-                                {getAvailablePlayers(homeTeamId).map(player => (
+                                {getAvailablePlayers(homeTeamId)
+                                    .map(player => (
                                     <div
                                         key={player.id}
                                         className={styles.playerItem}
@@ -384,7 +401,6 @@ const StartPage = () => {
 
                             <div>
                                 <h4>Away Roster</h4>
-                                {/*{renderPositionCounters(awayTeamId)}*/}
                                 <h5>Available Players</h5>
                                 {getAvailablePlayers(awayTeamId).map(player => (
                                     <div

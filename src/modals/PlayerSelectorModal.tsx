@@ -21,17 +21,18 @@ const PlayerSelectorModal = ({isOpen, team, onClose, onSelect, onGoBack}: Props)
             <div className={styles.modal}>
                 <h3>Select Player ({team.name})</h3>
                 <div className={styles.rosterGrid}>
-                    {team.roster.map(player => (
-                        <div
-                            key={player.id}
-                            className={styles.playerCard}
-                            onClick={() => onSelect(player)}
-                        >
-                            <div>#{player.jerseyNumber}</div>
-                            <div>{player.name}</div>
-                            <div>{player.position}</div>
-                        </div>
-                    ))}
+                    {team.roster
+                        .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
+                        .map(player => (
+                            <div
+                                key={player.id}
+                                className={styles.playerCard}
+                                onClick={() => onSelect(player)}
+                            >
+                                <div>#{player.jerseyNumber}</div>
+                                <div>{player.name}</div>
+                            </div>
+                        ))}
                 </div>
                 <div className={styles.modalActions}>
                     {onGoBack && (

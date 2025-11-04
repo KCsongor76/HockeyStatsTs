@@ -10,7 +10,7 @@ interface Props {
     excludedPlayer?: IPlayer;
     onClose: () => void;
     onSelect: (assists: IPlayer[]) => void;
-    onGoBack?: () => void;
+    onGoBack: () => void;
 }
 
 const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, onGoBack}: Props) => {
@@ -26,6 +26,11 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
         setSelectedAssists([])
     };
 
+    const handleGoBack = () => {
+        setSelectedAssists([])
+        onGoBack()
+    }
+
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modal}>
@@ -34,6 +39,7 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
                 <div className={styles.rosterGrid}>
                     {team.roster
                         .filter(player => player.id !== excludedPlayer?.id)
+                        .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
                         .map(player => (
                             <div
                                 key={player.id}
@@ -46,11 +52,9 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
                         ))}
                 </div>
                 <div className={styles.modalActions}>
-                    {onGoBack && (
-                        <Button styleType="negative" onClick={onGoBack}>
-                            Go Back
-                        </Button>
-                    )}
+                    <Button styleType="negative" onClick={handleGoBack}>
+                        Go Back
+                    </Button>
                     <Button styleType="negative" onClick={onClose}>
                         Cancel
                     </Button>

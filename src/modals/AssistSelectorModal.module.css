@@ -22,13 +22,15 @@
 }
 
 .rosterGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     margin: 20px 0;
 }
 
 .playerCard {
+    display: flex;
+    justify-content: space-between;
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 4px;
@@ -49,4 +51,10 @@
 .selected {
     background-color: #e0f7fa;
     border-color: #00bcd4;
+}
+
+@media (max-width: 400px) {
+    .playerCard {
+        flex-direction: column;
+    }
 }

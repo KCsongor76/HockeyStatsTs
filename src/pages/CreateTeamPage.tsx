@@ -7,6 +7,9 @@ import {TeamService} from "../OOP/services/TeamService";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import styles from "./CreateTeamPage.module.css";
+import Icon from "../components/Icon";
+import {ActionType} from "../OOP/enums/ActionType";
+import ExampleIcon from "../components/ExampleIcon";
 
 const CreateTeamPage = () => {
     const location = useLocation()
@@ -139,6 +142,11 @@ const CreateTeamPage = () => {
                             value={homeColor.secondary}
                             onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
                         />
+                        <ExampleIcon
+                            actionType={ActionType.GOAL}
+                            backgroundColor={homeColor.primary}
+                            color={homeColor.secondary}
+                        />
                         {errors.colors && <span className="error">{errors.colors}</span>}
                     </div>
 
@@ -159,23 +167,27 @@ const CreateTeamPage = () => {
                             value={awayColor.secondary}
                             onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
                         />
+                        <ExampleIcon
+                            actionType={ActionType.GOAL}
+                            backgroundColor={awayColor.primary}
+                            color={awayColor.secondary}
+                        />
                     </div>
                 </div>
 
                 <div className={styles.championshipGroup}>
                     <label>Championships:</label>
                     {Object.values(Championship).map((championship) => (
-                        <div key={championship} className={styles.championshipItem}>
-                            <Input
+                        <label>
+                            {championship}
+                            <input
                                 type="checkbox"
                                 id={`champ-${championship}`}
                                 checked={championships.includes(championship)}
                                 onChange={() => toggleChampionship(championship)}
                             />
-                            <label htmlFor={`champ-${championship}`}>{championship}</label>
-                        </div>
+                        </label>
                     ))}
-                    {errors.championships && <span className="error">{errors.championships}</span>}
                 </div>
 
                 <div className={styles.buttonGroup}>

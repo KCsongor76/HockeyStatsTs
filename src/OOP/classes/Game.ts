@@ -14,13 +14,21 @@ export class Game implements IGame {
     season: Season;
     selectedImage: string;
     teams: { home: ITeam; away: ITeam };
+    colors: { home: { primary: string, secondary: string }, away: { primary: string, secondary: string } };
     timestamp: string;
     type: GameType;
 
-    constructor(actions: IGameAction[], championship: Championship, id: string, score: {
-        home: IScoreData;
-        away: IScoreData
-    }, season: Season, selectedImage: string, teams: { home: ITeam; away: ITeam }, timestamp: string, type: GameType) {
+    constructor(
+        actions: IGameAction[],
+        championship: Championship,
+        id: string,
+        score: { home: IScoreData; away: IScoreData },
+        season: Season,
+        selectedImage: string,
+        teams: { home: ITeam; away: ITeam },
+        colors: { home: { primary: string, secondary: string }, away: { primary: string, secondary: string } },
+        timestamp: string, type: GameType
+    ) {
         this.actions = actions;
         this.championship = championship;
         this.id = id;
@@ -28,6 +36,7 @@ export class Game implements IGame {
         this.season = season;
         this.selectedImage = selectedImage;
         this.teams = teams;
+        this.colors = colors;
         this.timestamp = timestamp;
         this.type = type;
     }

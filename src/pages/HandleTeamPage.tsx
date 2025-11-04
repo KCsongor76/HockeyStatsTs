@@ -213,21 +213,19 @@ const HandleTeamPage = () => {
                             error={errors.logo}
                         />
 
-                        {/* Championship Selection */}
                         <div className={styles.championshipGroup}>
                             <label>Championships:</label>
                             {Object.values(Championship).map((championship) => (
-                                <div key={championship} className={styles.championshipItem}>
-                                    <Input
+                                <label>
+                                    {championship}
+                                    <input
                                         type="checkbox"
                                         id={`champ-${championship}`}
                                         checked={championships.includes(championship)}
                                         onChange={() => toggleChampionship(championship)}
                                     />
-                                    <label htmlFor={`champ-${championship}`}>{championship}</label>
-                                </div>
+                                </label>
                             ))}
-                            {errors.championships && <span style={{color: 'red'}}>{errors.championships}</span>}
                         </div>
                     </div>
 

@@ -56,11 +56,6 @@ const ActionDetailsModal: React.FC<Props> = ({isOpen, onClose, action}) => {
                     <span>{Math.floor(action.time / 60).toString().padStart(2, '0')} : {(action.time % 60).toString().padStart(2, '0')}</span>
                 </div>
 
-                <div className={styles.detailRow}>
-                    <strong>Location:</strong>
-                    <span>X: {action.x.toFixed(1)}%, Y: {action.y.toFixed(1)}%</span>
-                </div>
-
                 <Button styleType="neutral" onClick={onClose} className={styles.closeButton}>
                     Close
                 </Button>

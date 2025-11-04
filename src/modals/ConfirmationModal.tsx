@@ -51,11 +51,6 @@ const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm, onGoBa
                     </div>
                 )}
 
-                <div className={styles.detailRow}>
-                    <span>Position:</span>
-                    <span>X: {position?.x.toFixed(1)}%, Y: {position?.y.toFixed(1)}%</span>
-                </div>
-
                 {action.period && (
                     <div className={styles.detailRow}>
                         <span>Period:</span>

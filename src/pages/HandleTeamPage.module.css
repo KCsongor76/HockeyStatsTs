@@ -45,6 +45,12 @@
     margin: 1rem 0;
 }
 
+.championshipGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 @media (max-width: 768px) {
     .teamContainer {
         padding: 1rem;

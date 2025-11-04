@@ -8,17 +8,22 @@
 }
 
 .formGrid {
-    display: grid;
-    grid-template-columns: 1fr; /* Single column by default */
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
-    width: 100%; /* Take full width */
-    max-width: 500px; /* Limit width for better readability */
 }
 
 .colorGroup {
     display: flex;
+    align-items: center;
+    justify-content: space-evenly;
     gap: 1rem;
+    min-width: 300px;
+}
+
+.colorGroup input {
+    align-self: center;
 }
 
 .rinkImages {
@@ -163,11 +168,6 @@
 }
 
 @media (min-width: 769px) {
-    /* Keep single column layout for all screen sizes as requested */
-    .formGrid {
-        grid-template-columns: 1fr;
-    }
-
     .rinkImages {
         justify-content: center;
     }

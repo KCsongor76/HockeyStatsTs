@@ -153,7 +153,7 @@ const PlayerCrudPage = () => {
                             </Button>
                         </div>
                     </li>
-                ) : <p>No players found</p>}
+                ) : <p>No players found.</p>}
             </ul>
 
             <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>

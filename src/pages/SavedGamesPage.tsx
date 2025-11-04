@@ -19,7 +19,6 @@ interface SavedGamesPageProps {
 const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     const [teams, setTeams] = useState<ITeam[]>([]);
     const [games, setGames] = useState<IGame[]>(playerGames || []);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [homeTeamId, setHomeTeamId] = useState<string>("");
     const [awayTeamId, setAwayTeamId] = useState<string>("");
@@ -60,7 +59,6 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true);
                 setError(null);
 
                 if (!playerGames) {
@@ -77,23 +75,15 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
             } catch (err) {
                 console.error("Failed to fetch data:", err);
                 setError("Failed to load games data. Please try again later.");
-            } finally {
-                setIsLoading(false);
             }
         };
 
         fetchData();
     }, [playerGames]);
 
-    if (isLoading) {
-        return <div>Loading games...</div>;
-    }
-
     if (error) {
         return <div>{error}</div>;
     }
-
-    if (games.length === 0 || filteredGames.length === 0) return <div>No games available.</div>;
 
     return (
         <div className={styles.container}>
