@@ -372,63 +372,249 @@ const StartPage = () => {
                             <h3>Team Rosters</h3>
                         </div>
                         <div className={styles.rosterContent}>
+                            {/* Home Team Roster */}
                             <div>
                                 <h4>Home Roster</h4>
+
+                                {/* Available Players */}
                                 <h5>Available Players</h5>
-                                {getAvailablePlayers(homeTeamId)
-                                    .map(player => (
-                                    <div
-                                        key={player.id}
-                                        className={styles.playerItem}
-                                        onClick={() => addToRoster(homeTeamId, player)}
-                                    >
-                                        <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
-                                        #{player.jerseyNumber} - {player.name} ({player.position})
-                                    </div>
-                                ))}
+                                <div className={styles.positionGroup}>
+                                    <h6>Goalies</h6>
+                                    {getAvailablePlayers(homeTeamId)
+                                        .filter(player => player.position === 'Goalie')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => addToRoster(homeTeamId, player)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Defenders</h6>
+                                    {getAvailablePlayers(homeTeamId)
+                                        .filter(player => player.position === 'Defender')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => addToRoster(homeTeamId, player)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Forwards</h6>
+                                    {getAvailablePlayers(homeTeamId)
+                                        .filter(player => player.position === 'Forward')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => addToRoster(homeTeamId, player)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+
+                                {/* Selected Players */}
                                 <h5>Selected Players</h5>
-                                {getSelectedPlayers(homeTeamId).map(player => (
-                                    <div
-                                        key={player.id}
-                                        className={styles.playerItem}
-                                        onClick={() => removeFromRoster(homeTeamId, player.id)}
-                                    >
-                                        <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
-                                        #{player.jerseyNumber} - {player.name} ({player.position})
-                                    </div>
-                                ))}
-                                {errors.homeRoster && <span className={styles.error}>{errors.homeRoster}</span>}
+                                <div className={styles.positionGroup}>
+                                    <h6>Goalies</h6>
+                                    {getSelectedPlayers(homeTeamId)
+                                        .filter(player => player.position === 'Goalie')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => removeFromRoster(homeTeamId, player.id)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Defenders</h6>
+                                    {getSelectedPlayers(homeTeamId)
+                                        .filter(player => player.position === 'Defender')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => removeFromRoster(homeTeamId, player.id)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Forwards</h6>
+                                    {getSelectedPlayers(homeTeamId)
+                                        .filter(player => player.position === 'Forward')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => removeFromRoster(homeTeamId, player.id)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+
+                                {/* Home Team Roster Summary */}
+                                <div className={styles.rosterSummary}>
+                                    {(() => {
+                                        const homeRoster = getSelectedPlayers(homeTeamId);
+                                        const counts = getPositionCounts(homeRoster);
+                                        const minSkaters = 15;
+                                        const maxSkaters = championship === Championship.ERSTE_LEAGUE ? 19 : 20;
+                                        const totalSkaters = counts.defenders + counts.forwards;
+
+                                        return (
+                                            <>
+                                                <div>Goalies: {counts.goalies}/2</div>
+                                                <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
+                                                {errors.homeRoster && <span className={styles.error}>{errors.homeRoster}</span>}
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
 
+                            {/* Away Team Roster */}
                             <div>
                                 <h4>Away Roster</h4>
+
+                                {/* Available Players */}
                                 <h5>Available Players</h5>
-                                {getAvailablePlayers(awayTeamId).map(player => (
-                                    <div
-                                        key={player.id}
-                                        className={styles.playerItem}
-                                        onClick={() => addToRoster(awayTeamId, player)}
-                                    >
-                                        <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
-                                        #{player.jerseyNumber} - {player.name} ({player.position})
-                                    </div>
-                                ))}
+                                <div className={styles.positionGroup}>
+                                    <h6>Goalies</h6>
+                                    {getAvailablePlayers(awayTeamId)
+                                        .filter(player => player.position === 'Goalie')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => addToRoster(awayTeamId, player)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Defenders</h6>
+                                    {getAvailablePlayers(awayTeamId)
+                                        .filter(player => player.position === 'Defender')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => addToRoster(awayTeamId, player)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Forwards</h6>
+                                    {getAvailablePlayers(awayTeamId)
+                                        .filter(player => player.position === 'Forward')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => addToRoster(awayTeamId, player)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+
+                                {/* Selected Players */}
                                 <h5>Selected Players</h5>
-                                {getSelectedPlayers(awayTeamId).map(player => (
-                                    <div
-                                        key={player.id}
-                                        className={styles.playerItem}
-                                        onClick={() => removeFromRoster(awayTeamId, player.id)}
-                                    >
-                                        <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
-                                        #{player.jerseyNumber} - {player.name} ({player.position})
-                                    </div>
-                                ))}
-                                {errors.awayRoster && <span className={styles.error}>{errors.awayRoster}</span>}
+                                <div className={styles.positionGroup}>
+                                    <h6>Goalies</h6>
+                                    {getSelectedPlayers(awayTeamId)
+                                        .filter(player => player.position === 'Goalie')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => removeFromRoster(awayTeamId, player.id)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Defenders</h6>
+                                    {getSelectedPlayers(awayTeamId)
+                                        .filter(player => player.position === 'Defender')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => removeFromRoster(awayTeamId, player.id)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+                                <div className={styles.positionGroup}>
+                                    <h6>Forwards</h6>
+                                    {getSelectedPlayers(awayTeamId)
+                                        .filter(player => player.position === 'Forward')
+                                        .map(player => (
+                                            <div
+                                                key={player.id}
+                                                className={styles.playerItem}
+                                                onClick={() => removeFromRoster(awayTeamId, player.id)}
+                                            >
+                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                #{player.jerseyNumber} - {player.name}
+                                            </div>
+                                        ))}
+                                </div>
+
+                                {/* Away Team Roster Summary */}
+                                <div className={styles.rosterSummary}>
+                                    {(() => {
+                                        const awayRoster = getSelectedPlayers(awayTeamId);
+                                        const counts = getPositionCounts(awayRoster);
+                                        const minSkaters = 15;
+                                        const maxSkaters = championship === Championship.ERSTE_LEAGUE ? 19 : 20;
+                                        const totalSkaters = counts.defenders + counts.forwards;
+
+                                        return (
+                                            <>
+                                                <div>Goalies: {counts.goalies}/2</div>
+                                                <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
+                                                {errors.awayRoster && <span className={styles.error}>{errors.awayRoster}</span>}
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
+                {(errors.homeRoster || errors.awayRoster) && <span className={styles.error}>Some roster related error has occurred.</span>}
 
                 <div className={styles.buttonGroup}>
                     <Button styleType={"positive"} type="submit">Start Game</Button>
