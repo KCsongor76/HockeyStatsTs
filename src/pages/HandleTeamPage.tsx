@@ -190,7 +190,9 @@ const HandleTeamPage = () => {
     return (
         <div className={styles.teamContainer}>
             <div className={styles.teamHeader}>
-                <img src={team.logo} alt={team.name} className={styles.teamLogo}/>
+                {team.logo && team.id !== 'free-agent' && (
+                    <img src={team.logo} alt={team.name} className={styles.teamLogo}/>
+                )}
                 <h1>{team.name}</h1>
             </div>
 
