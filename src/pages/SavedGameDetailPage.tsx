@@ -15,19 +15,183 @@ import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
 import ActionTypeFilters from "../components/ActionTypeFilters";
 import {GameService} from "../OOP/services/GameService";
+import ActionSelectorModal from "../modals/ActionSelectorModal";
+import PlayerSelectorModal from "../modals/PlayerSelectorModal";
+import AssistSelectorModal from "../modals/AssistSelectorModal";
+import ConfirmationModal from "../modals/ConfirmationModal";
+import {ITeam} from "../OOP/interfaces/ITeam";
+import ActionsTable from "../components/ActionsTable";
 
 const SavedGameDetailPage = () => {
     const locationData = useLocation();
-    const game = locationData.state as IGame;
+    const [game, setGame] = useState<IGame>(locationData.state as IGame);
     const [teamView, setTeamView] = useState<"all" | "home" | "away">("all")
     const [selectedPeriods, setSelectedPeriods] = useState<number[]>([]);
     const [selectedActionTypes, setSelectedActionTypes] = useState<ActionType[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
     const [selectedAction, setSelectedAction] = useState<IGameAction | null>(null);
 
+    // New state for action editing flow
+    const [modalStep, setModalStep] = useState<'action' | 'player' | 'assist' | 'confirm' | null>(null);
+    const [editingAction, setEditingAction] = useState<IGameAction | null>(null);
+    const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);
+    const [currentAction, setCurrentAction] = useState<{
+        type?: ActionType,
+        team?: ITeam,
+        player?: IPlayer,
+        assists?: IPlayer[],
+        period?: number,
+        time?: number
+    }>({});
+
     // New state for color toggles
     const [useHomeTeamColors, setUseHomeTeamColors] = useState<boolean>(true);
     const [useAwayTeamColors, setUseAwayTeamColors] = useState<boolean>(true);
+
+    const navigate = useNavigate();
+
+    // Action editing handlers
+    const handleActionEdit = (action: IGameAction) => {
+        setEditingAction(action);
+        setCurrentAction(action);
+        setSelectedPosition({x: action.x, y: action.y});
+        setModalStep("confirm");
+    };
+
+    const handleActionDelete = async (actionToDelete: IGameAction) => {
+        if (window.confirm('Are you sure you want to delete this action?')) {
+            const updatedActions = game.actions.filter(action => action !== actionToDelete);
+            const updatedGame = {
+                ...game,
+                actions: updatedActions,
+                score: recalculateScores(updatedActions)
+            };
+
+            setGame(updatedGame);
+
+            try {
+                await GameService.updateGame(updatedGame);
+                alert('Action deleted successfully!');
+            } catch (error) {
+                console.error('Failed to update game', error);
+                alert('Failed to update game. See console for details.');
+            }
+        }
+    };
+
+    const recalculateScores = (actions: IGameAction[]) => {
+        const newHomeScore = {goals: 0, shots: 0, turnovers: 0, hits: 0};
+        const newAwayScore = {goals: 0, shots: 0, turnovers: 0, hits: 0};
+
+        actions.forEach(action => {
+            const score = action.team.id === game.teams.home.id ? newHomeScore : newAwayScore;
+            score.goals += action.type === ActionType.GOAL ? 1 : 0;
+            score.shots += [ActionType.SHOT, ActionType.GOAL].includes(action.type) ? 1 : 0;
+            score.turnovers += action.type === ActionType.TURNOVER ? 1 : 0;
+            score.hits += action.type === ActionType.HIT ? 1 : 0;
+        });
+
+        return {home: newHomeScore, away: newAwayScore};
+    };
+
+    // Modal flow handlers
+    const handleActionSelect = (type: ActionType, team: ITeam, period: number, time: number) => {
+        setCurrentAction(prev => ({...prev, type, team, period, time}));
+        setModalStep('player');
+    };
+
+    const handlePlayerSelect = (player: IPlayer) => {
+        if (currentAction.type === ActionType.GOAL) {
+            setModalStep('assist');
+        } else {
+            setModalStep('confirm');
+        }
+        setCurrentAction(prev => ({...prev, player}));
+    };
+
+    const handleAssistSelect = (assists: IPlayer[]) => {
+        setCurrentAction(prev => ({...prev, assists}));
+        setModalStep('confirm');
+    };
+
+    const goBackToActionSelector = () => {
+        setModalStep('action');
+        setCurrentAction(prev => {
+            const {player, assists, ...rest} = prev;
+            return rest;
+        });
+    };
+
+    const goBackToPlayerSelector = () => {
+        setModalStep('player');
+        setCurrentAction(prev => {
+            const {player, assists, ...rest} = prev;
+            return rest;
+        });
+    };
+
+    const goBackToAssistSelector = () => {
+        setCurrentAction(prev => {
+            const {assists, ...rest} = prev;
+            return rest;
+        });
+        setModalStep('assist');
+    };
+
+    const resetModalFlow = () => {
+        setModalStep(null);
+        setSelectedPosition(null);
+        setCurrentAction({});
+        setEditingAction(null);
+    };
+
+    const confirmAction = async () => {
+        if (selectedPosition && currentAction.type && currentAction.team && currentAction.player) {
+            const newAction: IGameAction = {
+                type: currentAction.type,
+                team: currentAction.team,
+                player: currentAction.player,
+                period: currentAction.period || 1,
+                time: currentAction.time || 0,
+                x: selectedPosition.x,
+                y: selectedPosition.y,
+                assists: currentAction.assists ?? []
+            };
+
+            let updatedActions;
+            if (editingAction) {
+                // Update mode
+                updatedActions = game.actions.map(action =>
+                    action === editingAction ? newAction : action
+                );
+            } else {
+                // Create mode
+                updatedActions = [...game.actions, newAction];
+            }
+
+            const updatedGame = {
+                ...game,
+                actions: updatedActions,
+                score: recalculateScores(updatedActions)
+            };
+
+            setGame(updatedGame);
+
+            try {
+                await GameService.updateGame(updatedGame);
+                alert(editingAction ? 'Action updated successfully!' : 'Action added successfully!');
+            } catch (error) {
+                console.error('Failed to update game', error);
+                alert('Failed to update game. See console for details.');
+            }
+        }
+
+        resetModalFlow();
+    };
+
+    const handleIconClick = (action: IGameAction) => {
+        setSelectedAction(action);
+    };
 
     const getAvailablePeriodsAndActionTypes = () => ({
         availablePeriods: Array.from(new Set(game.actions.map(a => a.period))),
@@ -35,16 +199,15 @@ const SavedGameDetailPage = () => {
     });
 
     const {availablePeriods, availableActionTypes} = getAvailablePeriodsAndActionTypes();
-    const navigate = useNavigate();
 
     const getFilteredPlayers = () => {
         if (!game) return [];
 
-        const allPlayers = [...game.teams.home.players, ...game.teams.away.players] as IPlayer[];
+        const allPlayers = [...game.teams.home.roster, ...game.teams.away.roster] as IPlayer[];
         if (teamView === "home") {
-            return game.teams.home.players as IPlayer[] || [];
+            return game.teams.home.roster as IPlayer[] || [];
         } else if (teamView === "away") {
-            return game.teams.away.players as IPlayer[] || [];
+            return game.teams.away.roster as IPlayer[] || [];
         }
         return allPlayers;
     }
@@ -94,10 +257,6 @@ const SavedGameDetailPage = () => {
         setSelectedPlayer(prev =>
             prev === playerId ? null : playerId
         );
-    };
-
-    const handleIconClick = (action: IGameAction) => {
-        setSelectedAction(action);
     };
 
     // Get icon colors based on toggle states
@@ -234,22 +393,61 @@ const SavedGameDetailPage = () => {
                     />
                 )}
 
+                <ActionsTable
+                    actions={game.actions}
+                    gameType={game.type}
+                    onActionDelete={handleActionDelete}
+                    onActionEdit={handleActionEdit}
+                />
+
                 <Button styleType={"negative"} onClick={deleteHandler}>Delete Game</Button>
                 <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
             </div>
+
+            {/* Modals */}
+            <ActionSelectorModal
+                isOpen={modalStep === 'action'}
+                onClose={resetModalFlow}
+                onSelect={handleActionSelect}
+                homeTeam={game.teams.home}
+                awayTeam={game.teams.away}
+                homeColors={game.colors.home}
+                awayColors={game.colors.away}
+                gameType={game.type}
+            />
+
+            <PlayerSelectorModal
+                isOpen={modalStep === 'player'}
+                team={currentAction.team}
+                onClose={resetModalFlow}
+                onSelect={handlePlayerSelect}
+                onGoBack={goBackToActionSelector}
+            />
+
+            <AssistSelectorModal
+                isOpen={modalStep === 'assist'}
+                team={currentAction.team}
+                excludedPlayer={currentAction.player}
+                onClose={resetModalFlow}
+                onSelect={handleAssistSelect}
+                onGoBack={goBackToPlayerSelector}
+            />
+
+            <ConfirmationModal
+                isOpen={modalStep === 'confirm'}
+                action={currentAction}
+                position={selectedPosition}
+                onClose={resetModalFlow}
+                onConfirm={confirmAction}
+                onGoBack={currentAction.type === ActionType.GOAL ? goBackToAssistSelector : goBackToPlayerSelector}
+                mode={editingAction ? 'edit' : 'create'}
+            />
 
             <ActionDetailsModal
                 isOpen={!!selectedAction}
                 onClose={() => setSelectedAction(null)}
                 action={selectedAction}
             />
-
-            <div>
-                <h3>List of placeholder actions</h3>
-                {game.actions.map((action, index) => (
-                    <li key={index}>{action.type}</li>
-                ))}
-            </div>
         </div>
     );
 };

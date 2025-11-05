@@ -52,6 +52,9 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
 
     const sortPlayers = (playersToSort: IPlayer[]) => {
         return [...playersToSort].sort((a, b) => {
+            if (a.id === 'placeholder') return -1;
+            if (b.id === 'placeholder') return 1;
+
             const statsA = Player.getPlayerStats(games, a);
             const statsB = Player.getPlayerStats(games, b);
 

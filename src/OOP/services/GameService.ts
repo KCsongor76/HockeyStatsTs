@@ -32,4 +32,20 @@ export class GameService {
         // todo: when deleting game, make sure that all the stats get deleted from teams/players also
         // todo: also, have shallow delete?
     }
+
+    static updateGame = async (game: IGame) => {
+        if (!game.id) {
+            throw new Error("Cannot update game without an ID");
+        }
+
+        const docRef = doc(this.collectionRef, game.id);
+
+        // Using setDoc with merge: true will update existing fields and add new ones
+        await setDoc(docRef, {
+            ...game,
+            timestamp: new Date().toISOString()
+        }, { merge: true });
+
+        return game;
+    }
 }

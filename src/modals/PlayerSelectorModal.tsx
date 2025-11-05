@@ -3,6 +3,7 @@ import Button from '../components/Button';
 import {IPlayer} from '../OOP/interfaces/IPlayer';
 import {ITeam} from '../OOP/interfaces/ITeam';
 import styles from './PlayerSelectorModal.module.css';
+import {PLACEHOLDER_PLAYER} from "../OOP/constants/PlaceholderPlayer";
 
 interface Props {
     isOpen: boolean;
@@ -16,13 +17,21 @@ interface Props {
 const PlayerSelectorModal = ({isOpen, team, onClose, onSelect, onGoBack}: Props) => {
     if (!isOpen || !team) return null;
 
+    // Add placeholder player to the roster
+    const rosterWithPlaceholder = [PLACEHOLDER_PLAYER, ...team.roster];
+
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modal}>
                 <h3>Select Player ({team.name})</h3>
                 <div className={styles.rosterGrid}>
-                    {team.roster
-                        .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
+                    {rosterWithPlaceholder
+                        .sort((a, b) => {
+                            // Always keep placeholder at top
+                            if (a.id === 'placeholder') return -1;
+                            if (b.id === 'placeholder') return 1;
+                            return a.jerseyNumber - b.jerseyNumber;
+                        })
                         .map(player => (
                             <div
                                 key={player.id}

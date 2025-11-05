@@ -3,6 +3,7 @@ import Button from '../components/Button';
 import {IPlayer} from '../OOP/interfaces/IPlayer';
 import {ITeam} from '../OOP/interfaces/ITeam';
 import styles from './AssistSelectorModal.module.css';
+import {PLACEHOLDER_PLAYER} from "../OOP/constants/PlaceholderPlayer";
 
 interface Props {
     isOpen: boolean;
@@ -16,6 +17,11 @@ interface Props {
 const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, onGoBack}: Props) => {
     const [selectedAssists, setSelectedAssists] = useState<IPlayer[]>([]);
     if (!isOpen || !team) return null;
+
+    // Add placeholder player to the roster, exclude if it's the goal scorer
+    const rosterWithPlaceholder = [PLACEHOLDER_PLAYER, ...team.roster].filter(
+        player => player.id !== excludedPlayer?.id
+    );
 
     const toggleAssist = (player: IPlayer) => {
         setSelectedAssists(prev => prev.includes(player) ? prev.filter(p => p.id !== player.id) : [...prev, player]);
@@ -37,9 +43,13 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
                 <h3>Select Assists ({team.name})</h3>
                 <p>Select 0-2 players</p>
                 <div className={styles.rosterGrid}>
-                    {team.roster
-                        .filter(player => player.id !== excludedPlayer?.id)
-                        .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
+                    {rosterWithPlaceholder
+                        .sort((a, b) => {
+                            // Always keep placeholder at top
+                            if (a.id === 'placeholder') return -1;
+                            if (b.id === 'placeholder') return 1;
+                            return a.jerseyNumber - b.jerseyNumber;
+                        })
                         .map(player => (
                             <div
                                 key={player.id}

@@ -17,15 +17,17 @@ interface Props {
     onClose: () => void;
     onConfirm: () => void;
     onGoBack?: () => void;
+    onDelete?: () => void; // Add this
+    mode?: 'create' | 'edit'; // Add this
 }
 
-const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm, onGoBack}: Props) => {
+const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm, onGoBack, onDelete, mode = 'create'}: Props) => {
     if (!isOpen) return null;
 
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modal}>
-                <h3>Confirm Action</h3>
+                <h3>{mode === 'edit' ? 'Edit Action' : 'Confirm Action'}</h3>
 
                 <div className={styles.detailRow}>
                     <span>Action Type:</span>
@@ -71,11 +73,16 @@ const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm, onGoBa
                             Go Back
                         </Button>
                     )}
+                    {mode === 'edit' && onDelete && (
+                        <Button styleType="negative" onClick={onDelete}>
+                            Delete Action
+                        </Button>
+                    )}
                     <Button styleType="negative" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button styleType="positive" onClick={onConfirm}>
-                        Confirm
+                        {mode === 'edit' ? 'Save Changes' : 'Confirm'}
                     </Button>
                 </div>
             </div>
