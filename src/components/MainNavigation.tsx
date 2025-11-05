@@ -2,7 +2,8 @@ import styles from './MainNavigation.module.css';
 import {NavLink, useNavigate} from 'react-router-dom';
 import {auth} from "../firebase";
 import {signOut} from "firebase/auth";
-import { useState } from 'react';
+import {useState} from 'react';
+import {ADMIN, HANDLE_PLAYERS, HANDLE_TEAMS, SAVED_GAMES, START} from "../OOP/constants/NavigationNames";
 
 interface MainNavigationProps {
     isSignedIn: boolean | undefined;
@@ -54,7 +55,7 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
                 </li>
                 <li>
                     <NavLink
-                        to="/start"
+                        to={`/${START}`}
                         className={({isActive}) => isActive ? styles.active : styles.link}
                         onClick={closeMenu}
                     >
@@ -68,7 +69,7 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
                     <>
                         <li>
                             <NavLink
-                                to="/previous_games"
+                                to={`/${SAVED_GAMES}`}
                                 className={({isActive}) => isActive ? styles.active : styles.link}
                                 onClick={closeMenu}
                             >
@@ -77,7 +78,7 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
                         </li>
                         <li>
                             <NavLink
-                                to="/handleTeams"
+                                to={`/${HANDLE_TEAMS}`}
                                 className={({isActive}) => isActive ? styles.active : styles.link}
                                 onClick={closeMenu}
                             >
@@ -86,7 +87,7 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
                         </li>
                         <li>
                             <NavLink
-                                to="/handlePlayers"
+                                to={`/${HANDLE_PLAYERS}`}
                                 className={({isActive}) => isActive ? styles.active : styles.link}
                                 onClick={closeMenu}
                             >
@@ -112,7 +113,7 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
                 {!isSignedIn && isSignedIn !== undefined && (
                     <li>
                         <NavLink
-                            to="/admin"
+                            to={`/${ADMIN}`}
                             className={({isActive}) => isActive ? styles.active : styles.link}
                             onClick={closeMenu}
                         >

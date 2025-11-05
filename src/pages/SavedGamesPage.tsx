@@ -10,6 +10,7 @@ import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
 import Select from "../components/Select";
 import styles from "./SavedGamesPage.module.css";
+import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
 
 interface SavedGamesPageProps {
     playerGames?: IGame[];
@@ -170,7 +171,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         <li
                             key={game.id}
                             className={styles.gameItem}
-                            onClick={() => navigate(`/previous_games/${game.id}`, {state: game})}
+                            onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}
                         >
                             <div className={styles.gameTeams}>
                                 <div className={styles.gameTeam}>

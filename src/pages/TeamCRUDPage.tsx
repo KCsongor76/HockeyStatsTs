@@ -11,6 +11,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import styles from "./TeamCRUDPage.module.css"
+import {CREATE} from "../OOP/constants/NavigationNames";
 
 const TeamCrudPage = () => {
     const loaderData = useLoaderData() as {
@@ -64,7 +65,7 @@ const TeamCrudPage = () => {
                 <h1>Teams Management</h1>
                 <Button
                     styleType={"positive"}
-                    onClick={() => navigate("create", {state: {teams: teams}})}
+                    onClick={() => navigate(CREATE, {state: {teams: teams}})}
                 >
                     Create New Team
                 </Button>

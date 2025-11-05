@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import styles from "./CreatePlayerPage.module.css";
+import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
 const CreatePlayerPage = () => {
     const location = useLocation()
@@ -61,7 +62,7 @@ const CreatePlayerPage = () => {
             console.log(player)
             await PlayerService.createPlayer(player.teamId, player);
             alert('Player created successfully!');
-            navigate("/handlePlayers")
+            navigate(`/${HANDLE_PLAYERS}`)
         } catch (error) {
             setErrors(prev => ({
                 ...prev,
@@ -176,7 +177,7 @@ const CreatePlayerPage = () => {
 
             if (successCount > 0) {
                 setTimeout(() => {
-                    navigate("/handlePlayers");
+                    navigate(`/${HANDLE_PLAYERS}`);
                 }, 200);
             }
 

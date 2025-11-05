@@ -5,6 +5,7 @@ import {IGame} from "../OOP/interfaces/IGame";
 import {useNavigate} from "react-router-dom";
 import Button from "./Button";
 import styles from "./PlayerTable.module.css";
+import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
 interface PlayerTableProps {
     pageType: "player" | "team" | "game";
@@ -237,7 +238,7 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
                         <td>{Player.getPlayerStats(games, player).turnovers || 0}</td>
                         <td>{(Player.getPlayerStats(games, player).shotPercentage || 0).toFixed(2)}%</td>
                         <td>
-                            <Button styleType={"neutral"} onClick={() => navigate(`../../handlePlayers/${player.id}`, {
+                            <Button styleType={"neutral"} onClick={() => navigate(`../../${HANDLE_PLAYERS}/${player.id}`, {
                                 state: {player, games}
                             })}>
                                 View Player

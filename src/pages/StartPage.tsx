@@ -13,6 +13,7 @@ import Input from "../components/Input";
 import styles from "./StartPage.module.css"
 import ExampleIcon from "../components/ExampleIcon";
 import {ActionType} from "../OOP/enums/ActionType";
+import {GAME} from "../OOP/constants/NavigationNames";
 
 const StartPage = () => {
     const loaderData = useLoaderData();
@@ -177,7 +178,7 @@ const StartPage = () => {
 
         console.log("Starting game with:", setup);
 
-        navigate('/game', {state: setup});
+        navigate(`/${GAME}`, {state: setup});
     };
 
     const getAvailablePlayers = (teamId: string) => {
@@ -206,7 +207,7 @@ const StartPage = () => {
             if (savedGame) {
                 if (window.confirm('An unfinished game was found. Do you want to continue?')) {
                     hasCheckedForSavedGame.current = true;
-                    navigate('/game', {state: JSON.parse(savedGame as string)});
+                    navigate(`/${GAME}`, {state: JSON.parse(savedGame as string)});
                 } else {
                     localStorage.removeItem('unfinishedGame');
                     hasCheckedForSavedGame.current = true;

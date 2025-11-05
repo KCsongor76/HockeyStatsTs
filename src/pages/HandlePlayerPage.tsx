@@ -15,6 +15,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import styles from "./HandlePlayerPage.module.css"
+import {TRANSFER, TRANSFER_ID} from "../OOP/constants/NavigationNames";
 
 const HandlePlayerPage = () => {
     const data = useLocation();
@@ -241,7 +242,7 @@ const HandlePlayerPage = () => {
                 <Button
                     styleType={"positive"}
                     type="button"
-                    onClick={() => navigate(`../transfer/:${player.id}`, {state: {player, team}})}
+                    onClick={() => navigate(`../${TRANSFER}/:${player.id}`, {state: {player, team}})}
                 >
                     Transfer
                 </Button>

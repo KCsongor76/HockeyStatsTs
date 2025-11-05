@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from "./HomePage.module.css";
+import {ADMIN, HANDLE_PLAYERS, HANDLE_TEAMS, SAVED_GAMES, START} from "../OOP/constants/NavigationNames";
 
 interface HomePageProps {
     isSignedIn: boolean | undefined;
@@ -23,25 +24,25 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
                     title: 'Start New Game',
                     description: 'Begin a new hockey game tracking session',
                     icon: '🏒',
-                    path: '/start'
+                    path: `/${START}`
                 },
                 {
                     title: 'Previous Games',
                     description: 'Review and analyze past game records',
                     icon: '📊',
-                    path: '/previous_games'
+                    path: `/${SAVED_GAMES}`
                 },
                 {
                     title: 'Manage Teams',
                     description: 'Create, edit, and manage hockey teams',
                     icon: '🏆',
-                    path: '/handleTeams'
+                    path: `/${HANDLE_TEAMS}`
                 },
                 {
                     title: 'Manage Players',
                     description: 'Add, transfer, and track player information',
                     icon: '👥',
-                    path: '/handlePlayers'
+                    path: `/${HANDLE_PLAYERS}`
                 },
             ]);
         } else {
@@ -50,19 +51,19 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
                     title: 'Start New Game',
                     description: 'Begin a new hockey game tracking session',
                     icon: '🏒',
-                    path: '/start'
+                    path: `/${START}`
                 },
                 {
                     title: 'Previous Games',
                     description: 'Review and analyze past game records',
                     icon: '📊',
-                    path: '/previous_games'
+                    path: `/${SAVED_GAMES}`
                 },
                 {
                     title: 'Admin Login',
                     description: 'Access admin features',
                     icon: '🔑',
-                    path: '/admin'
+                    path: `/${ADMIN}`
                 }
             ]);
         }

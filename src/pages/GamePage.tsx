@@ -26,6 +26,7 @@ import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
 import ActionTypeFilters from "../components/ActionTypeFilters";
 import ActionsTable from "../components/ActionsTable";
+import {START} from "../OOP/constants/NavigationNames";
 
 interface GameSetup {
     season: Season;
@@ -435,7 +436,7 @@ const GamePage = () => {
                 await GameService.saveGame(gameData);
                 localStorage.removeItem('unfinishedGame');
                 alert('Game finalized successfully!');
-                navigate('/start');
+                navigate(`/${START}`);
             } catch (error) {
                 console.error('Failed to save game', error);
                 alert('Failed to save game. See console for details.');

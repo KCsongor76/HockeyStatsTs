@@ -7,6 +7,7 @@ import {PlayerService} from "../OOP/services/PlayerService";
 import Button from "../components/Button";
 import Select from "../components/Select";
 import styles from "./TransferPlayerPage.module.css"
+import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
 const TransferPlayerPage = () => {
     const location = useLocation();
@@ -23,7 +24,7 @@ const TransferPlayerPage = () => {
             try {
                 await PlayerService.transferPlayer(player.teamId, selectedTeamId, player);
                 alert("Player is now a free agent");
-                navigate('/handlePlayers');
+                navigate(`/${HANDLE_PLAYERS}`);
             } catch (error) {
                 setErrors({general: 'Failed to set as free agent.'});
             }
@@ -48,7 +49,7 @@ const TransferPlayerPage = () => {
             if (window.confirm(`Transfer ${player.name} to ${newTeam.name}?`)) {
                 await PlayerService.transferPlayer(player.teamId, selectedTeamId, player);
                 alert("Transfer successful.");
-                navigate('/handlePlayers');
+                navigate(`/${HANDLE_PLAYERS}`);
             }
         } catch (error) {
             setErrors({general: 'Transfer failed. Please try again.'});

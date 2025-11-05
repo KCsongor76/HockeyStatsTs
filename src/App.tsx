@@ -23,6 +23,17 @@ import {loader as startPageLoader} from "./pages/StartPage";
 import {TeamService} from "./OOP/services/TeamService";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
+import {
+    ADMIN,
+    CREATE,
+    GAME,
+    HANDLE_PLAYERS,
+    HANDLE_TEAMS,
+    ID,
+    SAVED_GAMES,
+    SAVED_GAMES_GAME_ID,
+    START, TRANSFER_ID
+} from "./OOP/constants/NavigationNames";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -57,28 +68,28 @@ function App() {
             errorElement: <ErrorPage/>,
             children: [
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
-                {path: "start", element: <StartPage/>, loader: startPageLoader},
-                {path: "game", element: <GamePage/>},
-                {path: "previous_games", element: <SavedGamesPage showFilters={true}/>},
-                {path: "previous_games/:gameId", element: <SavedGameDetailPage/>},
+                {path: START, element: <StartPage/>, loader: startPageLoader},
+                {path: GAME, element: <GamePage/>},
+                {path: SAVED_GAMES, element: <SavedGamesPage showFilters={true}/>},
+                {path: SAVED_GAMES_GAME_ID, element: <SavedGameDetailPage/>},
                 {
-                    path: "handleTeams",
+                    path: HANDLE_TEAMS,
                     children: [
                         {index: true, element: <TeamCRUDPage/>, loader: teamCRUDPageLoader},
-                        {path: "create", element: <CreateTeamPage/>,},
-                        {path: ":id", element: <HandleTeamPage/>},
+                        {path: CREATE, element: <CreateTeamPage/>,},
+                        {path: ID, element: <HandleTeamPage/>},
                     ],
                 },
                 {
-                    path: "handlePlayers",
+                    path: HANDLE_PLAYERS,
                     children: [
                         {index: true, element: <PlayerCRUDPage/>, loader: playerCRUDPageLoader},
-                        {path: "create", element: <CreatePlayerPage/>},
-                        {path: ":id", element: <HandlePlayerPage/>},
-                        {path: "transfer/:id", element: <TransferPlayerPage/>},
+                        {path: CREATE, element: <CreatePlayerPage/>},
+                        {path: ID, element: <HandlePlayerPage/>},
+                        {path: TRANSFER_ID, element: <TransferPlayerPage/>},
                     ],
                 },
-                {path: "admin", element: <Navigate to="/" replace/>}
+                {path: ADMIN, element: <Navigate to="/" replace/>}
             ],
         },
     ];
@@ -98,11 +109,11 @@ function App() {
             errorElement: <ErrorPage/>,
             children: [
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
-                {path: "start", element: <StartPage/>,},
-                {path: "game", element: <GamePage/>},
-                {path: "previous_games", element: <SavedGamesPage showFilters={true}/>},
-                {path: "previous_games/:gameId", element: <SavedGameDetailPage/>},
-                {path: "admin", element: <AuthPage/>},
+                {path: START, element: <StartPage/>,},
+                {path: GAME, element: <GamePage/>},
+                {path: SAVED_GAMES, element: <SavedGamesPage showFilters={true}/>},
+                {path: SAVED_GAMES_GAME_ID, element: <SavedGameDetailPage/>},
+                {path: ADMIN, element: <AuthPage/>},
                 {path: "*", element: <Navigate to="/admin" replace/>}, // Redirect unauthorized users
             ]
         }
