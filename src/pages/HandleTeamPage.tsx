@@ -46,10 +46,19 @@ const HandleTeamPage = () => {
         return result;
     };
 
+    // Filter players based on games they participated in for the selected filters
     const filteredPlayers = useMemo(() => {
-        const allPlayersInGames = new Map<string, IPlayer>();
+        // Get all players who ever played for this team (including transferred/deleted ones)
+        const allPlayersInGames = new Map<string, Player>();
 
+        // Process all games to find players who played for this team
         games.forEach(game => {
+            // Check if game matches current filters
+            const matchesSeason = selectedSeason === 'All' || game.season === selectedSeason;
+            const matchesChampionship = selectedChampionship === 'All' || game.championship === selectedChampionship;
+
+            if (!matchesSeason || !matchesChampionship) return;
+
             if (game.teams.home.id === team.id && game.teams.home.roster) {
                 game.teams.home.roster.forEach(player => {
                     if (!allPlayersInGames.has(player.id)) {
@@ -66,7 +75,9 @@ const HandleTeamPage = () => {
             }
         });
 
-        if (team.players) {
+        // If "All Seasons" and "All Championships" are selected, include current team players
+        // (to include those who haven't played yet but are on the roster)
+        if (selectedSeason === 'All' && selectedChampionship === 'All' && team.players) {
             team.players.forEach(player => {
                 if (!allPlayersInGames.has(player.id)) {
                     allPlayersInGames.set(player.id, player);
@@ -75,7 +86,7 @@ const HandleTeamPage = () => {
         }
 
         return Array.from(allPlayersInGames.values());
-    }, [team.players, games, team.id]);
+    }, [team.players, games, team.id, selectedSeason, selectedChampionship]);
 
     const handleDiscard = () => {
         setName(team.name);
@@ -190,7 +201,9 @@ const HandleTeamPage = () => {
     return (
         <div className={styles.teamContainer}>
             <div className={styles.teamHeader}>
-                <img src={team.logo} alt={team.name} className={styles.teamLogo}/>
+                {team.logo && team.id !== 'free-agent' && (
+                    <img src={team.logo} alt={team.name} className={styles.teamLogo}/>
+                )}
                 <h1>{team.name}</h1>
             </div>
 

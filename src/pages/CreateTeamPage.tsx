@@ -178,7 +178,7 @@ const CreateTeamPage = () => {
                 <div className={styles.championshipGroup}>
                     <label>Championships:</label>
                     {Object.values(Championship).map((championship) => (
-                        <label>
+                        <label key={championship}>
                             {championship}
                             <input
                                 type="checkbox"
