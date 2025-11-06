@@ -162,7 +162,7 @@ const ActionsTable: React.FC<Props> = ({ actions, gameType, onActionEdit, onActi
                                 styleType="neutral"
                                 onClick={() => onActionEdit(action)}
                             >
-                                View Action
+                                View
                             </Button>
                         </td>
                         <td>
@@ -170,7 +170,7 @@ const ActionsTable: React.FC<Props> = ({ actions, gameType, onActionEdit, onActi
                                 styleType="negative"
                                 onClick={() => onActionDelete(action)}
                             >
-                                Delete Action
+                                Delete
                             </Button>
                         </td>
                     </tr>

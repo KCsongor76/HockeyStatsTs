@@ -10,6 +10,10 @@ export interface ITeam {
         primary: string;
         secondary: string;
     }
+    inGameColor?: {
+        primary: string;
+        secondary: string;
+    }
     awayColor: {
         primary: string;
         secondary: string;

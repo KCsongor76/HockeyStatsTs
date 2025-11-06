@@ -20,7 +20,6 @@ import HandlePlayerPage from "./pages/HandlePlayerPage";
 import {loader as teamCRUDPageLoader} from "./pages/TeamCRUDPage";
 import {loader as playerCRUDPageLoader} from "./pages/PlayerCRUDPage";
 import {loader as startPageLoader} from "./pages/StartPage";
-import {TeamService} from "./OOP/services/TeamService";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
 import {
@@ -58,8 +57,6 @@ function App() {
 
         return () => unsubscribe();
     }, []);
-
-    TeamService.createFreeAgentTeamIfNotExists()
 
     const adminRoutes = [
         {

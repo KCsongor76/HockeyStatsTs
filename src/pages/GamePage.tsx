@@ -39,10 +39,29 @@ interface GameSetup {
     awayColors: { primary: string; secondary: string };
 }
 
+const getDefaultGame = (setup: GameSetup | null): IGame => ({
+    id: '',
+    type: setup?.gameType || GameType.REGULAR,
+    season: setup?.season || Season.SEASON_2025_2026,
+    championship: setup?.championship || Championship.ERSTE_LEAGUE,
+    actions: [],
+    timestamp: new Date().toISOString(),
+    score: {home: {goals: 0, shots: 0, turnovers: 0, hits: 0}, away: {goals: 0, shots: 0, turnovers: 0, hits: 0}},
+    teams: {
+        home: setup?.homeTeam || {} as ITeam,
+        away: setup?.awayTeam || {} as ITeam
+    },
+    colors: {
+        home: setup?.homeColors || {primary: '#000000', secondary: '#FFFFFF'},
+        away: setup?.awayColors || {primary: '#000000', secondary: '#FFFFFF'}
+    },
+    selectedImage: setup?.rinkImage || ''
+});
+
 const GamePage = () => {
     const location = useLocation();
     const [gameSetup, setGameSetup] = useState<GameSetup | null>(null);
-    const [currentGame, setCurrentGame] = useState<IGame | null>(null);
+    const [currentGame, setCurrentGame] = useState<IGame>(getDefaultGame(null));
     const [homeScore, setHomeScore] = useState<IScoreData>({goals: 0, shots: 0, turnovers: 0, hits: 0});
     const [awayScore, setAwayScore] = useState<IScoreData>({goals: 0, shots: 0, turnovers: 0, hits: 0});
     const [actions, setActions] = useState<IGameAction[]>([]);
@@ -75,6 +94,7 @@ const GamePage = () => {
         ({currentLocation, nextLocation}) =>
             !isFinalizing && actions.length > 0 && currentLocation.pathname !== nextLocation.pathname
     );
+
 
     const handleRinkClick = (e: React.MouseEvent<HTMLImageElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -135,8 +155,6 @@ const GamePage = () => {
     };
 
     const updateScoresOnDelete = (action: IGameAction) => {
-        if (!gameSetup) return;
-
         const updateScore = (setter: React.Dispatch<React.SetStateAction<IScoreData>>) => {
             setter(prev => ({
                 goals: prev.goals - (action.type === ActionType.GOAL ? 1 : 0),
@@ -146,7 +164,7 @@ const GamePage = () => {
             }));
         };
 
-        if (action.team.id === gameSetup.homeTeam.id) {
+        if (action.team.id === currentGame.teams.home.id) {
             updateScore(setHomeScore);
         } else {
             updateScore(setAwayScore);
@@ -154,13 +172,11 @@ const GamePage = () => {
     };
 
     const recalculateScores = () => {
-        if (!gameSetup) return;
-
         const newHomeScore: IScoreData = {goals: 0, shots: 0, turnovers: 0, hits: 0};
         const newAwayScore: IScoreData = {goals: 0, shots: 0, turnovers: 0, hits: 0};
 
         actions.forEach(action => {
-            const score = action.team.id === gameSetup.homeTeam.id ? newHomeScore : newAwayScore;
+            const score = action.team.id === currentGame.teams.home.id ? newHomeScore : newAwayScore;
             score.goals += action.type === ActionType.GOAL ? 1 : 0;
             score.shots += [ActionType.SHOT, ActionType.GOAL].includes(action.type) ? 1 : 0;
             score.turnovers += action.type === ActionType.TURNOVER ? 1 : 0;
@@ -172,8 +188,6 @@ const GamePage = () => {
     };
 
     const saveGameToLocalStorage = () => {
-        if (!gameSetup) return;
-
         const gameState = {
             homeScore,
             awayScore,
@@ -242,8 +256,6 @@ const GamePage = () => {
     };
 
     const updateScores = (action: IGameAction) => {
-        if (!gameSetup) return;
-
         const updateScore = (setter: React.Dispatch<React.SetStateAction<IScoreData>>) => {
             setter(prev => ({
                 goals: prev.goals + (action.type === ActionType.GOAL ? 1 : 0),
@@ -253,7 +265,7 @@ const GamePage = () => {
             }));
         };
 
-        if (action.team.id === gameSetup.homeTeam.id) {
+        if (action.team.id === currentGame.teams.home.id) {
             updateScore(setHomeScore);
         } else {
             updateScore(setAwayScore);
@@ -288,23 +300,19 @@ const GamePage = () => {
     const availableActionTypes = getAvailableActionTypes();
 
     const getFilteredPlayers = () => {
-        if (!gameSetup) return [];
-
-        const allPlayers = [...gameSetup.homeTeam.roster, ...gameSetup.awayTeam.roster] as IPlayer[];
+        const allPlayers = [...currentGame.teams.home.roster, ...currentGame.teams.away.roster] as IPlayer[];
         if (teamView === "home") {
-            return gameSetup.homeTeam.roster as IPlayer[] || [];
+            return currentGame.teams.home.roster as IPlayer[] || [];
         } else if (teamView === "away") {
-            return gameSetup.awayTeam.roster as IPlayer[] || [];
+            return currentGame.teams.away.roster as IPlayer[] || [];
         }
         return allPlayers;
     }
 
     const getFilteredActions = () => {
-        if (!gameSetup) return [];
-
         return actions.filter(action => {
-            if (teamView === 'home' && action.team.id !== gameSetup.homeTeam.id) return false;
-            if (teamView === 'away' && action.team.id !== gameSetup.awayTeam.id) return false;
+            if (teamView === 'home' && action.team.id !== currentGame.teams.home.id) return false;
+            if (teamView === 'away' && action.team.id !== currentGame.teams.away.id) return false;
             if (selectedPeriods.length > 0 && !selectedPeriods.includes(action.period)) return false;
             if (selectedActionTypes.length > 0 && !selectedActionTypes.includes(action.type)) return false;
             if (selectedPlayer) {
@@ -392,8 +400,6 @@ const GamePage = () => {
     };
 
     const saveGameLocally = () => {
-        if (!gameSetup) return;
-
         if (window.confirm('Save current game? This will overwrite any previously saved game.')) {
             const gameState = {
                 homeScore,
@@ -407,8 +413,7 @@ const GamePage = () => {
     };
 
     const finalizeGame = async () => {
-        if (!gameSetup) return;
-        if (currentGame?.score?.home?.goals === currentGame?.score?.away?.goals) {
+        if (currentGame.score.home.goals === currentGame.score.away.goals) {
             alert("Can't finalize a tie game!")
             return
         }
@@ -419,18 +424,18 @@ const GamePage = () => {
             try {
                 const gameData: IGame = {
                     id: '', // Will be generated by Firebase
-                    type: gameSetup.gameType,
-                    season: gameSetup.season,
-                    championship: gameSetup.championship,
+                    type: currentGame.type,
+                    season: currentGame.season,
+                    championship: currentGame.championship,
                     actions: actions,
                     timestamp: new Date().toISOString(),
                     score: {home: homeScore, away: awayScore},
-                    colors: {home: gameSetup.homeColors, away: gameSetup.awayColors},
+                    colors: {home: currentGame.colors.home, away: currentGame.colors.away},
                     teams: {
-                        home: gameSetup.homeTeam,
-                        away: gameSetup.awayTeam
+                        home: currentGame.teams.home,
+                        away: currentGame.teams.away
                     },
-                    selectedImage: gameSetup.rinkImage
+                    selectedImage: currentGame.selectedImage
                 };
 
                 await GameService.saveGame(gameData);
@@ -477,21 +482,26 @@ const GamePage = () => {
 
     useEffect(() => {
         if (gameSetup) {
-            setCurrentGame({
-                id: '',
-                type: gameSetup.gameType,
-                season: gameSetup.season,
-                championship: gameSetup.championship,
+            setCurrentGame(getDefaultGame(gameSetup));
+        }
+    }, [gameSetup]);
+
+    useEffect(() => {
+        if (gameSetup) {
+            setCurrentGame(prevGame => ({
+                ...prevGame,
+                type: currentGame.type,
+                season: currentGame.season,
+                championship: currentGame.championship,
                 actions: actions,
-                timestamp: new Date().toISOString(),
                 score: {home: homeScore, away: awayScore},
                 teams: {
-                    home: gameSetup.homeTeam,
-                    away: gameSetup.awayTeam
+                    home: currentGame.teams.home,
+                    away: currentGame.teams.away
                 },
-                colors: {home: gameSetup.homeColors, away: gameSetup.awayColors},
-                selectedImage: gameSetup.rinkImage
-            });
+                colors: {home: currentGame.colors.home, away: currentGame.colors.away},
+                selectedImage: currentGame.selectedImage
+            }));
         }
     }, [gameSetup, actions, homeScore, awayScore]);
 
@@ -544,11 +554,9 @@ const GamePage = () => {
     return (
         <>
             <div className={styles.gameContainer}>
-
-                {/* First rink with clickable area */}
                 <div className={styles.rinkContainer}>
                     <img
-                        src={gameSetup.rinkImage}
+                        src={currentGame.selectedImage}
                         alt="rink"
                         onClick={handleRinkClick}
                         className={styles.clickableRink}
@@ -558,21 +566,21 @@ const GamePage = () => {
                             // todo:
                             const colors = getIconColors(action);
                             return (
-                            <Icon
-                                key={index}
-                                actionType={action.type}
-                                backgroundColor={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.primary : gameSetup.awayColors.primary}
-                                color={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.secondary : gameSetup.awayColors.secondary}
-                                x={action.x}
-                                y={action.y}
-                                onClick={() => handleIconClick(action)}
-                            />
-                        )
+                                <Icon
+                                    key={index}
+                                    actionType={action.type}
+                                    backgroundColor={action.team.id === currentGame.teams.home.id ? currentGame.colors.home.primary : currentGame.colors.away.primary}
+                                    color={action.team.id === currentGame.teams.home.id ? currentGame.colors.home.secondary : currentGame.colors.away.secondary}
+                                    x={action.x}
+                                    y={action.y}
+                                    onClick={() => handleIconClick(action)}
+                                />
+                            )
                         })}
                     </div>}
                 </div>
 
-                {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
+                <GameScoreData game={currentGame} score={currentGame.score}/>
 
                 <div>
                     <Button styleType={"positive"} type="button" onClick={saveGameLocally}>
@@ -631,7 +639,7 @@ const GamePage = () => {
                             availablePeriods={availablePeriods}
                             selectedPeriods={selectedPeriods}
                             togglePeriod={togglePeriod}
-                            gameType={gameSetup.gameType}
+                            gameType={currentGame.type}
                         />
 
                         <h3>Action Types</h3>
@@ -642,16 +650,15 @@ const GamePage = () => {
                         />
                     </div>
 
-                    {/* Second rink */}
                     <div className={styles.rinkContainer}>
-                        <img src={gameSetup.rinkImage} alt="rink"/>
+                        <img src={currentGame.selectedImage} alt="rink"/>
                         <div className={styles.iconContainer}>
                             {getFilteredActions().map((action, index) => (
                                 <Icon
                                     key={`second-${index}`}
                                     actionType={action.type}
-                                    backgroundColor={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.primary : gameSetup.awayColors.primary}
-                                    color={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.secondary : gameSetup.awayColors.secondary}
+                                    backgroundColor={action.team.id === currentGame.teams.home.id ? currentGame.colors.home.primary : currentGame.colors.away.primary}
+                                    color={action.team.id === currentGame.teams.home.id ? currentGame.colors.home.secondary : currentGame.colors.away.secondary}
                                     x={action.x}
                                     y={action.y}
                                     onClick={() => handleIconClick(action)}
@@ -687,7 +694,7 @@ const GamePage = () => {
 
                     <ActionsTable
                         actions={actions}
-                        gameType={gameSetup.gameType}
+                        gameType={currentGame.type}
                         onActionEdit={handleActionEdit}
                         onActionDelete={handleActionDelete}
                     />
@@ -699,11 +706,11 @@ const GamePage = () => {
                 isOpen={modalStep === 'action'}
                 onClose={resetModalFlow}
                 onSelect={handleActionSelect}
-                homeTeam={gameSetup.homeTeam}
-                awayTeam={gameSetup.awayTeam}
-                homeColors={gameSetup.homeColors}
-                awayColors={gameSetup.awayColors}
-                gameType={gameSetup.gameType}
+                homeTeam={currentGame.teams.home}
+                awayTeam={currentGame.teams.away}
+                homeColors={currentGame.colors.home}
+                awayColors={currentGame.colors.away}
+                gameType={currentGame.type}
             />
 
             <PlayerSelectorModal
