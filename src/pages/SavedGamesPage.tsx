@@ -11,6 +11,7 @@ import Pagination from "../components/Pagination";
 import Select from "../components/Select";
 import styles from "./SavedGamesPage.module.css";
 import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface SavedGamesPageProps {
     playerGames?: IGame[];
@@ -28,6 +29,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     const [gameType, setGameType] = useState<GameType | "">("");
     const [sortOrder, setSortOrder] = useState('newest');
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
+    const [isLoading, setIsLoading] = useState(true); // Add loading state
 
     const navigate = useNavigate();
 
@@ -61,6 +63,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         const fetchData = async () => {
             try {
                 setError(null);
+                setIsLoading(true); // Start loading
 
                 if (!playerGames) {
                     const [teamsData, gamesData] = await Promise.all([
@@ -76,11 +79,17 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
             } catch (err) {
                 console.error("Failed to fetch data:", err);
                 setError("Failed to load games data. Please try again later.");
+            } finally {
+                setIsLoading(false); // End loading
             }
         };
 
         fetchData();
     }, [playerGames]);
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
 
     if (error) {
         return <div>{error}</div>;
