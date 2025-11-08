@@ -253,11 +253,13 @@ const HandleTeamPage = () => {
                     </div>
                 </div>
             ) : (
-                <div className={styles.buttonGroup}>
-                    <Button styleType={"neutral"} type="button" onClick={handleEdit}>
-                        Edit Team
-                    </Button>
-                </div>
+                team.id !== 'free-agent' && (
+                    <div className={styles.buttonGroup}>
+                        <Button styleType={"neutral"} type="button" onClick={handleEdit}>
+                            Edit Team
+                        </Button>
+                    </div>
+                )
             )}
 
             <Select
