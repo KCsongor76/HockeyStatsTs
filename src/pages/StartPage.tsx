@@ -33,6 +33,9 @@ const StartPage = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
 
+    console.log({homeColors})
+    console.log({awayColors})
+
     // Helper function to get team by ID
     const getTeamById = (id: string): ITeam | undefined => {
         return teams.find(t => t.id === id);
@@ -49,7 +52,7 @@ const StartPage = () => {
                 });
             }
         }
-    }, [homeTeamId, teams]);
+    }, [homeTeamId]);
 
     useEffect(() => {
         if (awayTeamId) {
@@ -61,7 +64,7 @@ const StartPage = () => {
                 });
             }
         }
-    }, [awayTeamId, teams]);
+    }, [awayTeamId]);
 
     // Update teams when championship changes
     useEffect(() => {
@@ -176,6 +179,8 @@ const StartPage = () => {
             rinkImage: selectedImage,
         }
 
+        console.log(homeColors)
+        console.log(awayColors)
         console.log("Starting game with:", setup);
 
         navigate(`/${GAME}`, {state: setup});
