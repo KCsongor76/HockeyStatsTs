@@ -697,8 +697,8 @@ const GamePage2 = () => {
                 onSelect={handleActionSelect}
                 homeTeam={gameSetup.homeTeam}
                 awayTeam={gameSetup.awayTeam}
-                homeColors={gameSetup.homeColors}
-                awayColors={gameSetup.awayColors}
+                homeColors={useDefaultHomeTeamColors ? gameSetup.homeTeam.homeColor : gameSetup.homeColors}
+                awayColors={useDefaultAwayTeamColors ? gameSetup.awayTeam.homeColor : gameSetup.awayColors}
                 gameType={gameSetup.gameType}
             />
 

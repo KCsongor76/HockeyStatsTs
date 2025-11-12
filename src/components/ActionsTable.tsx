@@ -122,7 +122,7 @@ const ActionsTable: React.FC<Props> = ({ actions, gameType, onActionEdit, onActi
         >
             {label}
             {sortField === field && (
-                <span>{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>
+                <span className={styles.sortIndicator}>{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>
             )}
         </th>
     );

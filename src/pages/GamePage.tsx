@@ -39,10 +39,12 @@ interface GameSetup {
     awayColors: { primary: string; secondary: string };
 }
 
-const GamePage = () => {
+const GamePage2 = () => {
     const location = useLocation();
     const [gameSetup, setGameSetup] = useState<GameSetup | null>(null);
     const [currentGame, setCurrentGame] = useState<IGame | null>(null);
+    console.log({gameSetup})
+    console.log({currentGame})
     const [homeScore, setHomeScore] = useState<IScoreData>({goals: 0, shots: 0, turnovers: 0, hits: 0});
     const [awayScore, setAwayScore] = useState<IScoreData>({goals: 0, shots: 0, turnovers: 0, hits: 0});
     const [actions, setActions] = useState<IGameAction[]>([]);
@@ -65,8 +67,8 @@ const GamePage = () => {
     const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
     const [selectedAction, setSelectedAction] = useState<IGameAction | null>(null); // New state for action details
 
-    const [useHomeTeamColors, setUseHomeTeamColors] = useState<boolean>(true);
-    const [useAwayTeamColors, setUseAwayTeamColors] = useState<boolean>(true);
+    const [useDefaultHomeTeamColors, setUseDefaultHomeTeamColors] = useState<boolean>(false);
+    const [useDefaultAwayTeamColors, setUseDefaultAwayTeamColors] = useState<boolean>(false);
 
     const [autosave, setAutosave] = useState(false);
     const navigate = useNavigate();
@@ -88,30 +90,30 @@ const GamePage = () => {
     const getIconColors = (action: IGameAction) => {
         const isHomeTeam = action.team.id === currentGame?.teams.home.id;
 
-        if (isHomeTeam && !useHomeTeamColors) {
+        if (isHomeTeam && useDefaultHomeTeamColors) {
             // Default colors for home team
             return {
-                backgroundColor: currentGame?.colors.home.primary,
-                color: currentGame?.colors.home.secondary
+                backgroundColor: gameSetup?.homeTeam?.homeColor?.primary,
+                color: gameSetup?.homeTeam?.homeColor?.secondary
             };
         }
 
-        if (!isHomeTeam && !useAwayTeamColors) {
+        if (!isHomeTeam && useDefaultAwayTeamColors) {
             // Default colors for away team
             return {
-                backgroundColor: currentGame?.colors.away.primary,
-                color: currentGame?.colors.away.secondary
+                backgroundColor: gameSetup?.awayTeam?.homeColor?.primary,
+                color: gameSetup?.awayTeam?.homeColor?.secondary
             };
         }
 
         // Use game colors
         return {
             backgroundColor: isHomeTeam
-                ? currentGame?.teams.home.homeColor.primary
-                : currentGame?.teams.away.awayColor.primary,
+                ? gameSetup?.homeColors?.primary
+                : gameSetup?.awayColors?.primary,
             color: isHomeTeam
-                ? currentGame?.teams.home.homeColor.secondary
-                : currentGame?.teams.away.awayColor.secondary
+                ? gameSetup?.homeColors?.secondary
+                : gameSetup?.awayColors?.secondary
         };
     };
 
@@ -537,15 +539,13 @@ const GamePage = () => {
         saveGameToLocalStorage();
     }, [actions, autosave]);
 
-    if (!gameSetup) {
+    if (!gameSetup || !currentGame) {
         return <div>Loading game data...</div>;
     }
 
     return (
         <>
             <div className={styles.gameContainer}>
-
-                {/* First rink with clickable area */}
                 <div className={styles.rinkContainer}>
                     <img
                         src={gameSetup.rinkImage}
@@ -555,14 +555,13 @@ const GamePage = () => {
                     />
                     {showDetails && <div className={styles.iconContainer}>
                         {actions.map((action, index) => {
-                            // todo:
                             const colors = getIconColors(action);
                             return (
                                 <Icon
                                     key={index}
                                     actionType={action.type}
-                                    backgroundColor={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.primary : gameSetup.awayColors.primary}
-                                    color={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.secondary : gameSetup.awayColors.secondary}
+                                    backgroundColor={colors.backgroundColor ?? '#ffffff'}
+                                    color={colors.color ?? '#000000'}
                                     x={action.x}
                                     y={action.y}
                                     onClick={() => handleIconClick(action)}
@@ -571,129 +570,126 @@ const GamePage = () => {
                         })}
                     </div>}
                 </div>
+            </div>
 
-                {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
+            {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
 
-                <div>
-                    <Button styleType={"positive"} type="button" onClick={saveGameLocally}>
-                        Save Game Locally
-                    </Button>
+            <h3 style={{textAlign: 'center'}}>Game Controls</h3>
+            <div style={
+                {
+                    display: "flex",
+                    justifyContent: "center",
+                }
+            }>
+                <Button styleType={"positive"} type="button" onClick={saveGameLocally}>
+                    Save Game Locally
+                </Button>
 
-                    <Button
-                        styleType={autosave ? "positive" : "negative"}
-                        onClick={toggleAutosave}
-                    >
-                        Autosave: {autosave ? "ON" : "OFF"}
-                    </Button>
+                <Button
+                    styleType={autosave ? "positive" : "negative"}
+                    onClick={toggleAutosave}
+                >
+                    Autosave: {autosave ? "ON" : "OFF"}
+                </Button>
 
-                    <Button styleType={"positive"} type="button" onClick={finalizeGame}>
-                        Finalize Game
-                    </Button>
+                <Button styleType={"positive"} type="button" onClick={finalizeGame}>
+                    Finalize Game
+                </Button>
 
-                    <Button
-                        styleType={showDetails ? "negative" : "positive"}
-                        onClick={() => setShowDetails(!showDetails)}
-                    >
-                        {showDetails ? 'Hide Details' : 'Show Details'}
-                    </Button>
+                <Button
+                    styleType={showDetails ? "negative" : "positive"}
+                    onClick={() => setShowDetails(!showDetails)}
+                >
+                    {showDetails ? 'Hide Game Icons' : 'Show Game Icons'}
+                </Button>
+            </div>
+
+            <h3 style={{textAlign: 'center'}}>Team Filters</h3>
+            <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
+
+            <h3 style={{textAlign: 'center'}}>Color Selectors</h3>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                <Button
+                    styleType={useDefaultHomeTeamColors ? 'positive' : 'neutral'}
+                    onClick={() => setUseDefaultHomeTeamColors(!useDefaultHomeTeamColors)}
+                >
+                    {useDefaultHomeTeamColors ? 'Home-currently: Default Colors' : 'Home-currently: Game Colors'}
+                </Button>
+
+                <Button
+                    styleType={useDefaultAwayTeamColors ? 'positive' : 'neutral'}
+                    onClick={() => setUseDefaultAwayTeamColors(!useDefaultAwayTeamColors)}
+                >
+                    {useDefaultAwayTeamColors ? 'Away-currently: Default Colors' : 'Away-currently: Game Colors'}
+                </Button>
+            </div>
+
+            <h3 style={{textAlign: 'center'}}>Available Period Filters</h3>
+            <PeriodFilters
+                availablePeriods={availablePeriods}
+                selectedPeriods={selectedPeriods}
+                togglePeriod={togglePeriod}
+                gameType={gameSetup.gameType}
+            />
+
+            <h3 style={{textAlign: 'center'}}>Available Action Type Filters</h3>
+            <ActionTypeFilters
+                availableActionTypes={availableActionTypes}
+                selectedActionTypes={selectedActionTypes}
+                toggleActionType={toggleActionType}
+            />
+
+            <div className={styles.rinkContainer}>
+                <img src={gameSetup.rinkImage} alt="rink"/>
+                <div className={styles.iconContainer}>
+                    {getFilteredActions().map((action, index) => {
+                        const colors = getIconColors(action);
+                        return <Icon
+                            key={`second-${index}`}
+                            actionType={action.type}
+                            backgroundColor={colors.backgroundColor ?? '#ffffff'}
+                            color={colors.color ?? '#000000'}
+                            x={action.x}
+                            y={action.y}
+                            onClick={() => handleIconClick(action)}
+                        />
+                    })}
                 </div>
             </div>
 
-
-            {showDetails && (
-                <>
-                    <div className={styles.gameContainer}>
-                        <h3>Team View</h3>
-                        <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
-
-                        <h3>Icon Colors</h3>
-                        <div style={{display: 'flex', gap: '1rem', marginBottom: '1rem'}}>
-                            <div>
-                                <Button
-                                    styleType={useHomeTeamColors ? 'positive' : 'neutral'}
-                                    onClick={() => setUseHomeTeamColors(!useHomeTeamColors)}
-                                >
-                                    {useHomeTeamColors ? 'Home-currently: Default Colors' : 'Home-currently: Game Colors'}
-                                </Button>
-                            </div>
-                            <div>
-                                <Button
-                                    styleType={useAwayTeamColors ? 'positive' : 'neutral'}
-                                    onClick={() => setUseAwayTeamColors(!useAwayTeamColors)}
-                                >
-                                    {useAwayTeamColors ? 'Away-currently: Default Colors' : 'Away-currently: Game Colors'}
-                                </Button>
-                            </div>
-                        </div>
-
-                        <h3>Periods</h3>
-                        <PeriodFilters
-                            availablePeriods={availablePeriods}
-                            selectedPeriods={selectedPeriods}
-                            togglePeriod={togglePeriod}
-                            gameType={gameSetup.gameType}
-                        />
-
-                        <h3>Action Types</h3>
-                        <ActionTypeFilters
-                            availableActionTypes={availableActionTypes}
-                            selectedActionTypes={selectedActionTypes}
-                            toggleActionType={toggleActionType}
-                        />
-                    </div>
-
-                    {/* Second rink */}
-                    <div className={styles.rinkContainer}>
-                        <img src={gameSetup.rinkImage} alt="rink"/>
-                        <div className={styles.iconContainer}>
-                            {getFilteredActions().map((action, index) => (
-                                <Icon
-                                    key={`second-${index}`}
-                                    actionType={action.type}
-                                    backgroundColor={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.primary : gameSetup.awayColors.primary}
-                                    color={action.team.id === gameSetup.homeTeam.id ? gameSetup.homeColors.secondary : gameSetup.awayColors.secondary}
-                                    x={action.x}
-                                    y={action.y}
-                                    onClick={() => handleIconClick(action)}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className={styles.gameContainer}>
-                        <h2>Player Statistics</h2>
-                        <h3>Skaters</h3>
-                        {currentGame && (
-                            <PlayerTable
-                                pageType="game"
-                                players={getFilteredPlayers().filter(p => p.position !== Position.GOALIE)}
-                                games={[currentGame]}
-                                selectedPlayer={selectedPlayer}
-                                togglePlayer={togglePlayer}
-                            />
-                        )}
-
-                        <h3>Goalies</h3>
-                        {currentGame && (
-                            <PlayerTable
-                                pageType="game"
-                                players={getFilteredPlayers().filter(p => p.position === Position.GOALIE)}
-                                games={[currentGame]}
-                                selectedPlayer={selectedPlayer}
-                                togglePlayer={togglePlayer}
-                            />
-                        )}
-                    </div>
-
-                    <ActionsTable
-                        actions={actions}
-                        gameType={gameSetup.gameType}
-                        onActionEdit={handleActionEdit}
-                        onActionDelete={handleActionDelete}
-                    />
-
-                </>
+            <h3 style={{textAlign: 'center'}}>Skaters</h3>
+            {currentGame && (
+                <PlayerTable
+                    pageType="game"
+                    players={getFilteredPlayers().filter(p => p.position !== Position.GOALIE)}
+                    games={[currentGame]}
+                    selectedPlayer={selectedPlayer}
+                    togglePlayer={togglePlayer}
+                />
             )}
+
+            <h3 style={{textAlign: 'center'}}>Goalies</h3>
+            {currentGame && (
+                <PlayerTable
+                    pageType="game"
+                    players={getFilteredPlayers().filter(p => p.position === Position.GOALIE)}
+                    games={[currentGame]}
+                    selectedPlayer={selectedPlayer}
+                    togglePlayer={togglePlayer}
+                />
+            )}
+
+            <ActionsTable
+                actions={actions}
+                gameType={gameSetup.gameType}
+                onActionEdit={handleActionEdit}
+                onActionDelete={handleActionDelete}
+            />
 
             <ActionSelectorModal
                 isOpen={modalStep === 'action'}
@@ -701,8 +697,8 @@ const GamePage = () => {
                 onSelect={handleActionSelect}
                 homeTeam={gameSetup.homeTeam}
                 awayTeam={gameSetup.awayTeam}
-                homeColors={gameSetup.homeColors}
-                awayColors={gameSetup.awayColors}
+                homeColors={useDefaultHomeTeamColors ? gameSetup.homeTeam.homeColor : gameSetup.homeColors}
+                awayColors={useDefaultAwayTeamColors ? gameSetup.awayTeam.homeColor : gameSetup.awayColors}
                 gameType={gameSetup.gameType}
             />
 
@@ -741,4 +737,4 @@ const GamePage = () => {
     );
 };
 
-export default GamePage;
+export default GamePage2;

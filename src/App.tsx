@@ -33,7 +33,6 @@ import {
     SAVED_GAMES_GAME_ID,
     START, TRANSFER_ID
 } from "./OOP/constants/NavigationNames";
-import GamePage2 from "./pages/GamePage2";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -67,7 +66,7 @@ function App() {
             children: [
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
                 {path: START, element: <StartPage/>, loader: startPageLoader},
-                {path: GAME, element: <GamePage2/>},
+                {path: GAME, element: <GamePage/>},
                 {path: SAVED_GAMES, element: <SavedGamesPage showFilters={true}/>},
                 {path: SAVED_GAMES_GAME_ID, element: <SavedGameDetailPage/>},
                 {
