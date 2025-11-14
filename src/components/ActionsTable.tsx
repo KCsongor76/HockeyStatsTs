@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { IGameAction } from "../OOP/interfaces/IGameAction";
-import { ActionType } from "../OOP/enums/ActionType";
 import { GameType } from "../OOP/enums/GameType";
 import { RegularPeriod, PlayoffPeriod } from "../OOP/enums/Period";
 import Button from "./Button";

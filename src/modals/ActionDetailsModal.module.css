@@ -1,4 +1,3 @@
-/* Add to GamePage.module.css */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -43,9 +42,3 @@
 .closeButton:hover {
     background-color: #0056b3;
 }
-
-/* Add cursor pointer to sortable headers */
-/*th {*/
-/*    cursor: pointer;*/
-/*    user-select: none;*/
-/*}*/

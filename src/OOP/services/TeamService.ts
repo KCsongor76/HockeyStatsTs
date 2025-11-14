@@ -1,5 +1,5 @@
 import {
-    addDoc, collection, collectionGroup, deleteDoc, doc,
+    collection, collectionGroup, deleteDoc, doc,
     getDoc, getDocs, query, setDoc, updateDoc, where
 } from "firebase/firestore";
 import {deleteObject, getDownloadURL, ref, uploadBytes} from "firebase/storage";
@@ -9,8 +9,6 @@ import {IPlayer} from "../interfaces/IPlayer";
 import {ITeam} from "../interfaces/ITeam";
 import {Team} from "../classes/Team";
 import {PlayerService} from "./PlayerService";
-
-// todo: arrow functions, atomic operations, batch writes?
 
 export class TeamService {
     private static collectionRef = collection(db, 'teams');
@@ -28,7 +26,7 @@ export class TeamService {
         await setDoc(docRef, teamWithId);
     }
 
-    static async getTeamById(id: string): Promise<ITeam | null> {
+    static getTeamById = async (id: string): Promise<ITeam | null> => {
         const docRef = doc(this.collectionRef, id);
         const docSnap = await getDoc(docRef);
 
@@ -52,18 +50,17 @@ export class TeamService {
         } as ITeam;
     }
 
-    static async updateTeam(id: string, team: Team) {
+    static updateTeam = async (id: string, team: Team) => {
         const docRef = doc(this.collectionRef, id);
-        console.log(team)
         // @ts-ignore
         await updateDoc(docRef, team.toPlainObject());
     }
 
-    static async deleteTeam(id: string) {
+    static deleteTeam = async (id: string) => {
         // Move players to free agent team
         const players = await PlayerService.getPlayersByTeam(id);
         const transferPromises = players.map(player =>
-            TeamService.transferPlayer(id, "free-agent", player)
+            PlayerService.transferPlayer(id, "free-agent", player)
         );
         await Promise.all(transferPromises);
 
@@ -88,7 +85,6 @@ export class TeamService {
         // Delete the team's logo if it exists
         if (teamData?.logo) {
             try {
-                console.log("logo deleted")
                 await this.deleteLogo(teamData.logo);
             } catch (error) {
                 console.error("Error deleting team logo:", error);
@@ -100,7 +96,7 @@ export class TeamService {
         await deleteDoc(teamDocRef);
     }
 
-    static async getAllTeams(): Promise<ITeam[]> {
+    static getAllTeams = async (): Promise<ITeam[]> => {
         // Fetch all teams and players in parallel
         const teamsSnapshot = await getDocs(this.collectionRef);
         const teamsData = teamsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()} as ITeam));
@@ -144,26 +140,7 @@ export class TeamService {
         }
     };
 
-    static checkNameExists = async (name: string) => {
-        const q = query(this.collectionRef, where('name', '==', name));
-        return !(await getDocs(q)).empty;
-    }
-
-    static checkLogoExists = async (fileName: string, isTeamCreation: boolean = false): Promise<boolean> => {
-        const logoRef = ref(storage, `team-logos/${fileName}`);
-        try {
-            await getDownloadURL(logoRef);
-            return true;
-        } catch (error) {
-            if (!isTeamCreation) {
-                console.error("Error deleting logo:", error);
-            }
-            return false;
-        }
-    };
-
-    // In TeamService.ts
-    static async createFreeAgentTeamIfNotExists() {
+    static createFreeAgentTeamIfNotExists = async () => {
         const freeAgentId = "free-agent";
         const freeAgentDocRef = doc(this.collectionRef, freeAgentId);
         const docSnap = await getDoc(freeAgentDocRef);
@@ -182,28 +159,7 @@ export class TeamService {
         }
     }
 
-    // todo: move to PlayerService?
-    static transferPlayer = async (fromTeamId: string, toTeamId: string, player: IPlayer) => {
-        try {
-            // Remove from old team
-            if (fromTeamId /*&& fromTeamId !== "free-agent"*/) {
-                const fromRef = doc(db, `teams/${fromTeamId}/players`, player.id);
-                await deleteDoc(fromRef);
-            }
-
-            // Add to new team
-            if (toTeamId /*&& toTeamId !== "free-agent"*/) {
-                const toRef = doc(db, `teams/${toTeamId}/players`, player.id);
-                await setDoc(toRef, {...player, teamId: toTeamId});
-            }
-        } catch (error) {
-            console.error('Error transferring player:', error);
-            throw new Error('Failed to transfer player');
-        }
-    }
-
-    // Add to TeamService.ts
-    static async isNameTaken(name: string, excludeId?: string): Promise<boolean> {
+    static isNameTaken = async (name: string, excludeId?: string): Promise<boolean> => {
         const q = query(
             this.collectionRef,
             where('name', '==', name),

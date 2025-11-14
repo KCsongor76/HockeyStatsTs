@@ -1,8 +1,6 @@
-import {addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc} from "firebase/firestore";
+import {collection, deleteDoc, doc, getDocs, setDoc} from "firebase/firestore";
 import {db} from "../../firebase";
 import {IGame} from "../interfaces/IGame";
-
-// todo: arrow functions, atomic operations, batch writes?
 
 export class GameService {
     private static collectionRef = collection(db, 'games');
@@ -14,12 +12,6 @@ export class GameService {
         return gameWithId as IGame;
     }
 
-    static getGame = async (game: IGame) => {
-        const docRef = doc(this.collectionRef, game.id);
-        const docSnap = await getDoc(docRef);
-        return docSnap.exists() ? {id: docSnap.id, ...docSnap.data()} as IGame : null;
-    }
-
     static getAllGames = async () => {
         const querySnapshot = await getDocs(this.collectionRef);
         return querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()} as IGame));
@@ -29,8 +21,6 @@ export class GameService {
         const id = game.id;
         const docRef = doc(this.collectionRef, id);
         await deleteDoc(docRef);
-        // todo: when deleting game, make sure that all the stats get deleted from teams/players also
-        // todo: also, have shallow delete?
     }
 
     static updateGame = async (game: IGame) => {

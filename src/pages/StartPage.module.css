@@ -4,7 +4,7 @@
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center all content */
+    align-items: center;
 }
 
 .formGrid {

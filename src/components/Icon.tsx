@@ -28,21 +28,6 @@ const Icon = ({actionType, backgroundColor, color, x, y, onClick}: Props) => {
         };
     };
 
-    const getSymbol = () => {
-        switch (actionType) {
-            case ActionType.GOAL:
-                return 'G';
-            case ActionType.SHOT:
-                return 'S';
-            case ActionType.HIT:
-                return 'H';
-            case ActionType.TURNOVER:
-                return 'T';
-            default:
-                return '?';
-        }
-    };
-
     const renderIcon = () => {
 
         switch (actionType) {

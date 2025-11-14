@@ -18,7 +18,7 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
     const [selectedAssists, setSelectedAssists] = useState<IPlayer[]>([]);
     if (!isOpen || !team) return null;
 
-    // Add placeholder player to the roster, exclude if it's the goal scorer
+    // Add a placeholder player to the roster, exclude if it's the goalscorer
     const rosterWithPlaceholder = [PLACEHOLDER_PLAYER, ...team.roster].filter(
         player => player.id !== excludedPlayer?.id
     );
@@ -45,7 +45,7 @@ const AssistSelectorModal = ({isOpen, team, excludedPlayer, onClose, onSelect, o
                 <div className={styles.rosterGrid}>
                     {rosterWithPlaceholder
                         .sort((a, b) => {
-                            // Always keep placeholder at top
+                            // Always keep placeholder at the top
                             if (a.id === 'placeholder') return -1;
                             if (b.id === 'placeholder') return 1;
                             return a.jerseyNumber - b.jerseyNumber;

@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {ActionType} from "../OOP/enums/ActionType";
-import Icon from "../components/Icon";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {GameType} from "../OOP/enums/GameType";
 import {RegularPeriod, PlayoffPeriod} from "../OOP/enums/Period";
@@ -52,7 +51,7 @@ const ActionSelectorModal = ({
         }
     };
 
-    // Get time constraints based on period
+    // Get time constraints based on Period
     const getTimeConstraints = (period: number) => {
         if (gameType === GameType.REGULAR) {
             switch (period) {

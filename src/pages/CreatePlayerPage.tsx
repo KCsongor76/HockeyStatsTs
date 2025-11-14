@@ -47,7 +47,6 @@ const CreatePlayerPage = () => {
         event.preventDefault();
         if (!validateForm()) return;
         if (isFreeAgent) playerData.teamId = "free-agent";
-        console.log(playerData)
 
         try {
             const isJerseyNumberAvailable = await PlayerService.isJerseyNumberAvailable(playerData.teamId, playerData.jerseyNumber)
@@ -59,7 +58,6 @@ const CreatePlayerPage = () => {
                 return;
             }
             const player = {...playerData, id: ""} as IPlayer;
-            console.log(player)
             await PlayerService.createPlayer(player.teamId, player);
             alert('Player created successfully!');
             navigate(`/${HANDLE_PLAYERS}`)
@@ -89,15 +87,15 @@ const CreatePlayerPage = () => {
         }
     }
 
-    const parsePlayerFile = (content: string): { teamId: string; players: Array<{ jerseyNumber: number; name: string; position: Position }> } => {
+    const parsePlayerFile = (content: string): {
+        teamId: string;
+        players: Array<{ jerseyNumber: number; name: string; position: Position }>
+    } => {
         const lines = content.split('\n').filter(line => line.trim() !== '');
 
         if (lines.length < 3) {
             throw new Error('Invalid file format. File must have at least 3 lines.');
         }
-
-        // First line: header (jersey_number | player_name | position)
-        const header = lines[0];
 
         // Second line: team ID
         const teamId = lines[1].trim();
@@ -118,19 +116,18 @@ const CreatePlayerPage = () => {
             const name = parts[1];
             const position = mapPositionString(parts[2]);
 
-            return { jerseyNumber, name, position };
+            return {jerseyNumber, name, position};
         });
 
-        return { teamId, players };
+        return {teamId, players};
     }
-
 
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        // Check if file is text file
+        // Check if file is a text file
         if (!file.name.toLowerCase().endsWith('.txt')) {
             setUploadStatus('Error: Please upload a .txt file');
             return;
@@ -141,7 +138,7 @@ const CreatePlayerPage = () => {
 
         try {
             const content = await readFileAsText(file);
-            const { teamId, players } = parsePlayerFile(content);
+            const {teamId, players} = parsePlayerFile(content);
 
             let successCount = 0;
             let errorCount = 0;
@@ -149,8 +146,6 @@ const CreatePlayerPage = () => {
             // Upload each player
             for (const playerData of players) {
                 try {
-                    // Check if jersey number is available
-                    // const isAvailable = await PlayerService.isJerseyNumberAvailable(teamId, playerData.jerseyNumber);
                     const isAvailable = true
                     if (isAvailable) {
                         const player: IPlayer = {
@@ -198,7 +193,7 @@ const CreatePlayerPage = () => {
                 const content = e.target?.result as string;
                 resolve(content);
             };
-            reader.onerror = (e) => reject(new Error('Failed to read file'));
+            reader.onerror = () => reject(new Error('Failed to read file'));
             reader.readAsText(file);
         });
     }
@@ -207,7 +202,6 @@ const CreatePlayerPage = () => {
         <div className={styles.formContainer}>
             <h1 className={styles.formTitle}>Create New Player</h1>
 
-            {/* File Upload Section */}
             <div className={styles.uploadSection}>
                 <h2>Upload Players from File</h2>
                 <Input
@@ -215,7 +209,6 @@ const CreatePlayerPage = () => {
                     type="file"
                     accept=".txt"
                     onChange={handleFileUpload}
-                    // disabled={isUploading}
                 />
                 {isUploading && <p>Uploading players...</p>}
                 {uploadStatus && (
@@ -225,7 +218,7 @@ const CreatePlayerPage = () => {
                 )}
             </div>
 
-            <hr className={styles.divider} />
+            <hr className={styles.divider}/>
 
             {/* Manual Player Creation Form */}
             <h2>Create Player Manually</h2>

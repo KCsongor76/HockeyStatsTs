@@ -27,7 +27,7 @@ const PlayerSelectorModal = ({isOpen, team, onClose, onSelect, onGoBack}: Props)
                 <div className={styles.rosterGrid}>
                     {rosterWithPlaceholder
                         .sort((a, b) => {
-                            // Always keep placeholder at top
+                            // Always keep placeholder at the top
                             if (a.id === 'placeholder') return -1;
                             if (b.id === 'placeholder') return 1;
                             return a.jerseyNumber - b.jerseyNumber;

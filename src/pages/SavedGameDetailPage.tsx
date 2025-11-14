@@ -263,7 +263,7 @@ const SavedGameDetailPage2 = () => {
         const isHomeTeam = action.team.id === game.teams.home.id;
 
         if (isHomeTeam && useDefaultHomeTeamColors) {
-            // Default colors for home team
+            // Default colors for the home team
             return {
                 backgroundColor: game.teams.home.homeColor.primary,
                 color: game.teams.home.homeColor.secondary
@@ -271,7 +271,7 @@ const SavedGameDetailPage2 = () => {
         }
 
         if (!isHomeTeam && useDefaultAwayTeamColors) {
-            // Default colors for away team
+            // Default colors for the away team
             return {
                 backgroundColor: game.teams.away.awayColor.primary,
                 color: game.teams.away.awayColor.secondary

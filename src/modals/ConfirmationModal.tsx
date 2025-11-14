@@ -21,7 +21,7 @@ interface Props {
     mode?: 'create' | 'edit'; // Add this
 }
 
-const ConfirmationModal = ({isOpen, action, position, onClose, onConfirm, onGoBack, onDelete, mode = 'create'}: Props) => {
+const ConfirmationModal = ({isOpen, action, onClose, onConfirm, onGoBack, onDelete, mode = 'create'}: Props) => {
     if (!isOpen) return null;
 
     return (

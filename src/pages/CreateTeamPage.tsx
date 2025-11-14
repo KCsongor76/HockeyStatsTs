@@ -7,7 +7,6 @@ import {TeamService} from "../OOP/services/TeamService";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import styles from "./CreateTeamPage.module.css";
-import Icon from "../components/Icon";
 import {ActionType} from "../OOP/enums/ActionType";
 import ExampleIcon from "../components/ExampleIcon";
 
@@ -88,7 +87,6 @@ const CreateTeamPage = () => {
             };
             await TeamService.createTeam(newTeamData);
 
-            console.log("Team created successfully");
             alert("Team created successfully!");
             navigate("../")
         } catch (error) {

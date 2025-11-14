@@ -31,7 +31,7 @@ const Select: React.FC<SelectProps> = ({
                                            className = '',
                                            error
                                        }) => {
-    const selectId = id || name || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const selectId = id || name || `select-${Math.random().toString(36).substring(2, 11)}`;
 
     return (
         <div className={`${styles.selectContainer} ${className}`}>

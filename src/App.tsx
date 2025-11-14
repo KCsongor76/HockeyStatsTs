@@ -45,7 +45,7 @@ function App() {
                 const isAdmin = adminUids.includes(user.uid);
                 setIsSignedIn(isAdmin);
 
-                // Redirect non-admin users to home
+                // Redirect non-admin users home
                 if (!isAdmin && window.location.pathname.startsWith('/admin')) {
                     window.location.href = '/';
                 }

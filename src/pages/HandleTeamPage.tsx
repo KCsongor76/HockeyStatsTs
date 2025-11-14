@@ -4,7 +4,6 @@ import {Team} from "../OOP/classes/Team";
 import {Championship} from "../OOP/enums/Championship";
 import {GameType} from "../OOP/enums/GameType";
 import {Season} from "../OOP/enums/Season";
-import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {IGame} from "../OOP/interfaces/IGame";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
@@ -305,7 +304,7 @@ const HandleTeamPage = () => {
                                 <div>
                                     <h3>Playoff Players Stats</h3>
                                     <PlayerTable pageType="team" players={filteredPlayers} games={playoffGames}/>
-                                    {/* Add distinctive line under playoff stats table */}
+                                    {/* Add distinctive line under the playoff stats table */}
                                     <hr style={{margin: '2rem 0', border: '2px solid #ccc'}}/>
                                 </div>
                             </>

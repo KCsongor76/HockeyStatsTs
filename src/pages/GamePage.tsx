@@ -43,8 +43,6 @@ const GamePage2 = () => {
     const location = useLocation();
     const [gameSetup, setGameSetup] = useState<GameSetup | null>(null);
     const [currentGame, setCurrentGame] = useState<IGame | null>(null);
-    console.log({gameSetup})
-    console.log({currentGame})
     const [homeScore, setHomeScore] = useState<IScoreData>({goals: 0, shots: 0, turnovers: 0, hits: 0});
     const [awayScore, setAwayScore] = useState<IScoreData>({goals: 0, shots: 0, turnovers: 0, hits: 0});
     const [actions, setActions] = useState<IGameAction[]>([]);
@@ -91,7 +89,7 @@ const GamePage2 = () => {
         const isHomeTeam = action.team.id === currentGame?.teams.home.id;
 
         if (isHomeTeam && useDefaultHomeTeamColors) {
-            // Default colors for home team
+            // Default colors for the home team
             return {
                 backgroundColor: gameSetup?.homeTeam?.homeColor?.primary,
                 color: gameSetup?.homeTeam?.homeColor?.secondary
@@ -99,7 +97,7 @@ const GamePage2 = () => {
         }
 
         if (!isHomeTeam && useDefaultAwayTeamColors) {
-            // Default colors for away team
+            // Default colors for the away team
             return {
                 backgroundColor: gameSetup?.awayTeam?.homeColor?.primary,
                 color: gameSetup?.awayTeam?.homeColor?.secondary
@@ -119,7 +117,7 @@ const GamePage2 = () => {
 
     const handleActionEdit = (action: IGameAction) => {
         setEditingAction(action); // Memorize the original action
-        setCurrentAction(action); // Pre-populate the current action with existing data
+        setCurrentAction(action); // Pre-populates the current action with existing data
         setSelectedPosition({x: action.x, y: action.y});
         setModalStep("confirm");
     };
@@ -376,14 +374,13 @@ const GamePage2 = () => {
                 // Recalculate scores since the action might have changed type/team
                 recalculateScores();
             } else {
-                // Create mode: just add the new action
+                // Create mode: add the new action
                 setActions(prev => [...prev, newAction]);
                 updateScores(newAction);
             }
 
             // Auto-save if enabled
             if (autosave) {
-                console.log(autosave, "autosave run")
                 saveGameToLocalStorage();
             }
         }

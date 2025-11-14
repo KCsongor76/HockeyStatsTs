@@ -15,7 +15,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import styles from "./HandlePlayerPage.module.css"
-import {TRANSFER, TRANSFER_ID} from "../OOP/constants/NavigationNames";
+import {TRANSFER} from "../OOP/constants/NavigationNames";
 
 const HandlePlayerPage = () => {
     const data = useLocation();

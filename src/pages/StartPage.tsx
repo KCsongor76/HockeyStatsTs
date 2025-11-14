@@ -33,9 +33,6 @@ const StartPage = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
 
-    console.log({homeColors})
-    console.log({awayColors})
-
     // Helper function to get team by ID
     const getTeamById = (id: string): ITeam | undefined => {
         return teams.find(t => t.id === id);
@@ -70,7 +67,7 @@ const StartPage = () => {
     useEffect(() => {
         const championshipTeams = teams.filter(t => t.championships.includes(championship));
 
-        // Update home team if current selection is not in the new championship
+        // Update the home team if the current selection is not in the new championship
         if (homeTeamId && !championshipTeams.some(t => t.id === homeTeamId)) {
             setHomeTeamId(championshipTeams[0]?.id || '');
         }
@@ -138,7 +135,7 @@ const StartPage = () => {
         const awayCounts = getPositionCounts(awayRoster);
 
         const minSkatersLength = 15
-        let maxSkatersLength = 0
+        let maxSkatersLength
         if (championship === Championship.ERSTE_LEAGUE) {
             maxSkatersLength = 19
         } else {
@@ -179,10 +176,6 @@ const StartPage = () => {
             rinkImage: selectedImage,
         }
 
-        console.log(homeColors)
-        console.log(awayColors)
-        console.log("Starting game with:", setup);
-
         navigate(`/${GAME}`, {state: setup});
     };
 
@@ -196,8 +189,8 @@ const StartPage = () => {
 
     const getSelectedPlayers = (teamId: string) => {
         return teams
-            .find(t => t.id === teamId)?.roster
-            .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
+                .find(t => t.id === teamId)?.roster
+                .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
             || [];
     };
 
@@ -208,7 +201,6 @@ const StartPage = () => {
 
         const checkForSavedGame = () => {
             const savedGame = localStorage.getItem('unfinishedGame');
-            console.log(JSON.parse(savedGame as string))
             if (savedGame) {
                 if (window.confirm('An unfinished game was found. Do you want to continue?')) {
                     hasCheckedForSavedGame.current = true;
@@ -490,7 +482,8 @@ const StartPage = () => {
                                             <>
                                                 <div>Goalies: {counts.goalies}/2</div>
                                                 <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
-                                                {errors.homeRoster && <span className={styles.error}>{errors.homeRoster}</span>}
+                                                {errors.homeRoster &&
+                                                    <span className={styles.error}>{errors.homeRoster}</span>}
                                             </>
                                         );
                                     })()}
@@ -610,7 +603,8 @@ const StartPage = () => {
                                             <>
                                                 <div>Goalies: {counts.goalies}/2</div>
                                                 <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
-                                                {errors.awayRoster && <span className={styles.error}>{errors.awayRoster}</span>}
+                                                {errors.awayRoster &&
+                                                    <span className={styles.error}>{errors.awayRoster}</span>}
                                             </>
                                         );
                                     })()}
@@ -619,7 +613,8 @@ const StartPage = () => {
                         </div>
                     </div>
                 )}
-                {(errors.homeRoster || errors.awayRoster) && <span className={styles.error}>Some roster related error has occurred.</span>}
+                {(errors.homeRoster || errors.awayRoster) &&
+                    <span className={styles.error}>Some roster related error has occurred.</span>}
 
                 <div className={styles.buttonGroup}>
                     <Button styleType={"positive"} type="submit">Start Game</Button>
