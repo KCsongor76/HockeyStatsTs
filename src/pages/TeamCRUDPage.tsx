@@ -14,17 +14,14 @@ import styles from "./TeamCRUDPage.module.css"
 import {CREATE} from "../OOP/constants/NavigationNames";
 
 const TeamCrudPage = () => {
-    const loaderData = useLoaderData() as {
-        teams: ITeam[],
-        games: IGame[]
-    };
+    const loaderData = useLoaderData() as { teams: ITeam[], games: IGame[] };
     const [teams, setTeams] = useState<ITeam[]>(loaderData.teams);
     const games = loaderData.games;
     const [filters, setFilters] = useState({name: '', season: '', championship: ''});
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
     const navigate = useNavigate();
 
-    const seasonTeams = filters.season
+    const seasonTeamIDs = filters.season
         ? new Set(games
             .filter(g => g.season === filters.season)
             .flatMap(g => [g.teams.home.id, g.teams.away.id]))
@@ -32,7 +29,7 @@ const TeamCrudPage = () => {
 
     const filteredTeams = teams.filter(team =>
         (!filters.name || team.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.season || seasonTeams!.has(team.id)) &&
+        (!filters.season || seasonTeamIDs!.has(team.id)) &&
         (!filters.championship || team.championships?.includes(filters.championship as Championship))
     );
 

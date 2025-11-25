@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from "./HomePage.module.css";
-import {ADMIN, HANDLE_PLAYERS, HANDLE_TEAMS, SAVED_GAMES, START} from "../OOP/constants/NavigationNames";
+import {ADMIN_ITEMS, NORMAL_ITEMS, START_ITEM} from "../OOP/constants/MenuItems";
 
 interface HomePageProps {
     isSignedIn: boolean | undefined;
@@ -10,62 +10,13 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
     const navigate = useNavigate();
 
-    const [menuItems, setMenuItems] = useState([{
-        title: 'Start New Game',
-        description: 'Begin a new hockey game tracking session',
-        icon: '🏒',
-        path: '/start',
-    }]);
+    const [menuItems, setMenuItems] = useState([START_ITEM]);
 
     useEffect(() => {
         if (isSignedIn) {
-            setMenuItems([
-                {
-                    title: 'Start New Game',
-                    description: 'Begin a new hockey game tracking session',
-                    icon: '🏒',
-                    path: `/${START}`
-                },
-                {
-                    title: 'Previous Games',
-                    description: 'Review and analyze past game records',
-                    icon: '📊',
-                    path: `/${SAVED_GAMES}`
-                },
-                {
-                    title: 'Manage Teams',
-                    description: 'Create, edit, and manage hockey teams',
-                    icon: '🏆',
-                    path: `/${HANDLE_TEAMS}`
-                },
-                {
-                    title: 'Manage Players',
-                    description: 'Add, transfer, and track player information',
-                    icon: '👥',
-                    path: `/${HANDLE_PLAYERS}`
-                },
-            ]);
+            setMenuItems(ADMIN_ITEMS);
         } else {
-            setMenuItems([
-                {
-                    title: 'Start New Game',
-                    description: 'Begin a new hockey game tracking session',
-                    icon: '🏒',
-                    path: `/${START}`
-                },
-                {
-                    title: 'Previous Games',
-                    description: 'Review and analyze past game records',
-                    icon: '📊',
-                    path: `/${SAVED_GAMES}`
-                },
-                {
-                    title: 'Admin Login',
-                    description: 'Access admin features',
-                    icon: '🔑',
-                    path: `/${ADMIN}`
-                }
-            ]);
+            setMenuItems(NORMAL_ITEMS);
         }
     }, [isSignedIn]);
 

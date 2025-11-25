@@ -33,6 +33,7 @@ import {
     SAVED_GAMES_GAME_ID,
     START, TRANSFER_ID
 } from "./OOP/constants/NavigationNames";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -94,7 +95,7 @@ function App() {
     const placeholderRoutes = [
         {
             path: "*",
-            element: <p>Loading...</p>,
+            element: <LoadingSpinner/>,
             errorElement: <ErrorPage/>,
         },
     ];
@@ -106,7 +107,7 @@ function App() {
             errorElement: <ErrorPage/>,
             children: [
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
-                {path: START, element: <StartPage/>,},
+                {path: START, element: <StartPage/>, loader: startPageLoader},
                 {path: GAME, element: <GamePage/>},
                 {path: SAVED_GAMES, element: <SavedGamesPage showFilters={true}/>},
                 {path: SAVED_GAMES_GAME_ID, element: <SavedGameDetailPage/>},

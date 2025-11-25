@@ -39,7 +39,7 @@ interface GameSetup {
     awayColors: { primary: string; secondary: string };
 }
 
-const GamePage2 = () => {
+const GamePage = () => {
     const location = useLocation();
     const [gameSetup, setGameSetup] = useState<GameSetup | null>(null);
     const [currentGame, setCurrentGame] = useState<IGame | null>(null);
@@ -734,4 +734,4 @@ const GamePage2 = () => {
     );
 };
 
-export default GamePage2;
+export default GamePage;
