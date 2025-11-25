@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useMemo} from "react";
 import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import "./App.css";
 import {onAuthStateChanged} from "firebase/auth";
@@ -47,7 +47,7 @@ function App() {
                 setIsSignedIn(isAdmin);
 
                 // Redirect non-admin users home
-                if (!isAdmin && window.location.pathname.startsWith('/admin')) {
+                if (!isAdmin && window.location.pathname.startsWith(`/${ADMIN}`)) {
                     window.location.href = '/';
                 }
             } else {
@@ -117,9 +117,11 @@ function App() {
         }
     ]
 
-    const router = createBrowserRouter(
-        isLoaded ? (isSignedIn ? adminRoutes : normalRoutes) : placeholderRoutes
-    );
+    const router = useMemo(() => {
+        return createBrowserRouter(
+            isLoaded ? (isSignedIn ? adminRoutes : normalRoutes) : placeholderRoutes
+        );
+    }, [isLoaded, isSignedIn]); // Only re-create router when auth state changes
 
     return <RouterProvider router={router}/>;
 }
