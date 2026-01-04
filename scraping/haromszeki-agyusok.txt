@@ -1,0 +1,25 @@
+jersey_number | player_name | position
+29 | Szilárd Béres | goalie
+68 | Arnold László | goalie
+20 | Elod Antal | goalie
+71 | Otto Biro | defender
+11 | Szilard Ferencz | defender
+9 | Pal Horvath | goalie
+98 | Mate Kernaszt | goalie
+49 | Ákos Kertész | defender
+21 | Hunor Laszlo | defender
+7 | Markus Magnusson | goalie
+43 | Tamas Nagy | goalie
+27 | Zsolt-Ákos Szabó | defender
+16 | László Antal | forward
+8 | Gergely Barko | goalie
+52 | Olivér Gecse | goalie
+17 | Tivadar Görbea | goalie
+88 | Tamás Ilyés | forward
+ | Vitali Karamnov | forward
+18 | Adam Kiraly | defender
+66 | Zoltan Molnar | forward
+55 | Sergei Paior | goalie
+87 | Zoltán-László Róth | forward
+72 | Zalan Szöcs | forward
+15 | Lukas Zukauskas | forward

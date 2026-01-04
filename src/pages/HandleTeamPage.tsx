@@ -9,7 +9,6 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import SavedGamesPage from "./SavedGamesPage";
 import {Player} from "../OOP/classes/Player";
-import TeamTable from "../components/TeamTable";
 import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
 import Input from "../components/Input";
@@ -315,10 +314,80 @@ const HandleTeamPage = () => {
 
             <div className={styles.statsSection}>
                 <h3>Regular Season Team Stats</h3>
-                <TeamTable stats={regularTeamStats}/>
+                {/*<TeamTable stats={regularTeamStats}/>*/}
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr>
+                            <th>GP</th>
+                            <th>W</th>
+                            <th>OTW</th>
+                            <th>L</th>
+                            <th>OTL</th>
+                            <th>GF</th>
+                            <th>GA</th>
+                            <th>GD</th>
+                            <th>S</th>
+                            <th>H</th>
+                            <th>S%</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{regularTeamStats.gamesPlayed}</td>
+                            <td>{regularTeamStats.wins}</td>
+                            <td>{regularTeamStats.otWins}</td>
+                            <td>{regularTeamStats.losses}</td>
+                            <td>{regularTeamStats.otLosses}</td>
+                            <td>{regularTeamStats.goalsFor}</td>
+                            <td>{regularTeamStats.goalsAgainst}</td>
+                            <td>{regularTeamStats.goalDifference}</td>
+                            <td>{regularTeamStats.shots}</td>
+                            <td>{regularTeamStats.hits ? regularTeamStats.hits : 0}</td>
+                            <td>{regularTeamStats.shotPercentage.toFixed(2)}%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
 
                 <h3>Playoff Team Stats</h3>
-                <TeamTable stats={playoffTeamStats}/>
+                {/*<TeamTable stats={playoffTeamStats}/>*/}
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr>
+                            <th>GP</th>
+                            <th>W</th>
+                            <th>OTW</th>
+                            <th>L</th>
+                            <th>OTL</th>
+                            <th>GF</th>
+                            <th>GA</th>
+                            <th>GD</th>
+                            <th>S</th>
+                            <th>H</th>
+                            <th>S%</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{playoffTeamStats.gamesPlayed}</td>
+                            <td>{playoffTeamStats.wins}</td>
+                            <td>{playoffTeamStats.otWins}</td>
+                            <td>{playoffTeamStats.losses}</td>
+                            <td>{playoffTeamStats.otLosses}</td>
+                            <td>{playoffTeamStats.goalsFor}</td>
+                            <td>{playoffTeamStats.goalsAgainst}</td>
+                            <td>{playoffTeamStats.goalDifference}</td>
+                            <td>{playoffTeamStats.shots}</td>
+                            <td>{playoffTeamStats.hits ? playoffTeamStats.hits : 0}</td>
+                            <td>{playoffTeamStats.shotPercentage.toFixed(2)}%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
 
             <div className={styles.statsSection}>

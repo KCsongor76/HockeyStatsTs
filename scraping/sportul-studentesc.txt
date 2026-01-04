@@ -1,0 +1,54 @@
+jersey_number | player_name | position
+45 | Cosmin Agapie | goalie
+30 | Cristian Asandei | goalie
+1 | Mihai Alexandru Mocanu | goalie
+33 | Gabriel Moinescu | goalie
+50 | George Prodan | goalie
+39 | Toma Boholt | defender
+73 | Andrei Brebenel | defender
+12 | Stefanita Bucatos | defender
+33 | Mihai Constantin | defender
+5 | Florin David | defender
+75 | Paul Diaconita | defender
+91 | Alexandru Roman Diaconu | defender
+86 | Ionut Dinu | defender
+44 | Joseph Finfer | goalie
+6 | Nandor Kiss | defender
+66 | Liviu Moraru | defender
+51 | Alexandru Panait | defender
+46 | Leonard Pascaru | goalie
+23 | Andrei Prisacaru | defender
+69 | Mihnea Singiorzan | goalie
+19 | Stefan Stanescu | defender
+28 | Dávid-Dániel Tankó | defender
+13 | Alexandru Voicu | defender
+5 | Mihai Adamoiu | defender
+63 | Aristotel Agapie | goalie
+13 | Matei Gabriel Alexandrescu | goalie
+16 | Gergö Benedek | goalie
+88 | Robert Daniel Bica | defender
+15 | Gabriel Caval | goalie
+94 | Iulian Chitac | forward
+14 | Igor David | goalie
+10 | Ioan Dobrescu | defender
+7 | Róbert Fetés | goalie
+10 | Marian Ghita | goalie
+44 | Vlad Grigori | goalie
+96 | Robert Iordan | defender
+99 | Iani Dan Jugurica | goalie
+9 | Theodor Lupu | defender
+11 | Marian Manolica | forward
+87 | Bogdan Marinica | goalie
+22 | Horia Mazilu | forward
+17 | Radu Niculae | defender
+77 | Cristian Popa | forward
+91 | Claudiu Radu | defender
+27 | Robert Giovani Rusu | goalie
+67 | Cristian Sandor | goalie
+8 | Zoltán Sándor | defender
+71 | Cezar Sendrea | defender
+72 | Tamás Solymosi | goalie
+25 | Gabriel Spiridon | goalie
+3 | Andrei Bogdan Stefan | goalie
+33 | Cristian Vasilache | forward
+21 | Matei Virlanuta | forward

@@ -21,8 +21,6 @@ import {IGame} from "../OOP/interfaces/IGame";
 import {GameService} from "../OOP/services/GameService";
 import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
-import GameScoreData from "../components/GameScoreData";
-import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
 import ActionTypeFilters from "../components/ActionTypeFilters";
 import ActionsTable from "../components/ActionsTable";
@@ -569,7 +567,42 @@ const GamePage = () => {
                 </div>
             </div>
 
-            {currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}
+            {/*{currentGame && <GameScoreData game={currentGame} score={currentGame.score}/>}*/}
+
+            {currentGame && <div className={styles.scoreContainer}>
+                <div className={styles.scoreHeader}>
+                    <div>
+                        <p>Season: {currentGame.season}</p>
+                        <p>Championship: {currentGame.championship}</p>
+                        <p>Game type: {currentGame.type}</p>
+                    </div>
+                    <div className={styles.scoreValue}>
+                        Score: {currentGame.score.home.goals} - {currentGame.score.away.goals}
+                    </div>
+                </div>
+
+                <div className={styles.teamStats}>
+                    <div className={styles.teamSection}>
+                        <div className={styles.teamHeader}>
+                            <img src={currentGame.teams?.home.logo} alt="home team" className={styles.teamLogo}/>
+                            <h3>Home Team</h3>
+                        </div>
+                        <div className={styles.statItem}><span>Shots:</span> <span>{currentGame.score.home.shots}</span></div>
+                        <div className={styles.statItem}><span>Turnovers:</span> <span>{currentGame.score.home.turnovers}</span></div>
+                        <div className={styles.statItem}><span>Hits:</span> <span>{currentGame.score.home.hits}</span></div>
+                    </div>
+
+                    <div className={styles.teamSection}>
+                        <div className={styles.teamHeader}>
+                            <img src={currentGame.teams?.away.logo} alt="away team" className={styles.teamLogo}/>
+                            <h3>Away Team</h3>
+                        </div>
+                        <div className={styles.statItem}><span>Shots:</span> <span>{currentGame.score.away.shots}</span></div>
+                        <div className={styles.statItem}><span>Turnovers:</span> <span>{currentGame.score.away.turnovers}</span></div>
+                        <div className={styles.statItem}><span>Hits:</span> <span>{currentGame.score.away.hits}</span></div>
+                    </div>
+                </div>
+            </div>}
 
             <h3 style={{textAlign: 'center'}}>Game Controls</h3>
             <div style={
@@ -602,7 +635,33 @@ const GamePage = () => {
             </div>
 
             <h3 style={{textAlign: 'center'}}>Team Filters</h3>
-            <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
+            {/*<TeamFilters teamView={teamView} setTeamView={setTeamView}/>*/}
+            <div className={styles.filterContainer}>
+                <Button
+                    styleType={"neutral"}
+                    type="button"
+                    className={teamView === 'all' ? styles.activeButton : ''}
+                    onClick={() => setTeamView('all')}
+                >
+                    All Teams
+                </Button>
+                <Button
+                    styleType={"neutral"}
+                    type="button"
+                    className={teamView === 'home' ? styles.activeButton : ''}
+                    onClick={() => setTeamView('home')}
+                >
+                    Home Team
+                </Button>
+                <Button
+                    styleType={"neutral"}
+                    type="button"
+                    className={teamView === 'away' ? styles.activeButton : ''}
+                    onClick={() => setTeamView('away')}
+                >
+                    Away Team
+                </Button>
+            </div>
 
             <h3 style={{textAlign: 'center'}}>Color Selectors</h3>
             <div

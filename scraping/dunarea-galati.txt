@@ -1,0 +1,26 @@
+jersey_number | player_name | position
+1 | Bogdan Enache | goalie
+23 | Adrian Ionescu | goalie
+22 | Bence Norbert Pál | goalie
+31 | Andrei Bandrabur | goalie
+10 | Catalin Berdila | goalie
+66 | Cristian Boldizsár | defender
+14 | Cristian Popescu | defender
+11 | David Radu | goalie
+70 | Norbert Raduly | defender
+71 | Attila Szocs | defender
+24 | Alex Trincu | goalie
+14 | Luka Zorko | defender
+25 | Benjamin Barabas | forward
+77 | Iulian Corneanu | forward
+19 | Gergö Danalizi | goalie
+88 | Cezar Gheorghe | goalie
+7 | Remus Gheorghe | goalie
+15 | Vitali Kirichenko | forward
+17 | Mykhailo Krasnozhon | defender
+34 | Raul Alexandru Maftei | goalie
+25 | Vlad Meca | goalie
+87 | Sándor Nyika | defender
+81 | Huba Silló | forward
+21 | Otto Szopos | forward
+7 | Rares Toma | goalie

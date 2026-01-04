@@ -1,0 +1,59 @@
+jersey_number | player_name | position
+72 | Patrik Csala | goalie
+2 | Adrian Ferenczi | goalie
+74 | Balint Mark | goalie
+50 | Mate Molnar | goalie
+52 | Alex Olaru | goalie
+29 | Rasmus Rinne | goalie
+89 | Hunor Albert | goalie
+76 | Stefan Baricz | defender
+73 | Istvan Adorjan Bartis | goalie
+21 | Balazs Csiki | goalie
+44 | Nandor Fejes | defender
+32 | Matias Haaranen | defender
+46 | Kristof Ilyes-Kósa | goalie
+27 | Patrik Imre | defender
+46 | Janne Jalasvaara | defender
+19 | Bernat Kis | goalie
+62 | Konsta Mesikämmen | defender
+40 | Akos Molnar | defender
+21 | Bobby Raymond | defender
+33 | Bence Sándor | goalie
+25 | Tas Szabo | goalie
+77 | Owen Williams | defender
+96 | Zsolt Ádám | defender
+11 | Gergő Ambrus | goalie
+91 | Christopher Bodó | defender
+98 | Andrei Caramfil | defender
+68 | Hunor Császár | forward
+87 | Ádám Csiszer | defender
+84 | Zalan Czirjak | goalie
+20 | Csanad Feher | defender
+9 | Jozsef Ferenczi | goalie
+43 | David Fodor | goalie
+7 | Tihamer Gal | goalie
+8 | Elod Gall | goalie
+12 | Dallas Gerads | goalie
+4 | Mark Janos | forward
+47 | Adam Kosza | defender
+70 | Csaba Madarasz | goalie
+83 | Mozes Elemer Mathe | goalie
+79 | Zsolt Mathe | forward
+93 | Luca Iustin Moise | forward
+58 | David Negulescu | goalie
+70 | Brance Orbán | forward
+10 | Bence Puskas | forward
+45 | Csanád Ravasz | defender
+18 | Robert Salamon | goalie
+8 | Otto Sandor-Szekely | defender
+88 | Tamás Sárpátki | forward
+5 | Levente Simon | goalie
+88 | Radu Stanescu | defender
+15 | Ákos Szigeti | goalie
+78 | Szabolcs Szopos Böjte | forward
+61 | Razvan Timaru | forward
+66 | Attila Arpad Toth | defender
+28 | Daniel Tranca | defender
+16 | Péter Vincze | forward
+22 | Peter Vita | goalie
+22 | Janne Väyrynen | forward

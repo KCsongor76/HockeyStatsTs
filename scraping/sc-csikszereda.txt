@@ -1,0 +1,33 @@
+jersey_number | player_name | position
+31 | Marton Buda | goalie
+70 | Nikita Melnichuk | goalie
+22 | Otto Onodi | goalie
+29 | Adrian Petra | goalie
+44 | Aapo Ahola | defender
+16 | Andras Boda | defender
+23 | Peter Both | defender
+88 | Robert Ferencz Csibi | goalie
+26 | Elod Kovacs | defender
+76 | Csongor Kristo | goalie
+93 | Tamás Láday | defender
+ | Conor MacEachern | defender
+19 | Tamas Onodi | defender
+55 | Alpar Sallo | defender
+90 | Robert Szekeres | defender
+72 | Patrick Antal | forward
+20 | Tihamer Becze | forward
+20 | László Becze Mathe | forward
+61 | Gergö Biro | goalie
+11 | Austin Farley | goalie
+10 | Csanád Fodor | defender
+42 | Frank Gymer | goalie
+15 | Tamas Kedves | goalie
+97 | Botond Marton | defender
+7 | Akos Nyisztor | forward
+66 | Balazs Peter | forward
+88 | Reid Petryk | defender
+3 | Aron Reisz | forward
+21 | Nick Ritchie | goalie
+96 | Norbert Rokaly | goalie
+9 | Arnold Silló | defender
+42 | Zsolt Tamas | forward

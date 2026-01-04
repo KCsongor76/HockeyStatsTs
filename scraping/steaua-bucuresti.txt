@@ -1,0 +1,23 @@
+jersey_number | player_name | position
+33 | Örs Adorjan | goalie
+50 | Daniel Antal | goalie
+51 | Catalin Capsa | goalie
+5 | Toma Diaconescu | defender
+12 | Lukas Durkech | defender
+13 | Karel Kubát | defender
+15 | Szilard Orban | goalie
+79 | Csaba Todor | goalie
+19 | Alfred Antal | defender
+10 | Maxim Ashcheulov | defender
+17 | Roland Benedek | defender
+8 | Gabor Buda | goalie
+38 | Eduard Casaneanu | defender
+99 | Filip Dvorak | defender
+8 | Szilárd György | goalie
+6 | Menyhért Lázár | goalie
+18 | Calin Lupascu | forward
+11 | Patrik Machala | forward
+14 | Vladislav Teamriuc | defender
+16 | Robert Timaru | forward
+22 | Radim Valchar | defender
+74 | Roland Ördög | goalie

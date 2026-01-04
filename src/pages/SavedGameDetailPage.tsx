@@ -10,10 +10,7 @@ import {Position} from "../OOP/enums/Position";
 import ActionDetailsModal from "../modals/ActionDetailsModal";
 import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
-import GameScoreData from "../components/GameScoreData";
-import TeamFilters from "../components/TeamFilters";
 import PeriodFilters from "../components/PeriodFilters";
-import ActionTypeFilters from "../components/ActionTypeFilters";
 import {GameService} from "../OOP/services/GameService";
 import ActionSelectorModal from "../modals/ActionSelectorModal";
 import PlayerSelectorModal from "../modals/PlayerSelectorModal";
@@ -306,10 +303,71 @@ const SavedGameDetailPage2 = () => {
 
     return (
         <>
-            <GameScoreData game={game} score={game.score}/>
+            {/*<GameScoreData game={game} score={game.score}/>*/}
+
+            <div className={styles.scoreContainer}>
+                <div className={styles.scoreHeader}>
+                    <div>
+                        <p>Season: {game.season}</p>
+                        <p>Championship: {game.championship}</p>
+                        <p>Game type: {game.type}</p>
+                    </div>
+                    <div className={styles.scoreValue}>
+                        Score: {game.score.home.goals} - {game.score.away.goals}
+                    </div>
+                </div>
+
+                <div className={styles.teamStats}>
+                    <div className={styles.teamSection}>
+                        <div className={styles.teamHeader}>
+                            <img src={game.teams?.home.logo} alt="home team" className={styles.teamLogo}/>
+                            <h3>Home Team</h3>
+                        </div>
+                        <div className={styles.statItem}><span>Shots:</span> <span>{game.score.home.shots}</span></div>
+                        <div className={styles.statItem}><span>Turnovers:</span> <span>{game.score.home.turnovers}</span></div>
+                        <div className={styles.statItem}><span>Hits:</span> <span>{game.score.home.hits}</span></div>
+                    </div>
+
+                    <div className={styles.teamSection}>
+                        <div className={styles.teamHeader}>
+                            <img src={game.teams?.away.logo} alt="away team" className={styles.teamLogo}/>
+                            <h3>Away Team</h3>
+                        </div>
+                        <div className={styles.statItem}><span>Shots:</span> <span>{game.score.away.shots}</span></div>
+                        <div className={styles.statItem}><span>Turnovers:</span> <span>{game.score.away.turnovers}</span></div>
+                        <div className={styles.statItem}><span>Hits:</span> <span>{game.score.away.hits}</span></div>
+                    </div>
+                </div>
+            </div>
 
             <h3 style={{textAlign: 'center'}}>Team View</h3>
-            <TeamFilters teamView={teamView} setTeamView={setTeamView}/>
+            {/*<TeamFilters teamView={teamView} setTeamView={setTeamView}/>*/}
+            <div className={styles.filterContainer}>
+                <Button
+                    styleType={"neutral"}
+                    type="button"
+                    className={teamView === 'all' ? styles.activeButton : ''}
+                    onClick={() => setTeamView('all')}
+                >
+                    All Teams
+                </Button>
+                <Button
+                    styleType={"neutral"}
+                    type="button"
+                    className={teamView === 'home' ? styles.activeButton : ''}
+                    onClick={() => setTeamView('home')}
+                >
+                    Home Team
+                </Button>
+                <Button
+                    styleType={"neutral"}
+                    type="button"
+                    className={teamView === 'away' ? styles.activeButton : ''}
+                    onClick={() => setTeamView('away')}
+                >
+                    Away Team
+                </Button>
+            </div>
 
             <h3 style={{textAlign: 'center'}}>Icon Colors</h3>
             <div style={{display: 'flex', gap: '1rem', marginBottom: '1rem', justifyContent: 'center'}}>
@@ -340,11 +398,25 @@ const SavedGameDetailPage2 = () => {
             />
 
             <h3 style={{textAlign: 'center'}}>Action Types</h3>
-            <ActionTypeFilters
-                availableActionTypes={availableActionTypes}
-                selectedActionTypes={selectedActionTypes}
-                toggleActionType={toggleActionType}
-            />
+            {/*<ActionTypeFilters*/}
+            {/*    availableActionTypes={availableActionTypes}*/}
+            {/*    selectedActionTypes={selectedActionTypes}*/}
+            {/*    toggleActionType={toggleActionType}*/}
+            {/*/>*/}
+
+            <div className={styles.filterContainer}>
+                {availableActionTypes.length > 0 ? availableActionTypes.map(period => (
+                    <Button
+                        styleType={"neutral"}
+                        key={period}
+                        type="button"
+                        className={selectedActionTypes.includes(period) ? styles.activeButton : ''}
+                        onClick={() => toggleActionType(period)}
+                    >
+                        {period}
+                    </Button>
+                )) : <p>No available period data yet.</p>}
+            </div>
 
             <div className={styles.rinkContainer}>
                 <img src={game.selectedImage} alt="rink"/>

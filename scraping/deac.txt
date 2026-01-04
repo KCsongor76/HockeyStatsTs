@@ -1,0 +1,27 @@
+jersey_number | player_name | position
+ | Tamás Antek | goalie
+ | Zoltán Hetényi | goalie
+ | Martin Szeles | goalie
+ | Rajmund Bukor | defender
+ | Dominik Dobmayer | defender
+ | Peter Doman | defender
+ | Bence Haranghy | goalie
+ | Phil Kiss | goalie
+ | Mate Miklos Martonffy | defender
+ | Nikita Ustinenko | goalie
+ | Taras Yeliseyev | defender
+ | Maxim Askarov | forward
+ | Kirils Galoha | goalie
+ | Alpar Kovacs | goalie
+ | Brúnó Kreisz | defender
+ | Kirill Krutov | forward
+ | Vladislav Kuleshov | defender
+ | Gabor Mehes | goalie
+ | Gergö Mihalik | goalie
+ | Zétény Molnár | defender
+ | Yevgeni Mozer | goalie
+ | Levente Revesz | forward
+ | Anton Shenfeld | goalie
+ | Petar Simic | goalie
+ | Donát Szita | defender
+ | Matias Varttinen | forward

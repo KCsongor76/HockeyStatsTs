@@ -1,0 +1,29 @@
+jersey_number | player_name | position
+1 | Krisztian Erdei | goalie
+ | Hunor Gergely | goalie
+39 | Miklós Rajna | goalie
+83 | András Váradi | goalie
+61 | Vedran Bogesic | goalie
+2 | Krisztián Franyó | forward
+17 | Dániel Kiss | defender
+ | Zsombor Ladnyik | defender
+ | Mark Osztoics | defender
+97 | Dávid Pokornyi | defender
+4 | Taneli Ronkainen | defender
+40 | Levente Rósa | defender
+11 | Gabor Tornyai | goalie
+ | Bence Baróti | defender
+77 | Luka Burzan | forward
+21 | Keegan Dansereau | goalie
+75 | Maxim Golod | goalie
+81 | Patrik Kiss | forward
+8 | Alex Kovács | forward
+22 | Sebestyén Kovács | defender
+43 | Barnabás Lőczi | forward
+88 | Anthony Luciani | forward
+16 | Bence Paterka | defender
+ | Gergely Rapos | goalie
+24 | Maxim Szabó Rácz | forward
+9 | Zsolt Szalma | defender
+ | Márk Ványolos | forward
+10 | Nátán Vertes | defender

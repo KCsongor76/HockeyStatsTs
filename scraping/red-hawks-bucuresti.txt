@@ -1,0 +1,24 @@
+jersey_number | player_name | position
+72 | Levente Ambrus | goalie
+34 | David-Örs Mag | goalie
+35 | Bogdan Popa | goalie
+67 | Georgi Agafonov | goalie
+23 | Florin Creanga | goalie
+48 | Ivan Glazkov | goalie
+5 | Szabolcs Hildebrand | defender
+7 | Raul Jakob | goalie
+47 | Andrei Mocanu | defender
+80 | Dean Moore | defender
+11 | Costin Radu | defender
+36 | David Belu | defender
+68 | Mircea Constantin | forward
+22 | Mihail Georgescu | goalie
+13 | Nicolas Hinz | goalie
+9 | Adrian Irimia | goalie
+71 | Matyas Kovács | forward
+51 | Marius Marcus | goalie
+14 | Daniil Martynov | defender
+17 | Alexandru Cristian Munteanu | defender
+91 | Alexandr Novicov | defender
+10 | Anton Popa | goalie
+25 | Yevgeni Skachkov | goalie

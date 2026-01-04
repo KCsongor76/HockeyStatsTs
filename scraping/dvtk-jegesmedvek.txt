@@ -1,0 +1,31 @@
+jersey_number | player_name | position
+ | David Pratak | goalie
+ | Károly Tóth | goalie
+ | Márkó Csollák | defender
+ | Vilmos Czina | defender
+ | Lauri Kärmeniemi | defender
+ | Milan Mura | defender
+ | Dominik Orosz | defender
+ | Zeno Balazs Szaboki | defender
+ | Boldizsar Szalay | defender
+ | Simon Szathmary | defender
+ | Bence Szirányi | defender
+ | Roland Vokla | defender
+ | Ágoston Chlepko | goalie
+ | Hunor Alpar Csiki | forward
+ | Hunor Czecze | defender
+ | Mirko Djumic | defender
+ | Colin Doyle | defender
+ | Marton Farkas | forward
+ | Noah Kinloch-Varga | goalie
+ | Dávid Lövei | defender
+ | Miklos Makai | forward
+ | Henrik Marklund | defender
+ | Márk Miskolczi | forward
+ | József Pásztor | forward
+ | Jason Pineo | forward
+ | Kristóf Rétfalvi | goalie
+ | Brodi Stuart | goalie
+ | Gergö Toth | goalie
+ | David Trajcsik | defender
+ | Henrik Vörös | goalie

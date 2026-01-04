@@ -1,0 +1,29 @@
+jersey_number | player_name | position
+ | Akos Daradics | goalie
+ | Roland Farkas | goalie
+ | Dániel Kiss | goalie
+ | Attila Marton | goalie
+ | Daniel Laszlo Boros | defender
+ | Bence Jurkovics | defender
+ | Péter Kornyilov | defender
+ | Tamás Pozsgai | goalie
+ | Jiri Riha | defender
+ | Bence Szabó | defender
+ | Daniel Szabo | defender
+ | Gergö Szivak | goalie
+ | Arnold Varga | goalie
+ | Nandor Banga | goalie
+ | Antonín Honejsek | forward
+ | Bálint Horváth | goalie
+ | Levente Keresztes | defender
+ | Balint Molnar | defender
+ | Márton Nádasy | defender
+ | Gergö Nagy | goalie
+ | Dominik Novotný | defender
+ | Drake Pilon | defender
+ | Valentin Razumnyak | goalie
+ | Márk Schlekmann | defender
+ | Barnabas Szamel | defender
+ | Martin Turbucz | defender
+ | Márk Weidemann | defender
+ | Dániel Zimányi | defender
