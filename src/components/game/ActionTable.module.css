@@ -1,0 +1,31 @@
+.tableContainer {
+    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortableHeader:hover {
+    background-color: #f5f5f5;
+}
+
+.sortIndicator {
+    margin-left: 5px;
+    font-size: 0.8em;
+}

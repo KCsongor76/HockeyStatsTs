@@ -226,4 +226,15 @@ export class Player implements IPlayer {
 
         return {teamId, players};
     }
+
+    static calculateRosterStats(players: IPlayer[], regularGames: IGame[], playoffGames: IGame[]) {
+        const cache = new Map<string, { regular: any, playoff: any }>();
+        players.forEach(p => {
+            cache.set(p.id, {
+                regular: Player.getPlayerStats(regularGames, p),
+                playoff: Player.getPlayerStats(playoffGames, p)
+            });
+        });
+        return cache;
+    }
 }

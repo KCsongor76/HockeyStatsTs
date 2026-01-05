@@ -11,90 +11,12 @@ import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import SavedGamesPage from "./SavedGamesPage";
 import Button from "../components/Button";
-import Input from "../components/Input";
 import Select from "../components/Select";
 import {TRANSFER} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Game} from "../OOP/classes/Game";
-
-interface PlayerStatsData {
-    gamesPlayed: number;
-    goals: number;
-    assists: number;
-    points: number;
-    shots: number;
-    hits: number;
-    turnovers: number;
-    shotPercentage: number;
-}
-
-interface SeasonalPlayerStats {
-    season: string;
-    stats: PlayerStatsData;
-}
-
-const PlayerStatsTable = ({
-                              title,
-                              totalStats,
-                              seasonalStats,
-                              showSeasonColumn
-                          }: {
-    title: string;
-    totalStats: PlayerStatsData;
-    seasonalStats: SeasonalPlayerStats[];
-    showSeasonColumn: boolean;
-}) => {
-    return (
-        <div>
-            <h3>{title}</h3>
-            <table>
-                <thead>
-                <tr>
-                    {showSeasonColumn && <th>Season</th>}
-                    <th>GP</th>
-                    <th>G</th>
-                    <th>A</th>
-                    <th>P</th>
-                    <th>S</th>
-                    <th>H</th>
-                    <th>T</th>
-                    <th>S%</th>
-                </tr>
-                </thead>
-                <tbody>
-                {/* Seasonal Rows */}
-                {showSeasonColumn && seasonalStats.map((row) => (
-                    <tr key={row.season}>
-                        <td>{row.season}</td>
-                        <td>{row.stats.gamesPlayed}</td>
-                        <td>{row.stats.goals}</td>
-                        <td>{row.stats.assists}</td>
-                        <td>{row.stats.points}</td>
-                        <td>{row.stats.shots}</td>
-                        <td>{row.stats.hits}</td>
-                        <td>{row.stats.turnovers}</td>
-                        <td>{row.stats.shotPercentage.toFixed(2)}%</td>
-                    </tr>
-                ))}
-
-                {/* Total Row */}
-                <tr>
-                    {showSeasonColumn && <td>Total</td>}
-                    <td>{totalStats.gamesPlayed}</td>
-                    <td>{totalStats.goals}</td>
-                    <td>{totalStats.assists}</td>
-                    <td>{totalStats.points}</td>
-                    <td>{totalStats.shots}</td>
-                    <td>{totalStats.hits}</td>
-                    <td>{totalStats.turnovers}</td>
-                    <td>{totalStats.shotPercentage.toFixed(2)}%</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    );
-};
-
+import PlayerForm, {PlayerFormData} from "../components/forms/PlayerForm";
+import PlayerStatsTable, {PlayerStatsData} from "../components/tables/PlayerStatsTable";
 
 const HandlePlayerPage = () => {
     const data = useLocation();
@@ -111,11 +33,8 @@ const HandlePlayerPage = () => {
 
     const [team, setTeam] = useState<ITeam | null>(null);
 
-    const [name, setName] = useState<string>(player.name);
-    const [position, setPosition] = useState<Position>(player.position);
-    const [jerseyNumber, setJerseyNumber] = useState<number>(player.jerseyNumber);
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const [selectedSeason, setSelectedSeason] = useState<Season | 'All'>('All');
     const [selectedTeamId, setSelectedTeamId] = useState<string>("");
@@ -189,40 +108,34 @@ const HandlePlayerPage = () => {
         playoff: Player.getPlayerStats(playoffGames, player) as PlayerStatsData
     }), [regularGames, playoffGames, player]);
 
-    const saveHandler = async () => {
-        if (name === player.name && position === player.position && jerseyNumber === player.jerseyNumber) {
+    const saveHandler = async (data: PlayerFormData) => {
+        if (data.name === player.name && data.position === player.position && data.jerseyNumber === player.jerseyNumber) {
             setIsEditing(false);
-            setError(null);
+            setErrors({});
             return;
         }
 
-        if (jerseyNumber !== player.jerseyNumber) {
-            const err = Player.validateJerseyNumber(jerseyNumber);
+        if (data.jerseyNumber !== player.jerseyNumber) {
+            const err = Player.validateJerseyNumber(data.jerseyNumber);
             if (err) {
-                setError(err);
-                return;
-            }
-            try {
-                const isAvailable = await PlayerService.isJerseyNumberAvailable(player.teamId, jerseyNumber);
-                if (!isAvailable) {
-                    setError(`Jersey number #${jerseyNumber} is already taken.`);
-                    return;
-                }
-            } catch (e) {
-                setError('Failed to verify jersey number.');
+                setErrors(prev => ({...prev, jerseyNumber: err}));
                 return;
             }
         }
 
         try {
-            await PlayerService.updatePlayer(player.teamId, player.id, {name, position, jerseyNumber});
-            const updatedPlayer = new Player(player.id, jerseyNumber, name, position as Position, player.teamId);
+            await PlayerService.updatePlayer(player.teamId, player.id, {
+                name: data.name,
+                position: data.position,
+                jerseyNumber: data.jerseyNumber
+            });
+            const updatedPlayer = new Player(player.id, data.jerseyNumber, data.name, data.position, player.teamId);
             setPlayer(updatedPlayer);
             setIsEditing(false);
-            setError(null);
+            setErrors({});
         } catch (error) {
             console.error("Failed to update player:", error);
-            setError('Failed to update player.');
+            setErrors(prev => ({...prev, general: 'Failed to update player.'}));
         }
     };
 
@@ -239,7 +152,6 @@ const HandlePlayerPage = () => {
     }, [player.teamId]);
 
     // Option mappers
-    const positionOptions = Object.values(Position).map(pos => ({value: pos, label: pos}));
     const seasonOptions = [
         {value: "All", label: "All Seasons"},
         ...Object.values(Season).map(season => ({value: season, label: season}))
@@ -259,38 +171,14 @@ const HandlePlayerPage = () => {
             <p>Jersey number: {player.jerseyNumber}</p>
 
             {isEditing ? (
-                <>
-                    <Input
-                        id="name"
-                        label="Name:"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-
-                    <Input
-                        id="jerseyNumber"
-                        label="Jersey number:"
-                        type="number"
-                        value={jerseyNumber}
-                        onChange={(e) => setJerseyNumber(Number(e.target.value))}
-                    />
-
-                    <Select
-                        id="position"
-                        label="Position:"
-                        value={position}
-                        onChange={(e) => setPosition(e.target.value as Position)}
-                        options={positionOptions}
-                    />
-
-                    {error && <p>{error}</p>}
-                    <div>
-                        <Button styleType={"positive"} type="button" onClick={saveHandler}>Save Changes</Button>
-                        <Button styleType={"negative"} type="button"
-                                onClick={() => setIsEditing(false)}>Discard</Button>
-                    </div>
-                </>
+                <PlayerForm
+                    initialData={player}
+                    onSubmit={saveHandler}
+                    onCancel={() => setIsEditing(false)}
+                    submitLabel="Save Changes"
+                    errors={errors}
+                    setErrors={setErrors}
+                />
             ) : (
                 <Button styleType={"neutral"} type="button" onClick={() => setIsEditing(true)}>Edit player</Button>
             )}
@@ -317,6 +205,7 @@ const HandlePlayerPage = () => {
 
             <PlayerStatsTable
                 title="Regular Season Players Stats"
+                variant="seasonal"
                 totalStats={totalStats.regular}
                 seasonalStats={seasonalStats.regular}
                 showSeasonColumn={selectedSeason === 'All'}
@@ -324,6 +213,7 @@ const HandlePlayerPage = () => {
 
             <PlayerStatsTable
                 title="Playoff Players Stats"
+                variant="seasonal"
                 totalStats={totalStats.playoff}
                 seasonalStats={seasonalStats.playoff}
                 showSeasonColumn={selectedSeason === 'All'}

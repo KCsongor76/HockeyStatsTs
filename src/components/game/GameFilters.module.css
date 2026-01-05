@@ -1,0 +1,19 @@
+.filterContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 5px;
+}
+
+.activeButton {
+    background-color: #007bff; /* Example active color, adjust as needed */
+    color: white;
+}
+
+.controlsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}

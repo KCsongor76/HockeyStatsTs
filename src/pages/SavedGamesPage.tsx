@@ -1,17 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {TeamService} from "../OOP/services/TeamService";
 import {GameService} from "../OOP/services/GameService";
-import {useNavigate} from "react-router-dom";
 import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
-import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Select from "../components/Select";
 import {Team} from "../OOP/classes/Team";
 import {Game, GameFilterCriteria} from "../OOP/classes/Game";
 import {useFilterPagination} from "../hooks/useFilterPagination";
+import SavedGameListItem from "../components/SavedGameListItem";
 
 interface SavedGamesPageProps {
     playerGames?: Game[];
@@ -39,8 +38,6 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     });
 
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-
-    const navigate = useNavigate();
 
     // Use Memoization for expensive filtering/sorting operations
     const processedGames = useMemo(() => {
@@ -161,30 +158,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
             <ul>
                 {currentGames.length > 0 ? (
                     currentGames.map((game) => (
-                        <li
-                            key={game.id}
-                            onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}
-                        >
-                            <div>
-                                <img src={game.teams.home.logo} alt={game.teams.home.name}/>
-                                <span>{game.teams.home.name}</span>
-                            </div>
-
-                            <span>
-                                {game.score.home.goals} - {game.score.away.goals}
-                            </span>
-
-                            <div>
-                                <span>{game.formattedDate}</span>
-                                <span>{game.championship}</span>
-                                <span>{game.type}</span>
-                            </div>
-
-                            <div>
-                                <img src={game.teams.away.logo} alt={game.teams.away.name}/>
-                                <span>{game.teams.away.name}</span>
-                            </div>
-                        </li>
+                        <SavedGameListItem key={game.id} game={game}/>
                     ))
                 ) : <p>No games found.</p>}
             </ul>

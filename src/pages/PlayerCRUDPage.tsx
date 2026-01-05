@@ -10,6 +10,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import {CREATE} from "../OOP/constants/NavigationNames";
+import EntityListItem from "../components/EntityListItem";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
 import {Game} from "../OOP/classes/Game";
@@ -163,30 +164,17 @@ const PlayerCrudPage = () => {
 
             <ul>
                 {currentPlayers.length > 0 ? currentPlayers.map((player: Player) => (
-                    <li key={player.id}>
-                        <p>
-                            {player.name} {` #${player.jerseyNumber} (${player.position}) `}
-                            <span>
-                                {teams.find(t => t.id === player.teamId)?.name || 'Unknown Team'}
-                            </span>
-                        </p>
-
-                        <div>
-                            <Button
-                                styleType={"neutral"}
-                                onClick={() => navigate(`${player.id}`, {state: {player, games}})}
-                            >
-                                View
-                            </Button>
-                            <Button
-                                styleType={"negative"}
-                                onClick={() => deleteHandler(player)}
-                            >
-                                Delete
-                            </Button>
-                        </div>
-                    </li>
-                )) : <p>No players found matching criteria.</p>}
+                    <EntityListItem
+                        key={player.id}
+                        onView={() => navigate(`${player.id}`, {state: {player, games}})}
+                        onDelete={() => deleteHandler(player)}
+                    >
+                        {player.name} {` #${player.jerseyNumber} (${player.position}) `}
+                        <span>
+                            {teams.find(t => t.id === player.teamId)?.name || 'Unknown Team'}
+                        </span>
+                    </EntityListItem>
+                )) : <p>No players found.</p>}
             </ul>
 
             <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>

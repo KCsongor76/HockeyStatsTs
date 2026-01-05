@@ -7,6 +7,7 @@ import {IGame} from "../interfaces/IGame";
 import {GameType} from "../enums/GameType";
 import {PlayoffPeriod, RegularPeriod} from "../enums/Period";
 import {Position} from "../enums/Position";
+import {Season} from "../enums/Season";
 
 export class Team implements ITeam {
     id: string;
@@ -263,5 +264,35 @@ export class Team implements ITeam {
         });
 
         return Array.from(uniquePlayers.values());
+    }
+
+    static filterGames<T extends IGame>(teamId: string, games: T[], season: Season | 'All', championship: Championship | 'All'): T[] {
+        return games.filter(g =>
+            (g.teams.home.id === teamId || g.teams.away.id === teamId) &&
+            (season === 'All' || g.season === season) &&
+            (championship === 'All' || g.championship === championship)
+        );
+    }
+
+    static getSeasonalStatsBreakdown(team: ITeam, games: IGame[]) {
+        const distinctSeasons = Array.from(new Set(games.map(g => g.season)))
+            .filter(Boolean)
+            .sort()
+            .reverse();
+
+        const regularGames = games.filter(g => g.type === GameType.REGULAR);
+        const playoffGames = games.filter(g => g.type === GameType.PLAYOFF);
+
+        const regular = distinctSeasons.map(season => ({
+            season,
+            stats: Team.getTeamStats(team, regularGames.filter(g => g.season === season))
+        }));
+
+        const playoff = distinctSeasons.map(season => ({
+            season,
+            stats: Team.getTeamStats(team, playoffGames.filter(g => g.season === season))
+        }));
+
+        return {regular, playoff};
     }
 }

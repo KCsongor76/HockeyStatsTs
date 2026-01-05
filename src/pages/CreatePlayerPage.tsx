@@ -1,28 +1,16 @@
 import React, {useState} from 'react';
-import {Position} from "../OOP/enums/Position";
 import {useLocation, useNavigate} from "react-router-dom";
 import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
-import Button from "../components/Button";
 import Input from "../components/Input";
-import Select from "../components/Select";
-import Checkbox from "../components/Checkbox";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
+import PlayerForm, {PlayerFormData} from "../components/forms/PlayerForm";
 
 const CreatePlayerPage = () => {
     const location = useLocation();
     const teams = location.state.teams as Team[];
-
-    const [playerData, setPlayerData] = useState({
-        name: '',
-        position: Position.GOALIE,
-        jerseyNumber: 1,
-        teamId: teams[0]?.id || '',
-    });
-
-    const [isFreeAgent, setIsFreeAgent] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [uploadStatus, setUploadStatus] = useState<string>('');
     const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -94,15 +82,13 @@ const CreatePlayerPage = () => {
         });
     };
 
-    const submitHandler = async (event: React.FormEvent) => {
-        event.preventDefault();
-
+    const submitHandler = async (data: PlayerFormData) => {
         const newErrors: Record<string, string> = {};
 
-        const nameErr = Player.validateName(playerData.name);
+        const nameErr = Player.validateName(data.name);
         if (nameErr) newErrors.name = nameErr;
 
-        const jerseyErr = Player.validateJerseyNumber(playerData.jerseyNumber);
+        const jerseyErr = Player.validateJerseyNumber(data.jerseyNumber);
         if (jerseyErr) newErrors.jerseyNumber = jerseyErr;
 
         if (Object.keys(newErrors).length > 0) {
@@ -110,16 +96,13 @@ const CreatePlayerPage = () => {
             return;
         }
 
-        const targetTeamId = isFreeAgent ? "free-agent" : playerData.teamId;
-
         try {
             const player: IPlayer = {
-                ...playerData,
-                teamId: targetTeamId,
+                ...data,
                 id: ""
             };
 
-            await PlayerService.createPlayer(targetTeamId, player);
+            await PlayerService.createPlayer(data.teamId, player);
             alert('Player created successfully!');
             navigate(`/${HANDLE_PLAYERS}`);
         } catch (error) {
@@ -130,11 +113,6 @@ const CreatePlayerPage = () => {
             console.error('Failed to create player:', error);
         }
     };
-
-    const positionOptions = Object.values(Position).map(p => ({value: p, label: p}));
-    const teamOptions = teams
-        .filter(team => team.id !== "free-agent")
-        .map(team => ({value: team.id, label: team.name}));
 
     return (
         <>
@@ -153,67 +131,15 @@ const CreatePlayerPage = () => {
             {uploadStatus && <p>{uploadStatus}</p>}
 
             <h2>Create Player Manually</h2>
-            <form onSubmit={submitHandler}>
-                <Input
-                    id="name"
-                    label="Name:"
-                    type="text"
-                    value={playerData.name}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, name: e.target.value}));
-                        setErrors(prev => ({...prev, name: ''}));
-                    }}
-                    required
-                    error={errors.name}
-                />
-
-                <Input
-                    id="jerseyNumber"
-                    label="Jersey number:"
-                    type="number"
-                    value={playerData.jerseyNumber}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, jerseyNumber: Number(e.target.value)}));
-                        setErrors(prev => ({...prev, jerseyNumber: ''}));
-                    }}
-                    required
-                    min={1}
-                    max={99}
-                    error={errors.jerseyNumber}
-                />
-
-                <Select
-                    id="position"
-                    label="Position:"
-                    value={playerData.position}
-                    onChange={(e) => setPlayerData(prev => ({...prev, position: e.target.value as Position}))}
-                    options={positionOptions}
-                />
-
-                <Checkbox
-                    id="freeAgent"
-                    label="Free Agent"
-                    checked={isFreeAgent}
-                    onChange={() => setIsFreeAgent(!isFreeAgent)}
-                />
-
-                {!isFreeAgent && (
-                    <Select
-                        id="team"
-                        label="Team:"
-                        value={playerData.teamId}
-                        onChange={(e) => setPlayerData(prev => ({...prev, teamId: e.target.value}))}
-                        options={teamOptions}
-                    />
-                )}
-
-                {errors.general && <span>{errors.general}</span>}
-
-                <div>
-                    <Button styleType={"positive"} type="submit">Create player</Button>
-                    <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
-                </div>
-            </form>
+            <PlayerForm
+                teams={teams}
+                showTeamSelector={true}
+                onSubmit={submitHandler}
+                onCancel={() => navigate(-1)}
+                submitLabel="Create player"
+                errors={errors}
+                setErrors={setErrors}
+            />
         </>
     );
 };

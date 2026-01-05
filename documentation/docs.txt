@@ -1,0 +1,22 @@
+App.tsx - same
+HomePage - same
+
+StartPage
+    select: season, championship, home/away team, gameType
+    input: colors (home/away - primary/secondary, so 4) + 2x ExampleIcon same
+    radio: rinkUp, rinkDown - no need to get from storage
+    roster selection (home, away, rules)
+    Button x2 (Start Game, Go Back)
+    errors (correct roster, no same teams, teams need to exist, colors need to be different (inside-outside))
+    loader - teams, rinks?
+
+    effects:
+        if championship changes -> teams change
+        if team changes -> colors change to new team's default colors
+        check from localstorage if there's an unfinished game
+
+
+GamePage
+    1st rink, clickable, and shows clickable Icons
+        if we click on the rink, the stats modal flow starts
+        if we click on the icon, the icon stats modal shows up, stats modal flow does NOT start

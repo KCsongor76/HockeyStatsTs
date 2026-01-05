@@ -9,6 +9,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import {CREATE} from "../OOP/constants/NavigationNames";
+import EntityListItem from "../components/EntityListItem";
 import {Team} from "../OOP/classes/Team";
 import {Game} from "../OOP/classes/Game";
 import {useFilterPagination} from "../hooks/useFilterPagination";
@@ -51,7 +52,8 @@ const TeamCrudPage = () => {
         return teams.filter(team =>
             (!filters.name || team.name.toLowerCase().includes(filters.name.toLowerCase())) &&
             (!filters.championship || team.championships.includes(filters.championship as Championship)) &&
-            (!seasonTeamIDs || seasonTeamIDs.has(team.id))
+            (!seasonTeamIDs || seasonTeamIDs.has(team.id)) &&
+            (team.id !== 'free-agent')
         );
     }, [teams, filters, seasonTeamIDs]);
 
@@ -117,24 +119,15 @@ const TeamCrudPage = () => {
             </div>
 
             <ul>
-                {currentTeams.length > 0 ? (
-                    currentTeams
-                        .filter(t => t.id !== "free-agent")
-                        .map((team: Team) => (
-                            <li key={team.id}>
-                                <p>{team.name}</p>
-                                <div>
-                                    <Button styleType={"neutral"}
-                                            onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
-                                        View
-                                    </Button>
-                                    <Button styleType={"negative"} onClick={() => deleteHandler(team)}>
-                                        Delete
-                                    </Button>
-                                </div>
-                            </li>
-                        ))
-                ) : <p>No teams found</p>}
+                {currentTeams.length > 0 ? currentTeams.map((team: Team) => (
+                    <EntityListItem
+                        key={team.id}
+                        onView={() => navigate(`${team.id}`, {state: {team, games}})}
+                        onDelete={() => deleteHandler(team)}
+                    >
+                        {team.name}
+                    </EntityListItem>
+                )) : <p>No teams found.</p>}
             </ul>
 
             <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
