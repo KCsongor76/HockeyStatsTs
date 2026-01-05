@@ -13,7 +13,7 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagination}) => {
     const perPageOptions = [10, 25, 50, 100];
-    const isFirstRender = useRef(true);
+    const prevPagination = useRef(pagination);
 
     const goToPreviousPage = () => {
         if (pagination.page > 1) {
@@ -28,14 +28,11 @@ const Pagination: React.FC<PaginationProps> = ({pagination, totalPages, setPagin
     };
 
     useEffect(() => {
-        // Skip scroll on first render
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
+        if (prevPagination.current.page !== pagination.page || prevPagination.current.perPage !== pagination.perPage) {
+            // scroll automatically to the bottom on page change or team per page change
+            window.scrollTo(0, document.body.scrollHeight);
+            prevPagination.current = pagination;
         }
-
-        // scroll automatically to the bottom on page change or team per page change
-        window.scrollTo(0, document.body.scrollHeight);
     }, [pagination.page, pagination.perPage]);
 
     return (

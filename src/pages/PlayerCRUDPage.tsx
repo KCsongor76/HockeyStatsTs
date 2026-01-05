@@ -13,11 +13,20 @@ import {CREATE} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
 import {Game} from "../OOP/classes/Game";
+import {useFilterPagination} from "../hooks/useFilterPagination";
 
 interface LoaderData {
     teams: Team[];
     players: Player[];
     games: Game[];
+}
+
+interface PlayerFilterCriteria {
+    team: string;
+    position: string;
+    jerseyNr: string;
+    search: string;
+    season: string;
 }
 
 const PlayerCrudPage = () => {
@@ -27,8 +36,19 @@ const PlayerCrudPage = () => {
     const teams = loaderData.teams;
     const games = loaderData.games;
 
-    const [filters, setFilters] = useState({team: '', position: '', jerseyNr: '', search: '', season: ''});
-    const [pagination, setPagination] = useState({page: 1, perPage: 10});
+    const {
+        filters,
+        handleFilterChange,
+        pagination,
+        setPagination,
+        paginate
+    } = useFilterPagination<Player, PlayerFilterCriteria>({
+        team: '',
+        position: '',
+        jerseyNr: '',
+        search: '',
+        season: ''
+    });
     const navigate = useNavigate();
 
     const teamsActiveInSeason = useMemo(() => {
@@ -57,14 +77,10 @@ const PlayerCrudPage = () => {
     }, [players, filters, teamsActiveInSeason]);
 
     // Pagination Logic
-    const {currentPlayers, totalPages} = useMemo(() => {
-        const indexOfLast = pagination.page * pagination.perPage;
-        const indexOfFirst = indexOfLast - pagination.perPage;
-        return {
-            currentPlayers: filteredPlayers.slice(indexOfFirst, indexOfLast),
-            totalPages: Math.ceil(filteredPlayers.length / pagination.perPage)
-        };
-    }, [filteredPlayers, pagination]);
+    const {
+        currentItems: currentPlayers,
+        totalPages
+    } = useMemo(() => paginate(filteredPlayers), [filteredPlayers, paginate]);
 
     const deleteHandler = async (player: Player) => {
         if (window.confirm(`Are you sure you want to delete ${player.name}?`)) {
@@ -76,11 +92,6 @@ const PlayerCrudPage = () => {
                 alert("Failed to delete player.");
             }
         }
-    };
-
-    const handleFilterChange = (key: string, value: string) => {
-        setFilters(prev => ({...prev, [key]: value}));
-        setPagination(prev => ({...prev, page: 1}));
     };
 
     // Filter Options

@@ -11,6 +11,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import Select from "../components/Select";
 import {Team} from "../OOP/classes/Team";
 import {Game, GameFilterCriteria} from "../OOP/classes/Game";
+import {useFilterPagination} from "../hooks/useFilterPagination";
 
 interface SavedGamesPageProps {
     playerGames?: Game[];
@@ -23,8 +24,13 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Filter States
-    const [filters, setFilters] = useState<GameFilterCriteria>({
+    const {
+        filters,
+        handleFilterChange,
+        pagination,
+        setPagination,
+        paginate
+    } = useFilterPagination<Game, GameFilterCriteria>({
         homeTeamId: "",
         awayTeamId: "",
         championship: "",
@@ -33,7 +39,6 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     });
 
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-    const [pagination, setPagination] = useState({page: 1, perPage: 10});
 
     const navigate = useNavigate();
 
@@ -44,19 +49,10 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     }, [games, filters, sortOrder]);
 
     // Pagination Logic
-    const {currentGames, totalPages} = useMemo(() => {
-        const indexOfLastGame = pagination.page * pagination.perPage;
-        const indexOfFirstGame = indexOfLastGame - pagination.perPage;
-        return {
-            currentGames: processedGames.slice(indexOfFirstGame, indexOfLastGame),
-            totalPages: Math.ceil(processedGames.length / pagination.perPage)
-        };
-    }, [processedGames, pagination]);
-
-    const handleFilterChange = (key: keyof GameFilterCriteria, value: any) => {
-        setFilters(prev => ({...prev, [key]: value}));
-        setPagination(prev => ({...prev, page: 1})); // Reset to page 1 on filter change
-    };
+    const {
+        currentItems: currentGames,
+        totalPages
+    } = useMemo(() => paginate(processedGames), [processedGames, paginate]);
 
     useEffect(() => {
         const fetchData = async () => {

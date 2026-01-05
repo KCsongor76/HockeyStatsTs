@@ -11,18 +11,30 @@ import Select from "../components/Select";
 import {CREATE} from "../OOP/constants/NavigationNames";
 import {Team} from "../OOP/classes/Team";
 import {Game} from "../OOP/classes/Game";
+import {useFilterPagination} from "../hooks/useFilterPagination";
 
 interface LoaderData {
     teams: Team[];
     games: Game[];
 }
 
+interface TeamFilterCriteria {
+    name: string;
+    season: string;
+    championship: string;
+}
+
 const TeamCrudPage = () => {
     const loaderData = useLoaderData() as LoaderData;
     const [teams, setTeams] = useState<Team[]>(loaderData.teams);
     const games = loaderData.games;
-    const [filters, setFilters] = useState({name: '', season: '', championship: ''});
-    const [pagination, setPagination] = useState({page: 1, perPage: 10});
+    const {
+        filters,
+        handleFilterChange,
+        pagination,
+        setPagination,
+        paginate
+    } = useFilterPagination<Team, TeamFilterCriteria>({name: '', season: '', championship: ''});
     const navigate = useNavigate();
 
     const seasonTeamIDs = useMemo(() => {
@@ -44,14 +56,7 @@ const TeamCrudPage = () => {
     }, [teams, filters, seasonTeamIDs]);
 
     // Pagination Logic
-    const {currentTeams, totalPages} = useMemo(() => {
-        const indexOfLastTeam = pagination.page * pagination.perPage;
-        const indexOfFirstTeam = indexOfLastTeam - pagination.perPage;
-        return {
-            currentTeams: filteredTeams.slice(indexOfFirstTeam, indexOfLastTeam),
-            totalPages: Math.ceil(filteredTeams.length / pagination.perPage)
-        };
-    }, [filteredTeams, pagination]);
+    const {currentItems: currentTeams, totalPages} = useMemo(() => paginate(filteredTeams), [filteredTeams, paginate]);
 
     const deleteHandler = async (team: Team) => {
         if (window.confirm(`Are you sure you want to delete ${team.name}?`)) {
@@ -64,11 +69,6 @@ const TeamCrudPage = () => {
                 alert("Failed to delete team.");
             }
         }
-    };
-
-    const handleFilterChange = (key: string, value: string) => {
-        setFilters(prev => ({...prev, [key]: value}));
-        setPagination(prev => ({...prev, page: 1})); // Reset to page 1 on filter change
     };
 
     // Filter Options
