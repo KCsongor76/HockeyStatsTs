@@ -11,6 +11,8 @@ import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import SavedGamesPage from "./SavedGamesPage";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 import {TRANSFER} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Game} from "../OOP/classes/Game";
@@ -236,6 +238,18 @@ const HandlePlayerPage = () => {
         fetchTeam();
     }, [player.teamId]);
 
+    // Option mappers
+    const positionOptions = Object.values(Position).map(pos => ({value: pos, label: pos}));
+    const seasonOptions = [
+        {value: "All", label: "All Seasons"},
+        ...Object.values(Season).map(season => ({value: season, label: season}))
+    ];
+    const teamFilterOptions = [
+        {value: "", label: "All Teams"},
+        ...availableTeams.map(team => ({value: team.id, label: team.name}))
+    ];
+
+
     return (
         <>
             <h1>Player Details</h1>
@@ -246,69 +260,60 @@ const HandlePlayerPage = () => {
 
             {isEditing ? (
                 <>
-                    <label htmlFor="name">Name:</label>
-                    <input
+                    <Input
                         id="name"
+                        label="Name:"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
 
-                    <label htmlFor="jerseyNumber">Jersey number:</label>
-                    <input
+                    <Input
                         id="jerseyNumber"
+                        label="Jersey number:"
                         type="number"
                         value={jerseyNumber}
                         onChange={(e) => setJerseyNumber(Number(e.target.value))}
                     />
 
-                    <label htmlFor="position">Position:</label>
-                    <select
+                    <Select
                         id="position"
+                        label="Position:"
                         value={position}
                         onChange={(e) => setPosition(e.target.value as Position)}
-                    >
-                        {Object.values(Position).map(pos => (
-                            <option key={pos} value={pos}>{pos}</option>
-                        ))}
-                    </select>
+                        options={positionOptions}
+                    />
 
-                    {error && <p className="error">{error}</p>}
-                    <Button styleType={"positive"} type="button" onClick={saveHandler}>Save Changes</Button>
-                    <Button styleType={"negative"} type="button" onClick={() => setIsEditing(false)}>Discard</Button>
+                    {error && <p>{error}</p>}
+                    <div>
+                        <Button styleType={"positive"} type="button" onClick={saveHandler}>Save Changes</Button>
+                        <Button styleType={"negative"} type="button"
+                                onClick={() => setIsEditing(false)}>Discard</Button>
+                    </div>
                 </>
             ) : (
                 <Button styleType={"neutral"} type="button" onClick={() => setIsEditing(true)}>Edit player</Button>
             )}
 
+            <div>
+                <Select
+                    id="seasonFilter"
+                    label="Season:"
+                    value={selectedSeason}
+                    onChange={(e) => setSelectedSeason(e.target.value as Season | 'All')}
+                    options={seasonOptions}
+                />
 
-            <label htmlFor="seasonFilter">Season:</label>
-            <select
-                id="seasonFilter"
-                value={selectedSeason}
-                onChange={(e) => setSelectedSeason(e.target.value as Season | 'All')}
-            >
-                <option value="All">All Seasons</option>
-                {Object.values(Season).map(season => (
-                    <option key={season} value={season}>{season}</option>
-                ))}
-            </select>
-
-            {availableTeams.length > 1 && (
-                <>
-                    <label htmlFor="teamFilter">Team:</label>
-                    <select
+                {availableTeams.length > 1 && (
+                    <Select
                         id="teamFilter"
+                        label="Team:"
                         value={selectedTeamId}
                         onChange={(e) => setSelectedTeamId(e.target.value)}
-                    >
-                        <option value="">All Teams</option>
-                        {availableTeams.map(team => (
-                            <option key={team.id} value={team.id}>{team.name}</option>
-                        ))}
-                    </select>
-                </>
-            )}
+                        options={teamFilterOptions}
+                    />
+                )}
+            </div>
 
             <PlayerStatsTable
                 title="Regular Season Players Stats"
@@ -324,7 +329,6 @@ const HandlePlayerPage = () => {
                 showSeasonColumn={selectedSeason === 'All'}
             />
 
-
             <div onClick={() => setShowGames(!showGames)}>
                 <h3>Games Played {relevantGames.length > 0 && `(${relevantGames.length})`}</h3>
                 <span>{showGames ? '▲' : '▼'}</span>
@@ -332,27 +336,28 @@ const HandlePlayerPage = () => {
 
             {showGames && (
                 <SavedGamesPage
-                    // Unique key to force re-render when filters change
                     key={`${selectedSeason}-${selectedTeamId}-${relevantGames.length}`}
                     playerGames={relevantGames}
                     showFilters={false}
                 />
             )}
 
-            <Button
-                styleType={"positive"}
-                type="button"
-                onClick={() => navigate(`../${TRANSFER}/:${player.id}`, {state: {player, team}})}
-            >
-                Transfer
-            </Button>
-            <Button
-                styleType={"negative"}
-                type="button"
-                onClick={() => navigate(-1)}
-            >
-                Go back
-            </Button>
+            <div>
+                <Button
+                    styleType={"positive"}
+                    type="button"
+                    onClick={() => navigate(`../${TRANSFER}/:${player.id}`, {state: {player, team}})}
+                >
+                    Transfer
+                </Button>
+                <Button
+                    styleType={"negative"}
+                    type="button"
+                    onClick={() => navigate(-1)}
+                >
+                    Go back
+                </Button>
+            </div>
         </>
     );
 };

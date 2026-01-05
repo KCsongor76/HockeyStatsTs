@@ -8,6 +8,7 @@ import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
 import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Select from "../components/Select";
 import {Team} from "../OOP/classes/Team";
 import {Game, GameFilterCriteria} from "../OOP/classes/Game";
 
@@ -82,78 +83,111 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         fetchData();
     }, [playerGames]);
 
+    // Option mappers
+    const teamOptions = [
+        {value: "", label: "All Teams"},
+        ...teams.map(t => ({value: t.id, label: t.name}))
+    ];
+    const championshipOptions = [
+        {value: "", label: "All Championships"},
+        ...Object.values(Championship).map(c => ({value: c, label: c}))
+    ];
+    const seasonOptions = [
+        {value: "", label: "All Seasons"},
+        ...Object.values(Season).map(s => ({value: s, label: s}))
+    ];
+    const gameTypeOptions = [
+        {value: "", label: "All GameTypes"},
+        ...Object.values(GameType).map(gt => ({value: gt, label: gt}))
+    ];
+    const sortOptions = [
+        {value: "newest", label: "Newest First"},
+        {value: "oldest", label: "Oldest First"}
+    ];
+
     if (isLoading) return <LoadingSpinner/>;
     if (error) return <div>{error}</div>;
 
     return (
         <>
             {showFilters && (
-                <>
-                    <label>Home team:
-                        <select value={filters.homeTeamId}
-                                onChange={(e) => handleFilterChange('homeTeamId', e.target.value)}>
-                            <option value="">All Teams</option>
-                            {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                        </select>
-                    </label>
+                <div>
+                    <Select
+                        id="homeTeamFilter"
+                        label="Home team:"
+                        value={filters.homeTeamId}
+                        onChange={(e) => handleFilterChange('homeTeamId', e.target.value)}
+                        options={teamOptions}
+                    />
 
-                    <label>Away team:
-                        <select value={filters.awayTeamId}
-                                onChange={(e) => handleFilterChange('awayTeamId', e.target.value)}>
-                            <option value="">All Teams</option>
-                            {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                        </select>
-                    </label>
+                    <Select
+                        id="awayTeamFilter"
+                        label="Away team:"
+                        value={filters.awayTeamId}
+                        onChange={(e) => handleFilterChange('awayTeamId', e.target.value)}
+                        options={teamOptions}
+                    />
 
-                    <label>Championship:
-                        <select value={filters.championship}
-                                onChange={(e) => handleFilterChange('championship', e.target.value)}>
-                            <option value="">All Championships</option>
-                            {Object.values(Championship).map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                    </label>
+                    <Select
+                        id="championshipFilter"
+                        label="Championship:"
+                        value={filters.championship}
+                        onChange={(e) => handleFilterChange('championship', e.target.value)}
+                        options={championshipOptions}
+                    />
 
-                    <label>Season:
-                        <select value={filters.season} onChange={(e) => handleFilterChange('season', e.target.value)}>
-                            <option value="">All Seasons</option>
-                            {Object.values(Season).map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                    </label>
+                    <Select
+                        id="seasonFilter"
+                        label="Season:"
+                        value={filters.season}
+                        onChange={(e) => handleFilterChange('season', e.target.value)}
+                        options={seasonOptions}
+                    />
 
-                    <label>GameType:
-                        <select value={filters.gameType}
-                                onChange={(e) => handleFilterChange('gameType', e.target.value)}>
-                            <option value="">All GameTypes</option>
-                            {Object.values(GameType).map(gt => <option key={gt} value={gt}>{gt}</option>)}
-                        </select>
-                    </label>
+                    <Select
+                        id="gameTypeFilter"
+                        label="GameType:"
+                        value={filters.gameType}
+                        onChange={(e) => handleFilterChange('gameType', e.target.value)}
+                        options={gameTypeOptions}
+                    />
 
-                    <label>Sort order:
-                        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}>
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
-                        </select>
-                    </label>
-                </>
+                    <Select
+                        id="sortOrder"
+                        label="Sort order:"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+                        options={sortOptions}
+                    />
+                </div>
             )}
 
             <ul>
                 {currentGames.length > 0 ? (
                     currentGames.map((game) => (
-                        <li key={game.id} onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}>
-                            <img src={game.teams.home.logo} alt={game.teams.home.name}/>
-                            <span>{game.teams.home.name}</span>
+                        <li
+                            key={game.id}
+                            onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}
+                        >
+                            <div>
+                                <img src={game.teams.home.logo} alt={game.teams.home.name}/>
+                                <span>{game.teams.home.name}</span>
+                            </div>
 
-                            <span>{game.score.home.goals} - {game.score.away.goals}</span>
+                            <span>
+                                {game.score.home.goals} - {game.score.away.goals}
+                            </span>
 
-                            <span>{game.formattedDate}</span>
+                            <div>
+                                <span>{game.formattedDate}</span>
+                                <span>{game.championship}</span>
+                                <span>{game.type}</span>
+                            </div>
 
-                            <span>Championship: {game.championship}</span>
-                            <span>Type: {game.type}</span>
-                            <span>Season: {game.season || "Not specified"}</span>
-
-                            <img src={game.teams.away.logo} alt={game.teams.away.name}/>
-                            <span>{game.teams.away.name}</span>
+                            <div>
+                                <img src={game.teams.away.logo} alt={game.teams.away.name}/>
+                                <span>{game.teams.away.name}</span>
+                            </div>
                         </li>
                     ))
                 ) : <p>No games found.</p>}

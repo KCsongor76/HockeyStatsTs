@@ -6,6 +6,8 @@ import {GameService} from "../OOP/services/GameService";
 import {TeamService} from "../OOP/services/TeamService";
 import Pagination from "../components/Pagination";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 import {CREATE} from "../OOP/constants/NavigationNames";
 import {Team} from "../OOP/classes/Team";
 import {Game} from "../OOP/classes/Game";
@@ -69,6 +71,16 @@ const TeamCrudPage = () => {
         setPagination(prev => ({...prev, page: 1})); // Reset to page 1 on filter change
     };
 
+    // Filter Options
+    const seasonOptions = [
+        {value: "", label: "All Seasons"},
+        ...Object.values(Season).map(s => ({value: s, label: s}))
+    ];
+    const championshipOptions = [
+        {value: "", label: "All Championships"},
+        ...Object.values(Championship).map(c => ({value: c, label: c}))
+    ];
+
     return (
         <>
             <h1>Teams</h1>
@@ -76,29 +88,33 @@ const TeamCrudPage = () => {
                 Create new Team
             </Button>
 
+            <div>
+                <Input
+                    id="search"
+                    label="Search by Name"
+                    hideLabel={true}
+                    type="text"
+                    placeholder="Search by name..."
+                    value={filters.name}
+                    onChange={(e) => handleFilterChange('name', e.target.value)}
+                />
 
-            <input
-                type="text"
-                placeholder="Search by name..."
-                value={filters.name}
-                onChange={(e) => handleFilterChange('name', e.target.value)}
-            />
+                <Select
+                    id="seasonFilter"
+                    label="Filter by Season"
+                    value={filters.season}
+                    onChange={(e) => handleFilterChange('season', e.target.value)}
+                    options={seasonOptions}
+                />
 
-            <select
-                value={filters.season}
-                onChange={(e) => handleFilterChange('season', e.target.value)}
-            >
-                <option value="">All Seasons</option>
-                {Object.values(Season).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-
-            <select
-                value={filters.championship}
-                onChange={(e) => handleFilterChange('championship', e.target.value)}
-            >
-                <option value="">All Championships</option>
-                {Object.values(Championship).map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+                <Select
+                    id="championshipFilter"
+                    label="Filter by Championship"
+                    value={filters.championship}
+                    onChange={(e) => handleFilterChange('championship', e.target.value)}
+                    options={championshipOptions}
+                />
+            </div>
 
             <ul>
                 {currentTeams.length > 0 ? (
@@ -107,13 +123,15 @@ const TeamCrudPage = () => {
                         .map((team: Team) => (
                             <li key={team.id}>
                                 <p>{team.name}</p>
-                                <Button styleType={"neutral"}
-                                        onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
-                                    View
-                                </Button>
-                                <Button styleType={"negative"} onClick={() => deleteHandler(team)}>
-                                    Delete
-                                </Button>
+                                <div>
+                                    <Button styleType={"neutral"}
+                                            onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
+                                        View
+                                    </Button>
+                                    <Button styleType={"negative"} onClick={() => deleteHandler(team)}>
+                                        Delete
+                                    </Button>
+                                </div>
                             </li>
                         ))
                 ) : <p>No teams found</p>}

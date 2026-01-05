@@ -7,6 +7,8 @@ import {PlayerService} from "../OOP/services/PlayerService";
 import {Position} from "../OOP/enums/Position";
 import Pagination from "../components/Pagination";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 import {CREATE} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
@@ -81,6 +83,20 @@ const PlayerCrudPage = () => {
         setPagination(prev => ({...prev, page: 1}));
     };
 
+    // Filter Options
+    const seasonOptions = [
+        {value: "", label: "All Seasons"},
+        ...Object.values(Season).map(s => ({value: s, label: s}))
+    ];
+    const teamOptions = [
+        {value: "", label: "All Teams"},
+        ...teams.filter(t => t.id !== 'free-agent').map(t => ({value: t.id, label: t.name}))
+    ];
+    const positionOptions = [
+        {value: "", label: "All Positions"},
+        ...Object.values(Position).map(p => ({value: p, label: p}))
+    ];
+
     return (
         <div>
             <h1>Players Registry</h1>
@@ -89,60 +105,75 @@ const PlayerCrudPage = () => {
                 Add New Player
             </Button>
 
-            <input
-                type="text"
-                placeholder="Search name..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-            />
+            <div>
+                <Input
+                    id="search"
+                    label="Search Name"
+                    hideLabel={true}
+                    type="text"
+                    placeholder="Search name..."
+                    value={filters.search}
+                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                />
 
-            <select value={filters.season} onChange={(e) => handleFilterChange('season', e.target.value)}>
-                <option value="">All Seasons</option>
-                {Object.values(Season).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+                <Select
+                    id="seasonFilter"
+                    label="Filter by Season"
+                    value={filters.season}
+                    onChange={(e) => handleFilterChange('season', e.target.value)}
+                    options={seasonOptions}
+                />
 
-            <select value={filters.team} onChange={(e) => handleFilterChange('team', e.target.value)}>
-                <option value="">All Teams</option>
-                {teams.filter(t => t.id !== 'free-agent').map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-            </select>
+                <Select
+                    id="teamFilter"
+                    label="Filter by Team"
+                    value={filters.team}
+                    onChange={(e) => handleFilterChange('team', e.target.value)}
+                    options={teamOptions}
+                />
 
-            <select value={filters.position} onChange={(e) => handleFilterChange('position', e.target.value)}>
-                <option value="">All Positions</option>
-                {Object.values(Position).map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+                <Select
+                    id="positionFilter"
+                    label="Filter by Position"
+                    value={filters.position}
+                    onChange={(e) => handleFilterChange('position', e.target.value)}
+                    options={positionOptions}
+                />
 
-            <input
-                type="number"
-                placeholder="Jersey #"
-                value={filters.jerseyNr}
-                onChange={(e) => handleFilterChange('jerseyNr', e.target.value)}
-            />
+                <Input
+                    id="jerseyFilter"
+                    label="Jersey #"
+                    type="number"
+                    placeholder="Jersey #"
+                    value={filters.jerseyNr}
+                    onChange={(e) => handleFilterChange('jerseyNr', e.target.value)}
+                />
+            </div>
 
             <ul>
                 {currentPlayers.length > 0 ? currentPlayers.map((player: Player) => (
                     <li key={player.id}>
                         <p>
-                            {player.name}
-                            {` #${player.jerseyNumber} (${player.position})`}
+                            {player.name} {` #${player.jerseyNumber} (${player.position}) `}
                             <span>
                                 {teams.find(t => t.id === player.teamId)?.name || 'Unknown Team'}
                             </span>
                         </p>
 
-                        <Button
-                            styleType={"neutral"}
-                            onClick={() => navigate(`${player.id}`, {state: {player, games}})}
-                        >
-                            View
-                        </Button>
-                        <Button
-                            styleType={"negative"}
-                            onClick={() => deleteHandler(player)}
-                        >
-                            Delete
-                        </Button>
+                        <div>
+                            <Button
+                                styleType={"neutral"}
+                                onClick={() => navigate(`${player.id}`, {state: {player, games}})}
+                            >
+                                View
+                            </Button>
+                            <Button
+                                styleType={"negative"}
+                                onClick={() => deleteHandler(player)}
+                            >
+                                Delete
+                            </Button>
+                        </div>
                     </li>
                 )) : <p>No players found matching criteria.</p>}
             </ul>

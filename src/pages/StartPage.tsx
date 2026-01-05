@@ -9,6 +9,9 @@ import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../firebase";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
+import RadioButton from "../components/RadioButton";
 import ExampleIcon from "../components/ExampleIcon";
 import {ActionType} from "../OOP/enums/ActionType";
 import {GAME} from "../OOP/constants/NavigationNames";
@@ -22,10 +25,12 @@ const StartPage = () => {
     const [gameType, setGameType] = useState<GameType>(GameType.REGULAR);
 
     const [teams, setTeams] = useState<Team[]>(loaderData.teams);
-    const defaultTeams = teams.filter(t => t.championships.includes(championship));
-
     const [season, setSeason] = useState<Season>(Season.SEASON_2025_2026);
     const [championship, setChampionship] = useState<Championship>(Championship.ERSTE_LEAGUE);
+
+    // Derived default teams based on championship
+    const defaultTeams = teams.filter(t => t.championships.includes(championship));
+
     const [homeTeamId, setHomeTeamId] = useState<string>(defaultTeams[0]?.id || '');
     const [awayTeamId, setAwayTeamId] = useState<string>(defaultTeams[1]?.id || '');
     const [homeColors, setHomeColors] = useState({primary: "#000000", secondary: "#ffffff"});
@@ -115,7 +120,7 @@ const StartPage = () => {
 
         if (homeTeamId && !isAvailable(homeTeamId)) setHomeTeamId(validTeams[0]?.id || '');
         if (awayTeamId && !isAvailable(awayTeamId)) setAwayTeamId(validTeams[1]?.id || '');
-    }, [championship]);
+    }, [championship, teams, homeTeamId, awayTeamId]);
 
     // Check saved game
     useEffect(() => {
@@ -131,59 +136,77 @@ const StartPage = () => {
         }
     }, [navigate]);
 
+    // Option Builders
+    const seasonOptions = Object.values(Season).map(s => ({value: s, label: s}));
+    const championshipOptions = Object.values(Championship).map(ch => ({value: ch, label: ch}));
+    const gameTypeOptions = Object.values(GameType).map(gt => ({value: gt, label: gt}));
+
+    const availableTeams = teams.filter(t => t.championships.includes(championship));
+    const teamOptions = availableTeams.map(t => ({value: t.id, label: t.name}));
+
     return (
         <form onSubmit={submitHandler}>
-            <label htmlFor="season">Season:</label>
-            <select id="season" value={season} onChange={e => setSeason(e.target.value as Season)}>
-                {Object.values(Season).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+            <Select
+                id="season"
+                label="Season:"
+                value={season}
+                onChange={e => setSeason(e.target.value as Season)}
+                options={seasonOptions}
+            />
 
-            <label htmlFor="championship">Championship:</label>
-            <select id="championship" value={championship}
-                    onChange={e => setChampionship(e.target.value as Championship)}>
-                {Object.values(Championship).map(ch => <option key={ch} value={ch}>{ch}</option>)}
-            </select>
+            <Select
+                id="championship"
+                label="Championship:"
+                value={championship}
+                onChange={e => setChampionship(e.target.value as Championship)}
+                options={championshipOptions}
+            />
 
             {/* Team Selectors */}
-            <label htmlFor="homeTeam">Home team:</label>
-            <select id="homeTeam" value={homeTeamId} onChange={e => setHomeTeamId(e.target.value)}>
-                {teams.filter(t => t.championships.includes(championship)).map(team => (
-                    <option key={team.id} value={team.id}>{team.name}</option>
-                ))}
-            </select>
-            {errors.homeTeamId && <span className="error">{errors.homeTeamId}</span>}
+            <Select
+                id="homeTeam"
+                label="Home team:"
+                value={homeTeamId}
+                onChange={e => setHomeTeamId(e.target.value)}
+                options={teamOptions}
+                error={errors.homeTeamId}
+            />
 
-            <label htmlFor="awayTeam">Away team:</label>
-            <select id="awayTeam" value={awayTeamId} onChange={e => setAwayTeamId(e.target.value)}>
-                {teams.filter(t => t.championships.includes(championship)).map(team => (
-                    <option key={team.id} value={team.id}>{team.name}</option>
-                ))}
-            </select>
-            {errors.awayTeamId && <span className="error">{errors.awayTeamId}</span>}
-            {errors.sameTeams && <span className="error">{errors.sameTeams}</span>}
+            <Select
+                id="awayTeam"
+                label="Away team:"
+                value={awayTeamId}
+                onChange={e => setAwayTeamId(e.target.value)}
+                options={teamOptions}
+                error={errors.awayTeamId || errors.sameTeams}
+            />
 
-            <label htmlFor="gameType">Game type:</label>
-            <select id="gameType" value={gameType} onChange={e => setGameType(e.target.value as GameType)}>
-                {Object.values(GameType).map(gt => <option key={gt} value={gt}>{gt}</option>)}
-            </select>
+            <Select
+                id="gameType"
+                label="Game type:"
+                value={gameType}
+                onChange={e => setGameType(e.target.value as GameType)}
+                options={gameTypeOptions}
+            />
 
             {/* Colors Section */}
-            <label htmlFor="homePrimary">Home Primary color</label>
-            <input
+            <h3>Home Colors</h3>
+            <Input
                 id="homePrimary"
+                label="Primary color"
                 type="color"
                 value={homeColors.primary}
                 onChange={e => setHomeColors(p => ({...p, primary: e.target.value}))}
             />
 
-            <label htmlFor="homeSecondary">Home Secondary color</label>
-            <input
+            <Input
                 id="homeSecondary"
+                label="Secondary color"
                 type="color"
                 value={homeColors.secondary}
                 onChange={e => setHomeColors(p => ({...p, secondary: e.target.value}))}
+                error={errors.homeColors}
             />
-            {errors.homeColors && <span className="error">{errors.homeColors}</span>}
 
             <ExampleIcon
                 actionType={ActionType.GOAL}
@@ -191,22 +214,23 @@ const StartPage = () => {
                 color={homeColors.secondary}
             />
 
-            <label htmlFor="awayPrimary">Away Primary color</label>
-            <input
+            <h3>Away Colors</h3>
+            <Input
                 id="awayPrimary"
+                label="Primary color"
                 type="color"
                 value={awayColors.primary}
                 onChange={e => setAwayColors(p => ({...p, primary: e.target.value}))}
             />
 
-            <label htmlFor="awaySecondary">Away Secondary color</label>
-            <input
+            <Input
                 id="awaySecondary"
+                label="Secondary color"
                 type="color"
                 value={awayColors.secondary}
                 onChange={e => setAwayColors(p => ({...p, secondary: e.target.value}))}
+                error={errors.awayColors}
             />
-            {errors.awayColors && <span className="error">{errors.awayColors}</span>}
 
             <ExampleIcon
                 actionType={ActionType.GOAL}
@@ -214,38 +238,46 @@ const StartPage = () => {
                 color={awayColors.secondary}
             />
 
-            {errors.sameColors && <span className="error">{errors.sameColors}</span>}
+            {errors.sameColors && <span>{errors.sameColors}</span>}
 
             {/* Rink Images */}
-            <label>
-                <input
-                    type="radio"
-                    name="rinkImage"
-                    value={rinkImages.rinkUp}
-                    checked={selectedImage === rinkImages.rinkUp}
-                    onChange={(e) => setSelectedImage(e.target.value)}
-                />
-                Up
-                <img src={rinkImages.rinkUp || undefined} alt="Up"/>
-            </label>
-            <label>
-                <input
-                    type="radio"
-                    name="rinkImage"
-                    value={rinkImages.rinkDown}
-                    checked={selectedImage === rinkImages.rinkDown}
-                    onChange={(e) => setSelectedImage(e.target.value)}
-                />
-                Down
-                <img src={rinkImages.rinkDown || undefined} alt="Down"/>
-            </label>
-            {errors.rinkImage && <span className="error">{errors.rinkImage}</span>}
+            <h3>Rink Direction</h3>
+            <RadioButton
+                id="rinkUp"
+                name="rinkImage"
+                value={rinkImages.rinkUp}
+                checked={selectedImage === rinkImages.rinkUp}
+                onChange={(e) => setSelectedImage(e.target.value)}
+                label={
+                    <>
+                        Up
+                        <img src={rinkImages.rinkUp || undefined} alt="Up"/>
+                    </>
+                }
+            />
+            <RadioButton
+                id="rinkDown"
+                name="rinkImage"
+                value={rinkImages.rinkDown}
+                checked={selectedImage === rinkImages.rinkDown}
+                onChange={(e) => setSelectedImage(e.target.value)}
+                label={
+                    <>
+                        Down
+                        <img src={rinkImages.rinkDown || undefined} alt="Down"/>
+                    </>
+                }
+            />
+
+            {errors.rinkImage && <span>{errors.rinkImage}</span>}
 
             {/* Roster Section */}
-            <Button styleType={showRosters ? "negative" : "positive"} type="button"
-                    onClick={() => setShowRosters(!showRosters)}>
-                {showRosters ? 'Hide Rosters' : 'Show Rosters'}
-            </Button>
+            <div>
+                <Button styleType={showRosters ? "negative" : "positive"} type="button"
+                        onClick={() => setShowRosters(!showRosters)}>
+                    {showRosters ? 'Hide Rosters' : 'Show Rosters'}
+                </Button>
+            </div>
 
             {showRosters && (
                 <>
@@ -270,10 +302,12 @@ const StartPage = () => {
             )}
 
             {(errors.homeRoster || errors.awayRoster) &&
-                <span className="error">Please check the rosters for errors.</span>}
+                <span>Please check the rosters for errors.</span>}
 
-            <Button styleType={"positive"} type="submit">Start Game</Button>
-            <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
+            <div>
+                <Button styleType={"positive"} type="submit">Start Game</Button>
+                <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
+            </div>
         </form>
     );
 };

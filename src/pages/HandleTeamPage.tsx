@@ -10,6 +10,9 @@ import {TeamService} from "../OOP/services/TeamService";
 import SavedGamesPage from "./SavedGamesPage";
 import {Player, PlayerSortField} from "../OOP/classes/Player";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
+import Checkbox from "../components/Checkbox";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {Game} from "../OOP/classes/Game";
 
@@ -266,49 +269,59 @@ const HandleTeamPage = () => {
         </th>
     );
 
+    // Filter Options
+    const seasonOptions = [
+        {value: "All", label: "All Seasons"},
+        ...Object.values(Season).map(season => ({value: season, label: season}))
+    ];
+    const championshipOptions = [
+        {value: "All", label: "All Championships"},
+        ...Object.values(Championship).map(champ => ({value: champ, label: champ}))
+    ];
+
     return (
         <>
-
             {team.logo && team.id !== 'free-agent' && (<img src={team.logo} alt={team.name}/>)}
-            <h1>{team.name}</h1>
-
+                <h1>{team.name}</h1>
 
             {isEditing ? (
                 <>
-                    <label htmlFor="teamName">Team name:</label>
-                    <input
+                    <Input
                         id="teamName"
+                        label="Team name:"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        error={errors.name}
                     />
-                    {errors.name && <span>{errors.name}</span>}
 
-                    <label htmlFor="teamLogo">Upload new logo:</label>
-                    <input
+                    <Input
                         id="teamLogo"
+                        label="Upload new logo:"
                         type="file"
-                        accept="image/*
-                        " onChange={handleLogoChange}
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        error={errors.logo}
                     />
-                    {errors.logo && <span>{errors.logo}</span>}
 
-                    <label>Championships:</label>
+                    <h3>Championships:</h3>
                     {Object.values(Championship).map((championship) => (
-                        <label key={championship}>
-                            {championship}
-                            <input
-                                type="checkbox"
-                                checked={championships.includes(championship)}
-                                onChange={() => toggleChampionship(championship)}
-                            />
-                        </label>
+                        <Checkbox
+                            key={championship}
+                            id={`champ-${championship}`}
+                            label={championship}
+                            checked={championships.includes(championship)}
+                            onChange={() => toggleChampionship(championship)}
+                        />
                     ))}
 
+                    {errors.championships && <span>{errors.championships}</span>}
                     {errors.general && <span>{errors.general}</span>}
 
-                    <Button styleType={"positive"} type="button" onClick={handleSave}>Save Changes</Button>
-                    <Button styleType={"negative"} type="button" onClick={handleDiscard}>Discard Changes</Button>
+                    <div>
+                        <Button styleType={"positive"} type="button" onClick={handleSave}>Save Changes</Button>
+                        <Button styleType={"negative"} type="button" onClick={handleDiscard}>Discard Changes</Button>
+                    </div>
 
                 </>
             ) : (
@@ -316,174 +329,169 @@ const HandleTeamPage = () => {
                 <Button styleType={"neutral"} type="button" onClick={handleEdit}>Edit Team</Button>
             )}
 
+                <div>
+                    <Select
+                        id="seasonFilter"
+                        label="Season:"
+                        value={selectedSeason || "All"}
+                        onChange={e => setSelectedSeason(e.target.value as Season | 'All')}
+                        options={seasonOptions}
+                    />
 
-            <label htmlFor="seasonFilter">Season:</label>
-            <select
-                id="seasonFilter"
-                value={selectedSeason || "All"}
-                onChange={e => setSelectedSeason(e.target.value as Season | 'All')}
-            >
-                <option value="All">All Seasons</option>
-                {Object.values(Season).map(season => (<option key={season} value={season}>{season}</option>))}
-            </select>
+                    <Select
+                        id="championshipFilter"
+                        label="Championship:"
+                        value={selectedChampionship || "All"}
+                        onChange={e => setSelectedChampionship(e.target.value as Championship | 'All')}
+                        options={championshipOptions}
+                    />
+                </div>
 
-            <label htmlFor="championshipFilter">Championship:</label>
-            <select
-                id="championshipFilter"
-                value={selectedChampionship || "All"}
-                onChange={e => setSelectedChampionship(e.target.value as Championship | 'All')}
-            >
-                <option value="All">All Championships</option>
-                {Object.values(Championship).map(champ => (<option key={champ} value={champ}>{champ}</option>))}
-            </select>
+                <div onClick={() => setShowPlayers(!showPlayers)}>
+                    <h3>Players {filteredPlayers.length > 0 && `(${filteredPlayers.length})`}</h3>
+                    <span>{showPlayers ? '▲' : '▼'}</span>
+                </div>
 
-
-            <div onClick={() => setShowPlayers(!showPlayers)}>
-                <h3>Players {filteredPlayers.length > 0 && `(${filteredPlayers.length})`}</h3>
-                <span>{showPlayers ? '▲' : '▼'}</span>
-            </div>
-
-            {showPlayers && (
-                <>
-                    {filteredPlayers.length > 0 && (
-                        <>
-                            <h3>Regular Season Players Stats</h3>
-                            <table>
-                                <thead>
-                                <tr>
-                                    {renderPlayerSortableHeader('name', 'Name')}
-                                    {renderPlayerSortableHeader('jerseyNumber', '#')}
-                                    {renderPlayerSortableHeader('position', 'Pos')}
-                                    {renderPlayerSortableHeader('gamesPlayed', 'GP')}
-                                    {renderPlayerSortableHeader('goals', 'G')}
-                                    {renderPlayerSortableHeader('assists', 'A')}
-                                    {renderPlayerSortableHeader('points', 'P')}
-                                    {renderPlayerSortableHeader('shots', 'S')}
-                                    {renderPlayerSortableHeader('hits', 'H')}
-                                    {renderPlayerSortableHeader('turnovers', 'T')}
-                                    {renderPlayerSortableHeader('shotPercentage', 'S%')}
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {Player.sort(
-                                    filteredPlayers,
-                                    new Map(filteredPlayers.map(p => [p.id, playerStatsCache.get(p.id)?.regular])),
-                                    playerSortField,
-                                    playerSortDirection
-                                ).map((player) => {
-                                    const stats = playerStatsCache.get(player.id)?.regular || {};
-                                    return (
-                                        <tr key={player.id}>
-                                            <td>{player.name}</td>
-                                            <td>{player.jerseyNumber}</td>
-                                            <td>{player.position}</td>
-                                            <td>{stats.gamesPlayed || 0}</td>
-                                            <td>{stats.goals || 0}</td>
-                                            <td>{stats.assists || 0}</td>
-                                            <td>{stats.points || 0}</td>
-                                            <td>{stats.shots || 0}</td>
-                                            <td>{stats.hits || 0}</td>
-                                            <td>{stats.turnovers || 0}</td>
-                                            <td>{(stats.shotPercentage || 0).toFixed(2)}%</td>
-                                            <td>
-                                                <Button styleType={"neutral"}
-                                                        onClick={() => navigate(`/${HANDLE_PLAYERS}/${player.id}`, {
-                                                            state: {
-                                                                player,
-                                                                games
-                                                            }
-                                                        })}>
-                                                    View
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                                </tbody>
-                            </table>
+                {showPlayers && (
+                    <>
+                        {filteredPlayers.length > 0 && (
+                            <>
+                                <h3>Regular Season Players Stats</h3>
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        {renderPlayerSortableHeader('name', 'Name')}
+                                        {renderPlayerSortableHeader('jerseyNumber', '#')}
+                                        {renderPlayerSortableHeader('position', 'Pos')}
+                                        {renderPlayerSortableHeader('gamesPlayed', 'GP')}
+                                        {renderPlayerSortableHeader('goals', 'G')}
+                                        {renderPlayerSortableHeader('assists', 'A')}
+                                        {renderPlayerSortableHeader('points', 'P')}
+                                        {renderPlayerSortableHeader('shots', 'S')}
+                                        {renderPlayerSortableHeader('hits', 'H')}
+                                        {renderPlayerSortableHeader('turnovers', 'T')}
+                                        {renderPlayerSortableHeader('shotPercentage', 'S%')}
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {Player.sort(
+                                        filteredPlayers,
+                                        new Map(filteredPlayers.map(p => [p.id, playerStatsCache.get(p.id)?.regular])),
+                                        playerSortField,
+                                        playerSortDirection
+                                    ).map((player) => {
+                                        const stats = playerStatsCache.get(player.id)?.regular || {};
+                                        return (
+                                            <tr key={player.id}>
+                                                <td>{player.name}</td>
+                                                <td>{player.jerseyNumber}</td>
+                                                <td>{player.position}</td>
+                                                <td>{stats.gamesPlayed || 0}</td>
+                                                <td>{stats.goals || 0}</td>
+                                                <td>{stats.assists || 0}</td>
+                                                <td>{stats.points || 0}</td>
+                                                <td>{stats.shots || 0}</td>
+                                                <td>{stats.hits || 0}</td>
+                                                <td>{stats.turnovers || 0}</td>
+                                                <td>{(stats.shotPercentage || 0).toFixed(2)}%</td>
+                                                <td>
+                                                    <Button styleType={"neutral"}
+                                                            onClick={() => navigate(`/${HANDLE_PLAYERS}/${player.id}`, {
+                                                                state: {
+                                                                    player,
+                                                                    games
+                                                                }
+                                                            })}>
+                                                        View
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    </tbody>
+                                </table>
 
 
-                            <h3>Playoff Players Stats</h3>
+                                <h3>Playoff Players Stats</h3>
 
-                            <table>
-                                <thead>
-                                <tr>
-                                    {renderPlayerSortableHeader('name', 'Name')}
-                                    {/* Repeated headers for clarity, could be extracted */}
-                                    {renderPlayerSortableHeader('jerseyNumber', '#')}
-                                    {renderPlayerSortableHeader('position', 'Pos')}
-                                    {renderPlayerSortableHeader('gamesPlayed', 'GP')}
-                                    {renderPlayerSortableHeader('goals', 'G')}
-                                    {renderPlayerSortableHeader('assists', 'A')}
-                                    {renderPlayerSortableHeader('points', 'P')}
-                                    {renderPlayerSortableHeader('shots', 'S')}
-                                    {renderPlayerSortableHeader('hits', 'H')}
-                                    {renderPlayerSortableHeader('turnovers', 'T')}
-                                    {renderPlayerSortableHeader('shotPercentage', 'S%')}
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {Player.sort(
-                                    filteredPlayers,
-                                    new Map(filteredPlayers.map(p => [p.id, playerStatsCache.get(p.id)?.playoff])),
-                                    playerSortField,
-                                    playerSortDirection
-                                ).map((player) => {
-                                    const stats = playerStatsCache.get(player.id)?.playoff || {};
-                                    return (
-                                        <tr key={player.id}>
-                                            <td>{player.name}</td>
-                                            <td>{player.jerseyNumber}</td>
-                                            <td>{player.position}</td>
-                                            <td>{stats.gamesPlayed || 0}</td>
-                                            <td>{stats.goals || 0}</td>
-                                            <td>{stats.assists || 0}</td>
-                                            <td>{stats.points || 0}</td>
-                                            <td>{stats.shots || 0}</td>
-                                            <td>{stats.hits || 0}</td>
-                                            <td>{stats.turnovers || 0}</td>
-                                            <td>{(stats.shotPercentage || 0).toFixed(2)}%</td>
-                                            <td>
-                                                <Button styleType={"neutral"}
-                                                        onClick={() => navigate(`/${HANDLE_PLAYERS}/${player.id}`, {
-                                                            state: {
-                                                                player,
-                                                                games
-                                                            }
-                                                        })}>
-                                                    View
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                                </tbody>
-                            </table>
-                        </>
-                    )}
-                </>
-            )}
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        {renderPlayerSortableHeader('name', 'Name')}
+                                        {renderPlayerSortableHeader('jerseyNumber', '#')}
+                                        {renderPlayerSortableHeader('position', 'Pos')}
+                                        {renderPlayerSortableHeader('gamesPlayed', 'GP')}
+                                        {renderPlayerSortableHeader('goals', 'G')}
+                                        {renderPlayerSortableHeader('assists', 'A')}
+                                        {renderPlayerSortableHeader('points', 'P')}
+                                        {renderPlayerSortableHeader('shots', 'S')}
+                                        {renderPlayerSortableHeader('hits', 'H')}
+                                        {renderPlayerSortableHeader('turnovers', 'T')}
+                                        {renderPlayerSortableHeader('shotPercentage', 'S%')}
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {Player.sort(
+                                        filteredPlayers,
+                                        new Map(filteredPlayers.map(p => [p.id, playerStatsCache.get(p.id)?.playoff])),
+                                        playerSortField,
+                                        playerSortDirection
+                                    ).map((player) => {
+                                        const stats = playerStatsCache.get(player.id)?.playoff || {};
+                                        return (
+                                            <tr key={player.id}>
+                                                <td>{player.name}</td>
+                                                <td>{player.jerseyNumber}</td>
+                                                <td>{player.position}</td>
+                                                <td>{stats.gamesPlayed || 0}</td>
+                                                <td>{stats.goals || 0}</td>
+                                                <td>{stats.assists || 0}</td>
+                                                <td>{stats.points || 0}</td>
+                                                <td>{stats.shots || 0}</td>
+                                                <td>{stats.hits || 0}</td>
+                                                <td>{stats.turnovers || 0}</td>
+                                                <td>{(stats.shotPercentage || 0).toFixed(2)}%</td>
+                                                <td>
+                                                    <Button styleType={"neutral"}
+                                                            onClick={() => navigate(`/${HANDLE_PLAYERS}/${player.id}`, {
+                                                                state: {
+                                                                    player,
+                                                                    games
+                                                                }
+                                                            })}>
+                                                        View
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    </tbody>
+                                </table>
+                            </>
+                        )}
+                    </>
+                )}
 
-            <TeamStatsTable
-                title="Regular Season Team Stats"
-                totalStats={regularTeamStats}
-                seasonalStats={seasonalStats.regular}
-                showSeasonColumn={selectedSeason === 'All'}
-            />
+                <TeamStatsTable
+                    title="Regular Season Team Stats"
+                    totalStats={regularTeamStats}
+                    seasonalStats={seasonalStats.regular}
+                    showSeasonColumn={selectedSeason === 'All'}
+                />
 
-            <TeamStatsTable
-                title="Playoff Team Stats"
-                totalStats={playoffTeamStats}
-                seasonalStats={seasonalStats.playoff}
-                showSeasonColumn={selectedSeason === 'All'}
-            />
+                <TeamStatsTable
+                    title="Playoff Team Stats"
+                    totalStats={playoffTeamStats}
+                    seasonalStats={seasonalStats.playoff}
+                    showSeasonColumn={selectedSeason === 'All'}
+                />
 
-            <div onClick={() => setShowGames(!showGames)}>
-                <h3>Team Games {getFilteredGames().length > 0 && `(${getFilteredGames().length})`}</h3>
-                <span>{showGames ? '▲' : '▼'}</span>
-            </div>
+                <div onClick={() => setShowGames(!showGames)}>
+                    <h3>Team Games {getFilteredGames().length > 0 && `(${getFilteredGames().length})`}</h3>
+                    <span>{showGames ? '▲' : '▼'}</span>
+                </div>
 
             {showGames && (
                 <SavedGamesPage
@@ -493,7 +501,7 @@ const HandleTeamPage = () => {
                 />
             )}
 
-            <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
+                <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
         </>
     );
 };

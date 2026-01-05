@@ -5,6 +5,7 @@ import {Team} from "../OOP/classes/Team";
 import {TeamService} from "../OOP/services/TeamService";
 import {PlayerService} from "../OOP/services/PlayerService";
 import Button from "../components/Button";
+import Select from "../components/Select";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {ITeam} from "../OOP/interfaces/ITeam";
@@ -92,61 +93,62 @@ const TransferPlayerPage = () => {
         fetchTeams();
     }, [player.teamId]);
 
+    const teamOptions = teams.map(t => ({value: t.id, label: t.name}));
+
     return (
         <form onSubmit={submitHandler}>
             <h1>Transfer Player</h1>
             <p>Player: {player.name} (#{player.jerseyNumber})</p>
             <p>Current Team: {currentTeam?.name || "Free Agent"}</p>
+
             {player.teamId !== "free-agent" && (
-                <div>
-                    <label htmlFor="teamSelect">Transfer to:</label>
-                    <select
-                        id="teamSelect"
-                        value={selectedTeamId}
-                        onChange={(e) => setSelectedTeamId(e.target.value)}
-                        disabled={isSubmitting}
-                    >
-                        {teams.map(t => (<option key={t.id} value={t.id}>{t.name}</option>))}
-                    </select>
-                    {errors.team && <span className="error">{errors.team}</span>}
-                </div>
+                <Select
+                    id="teamSelect"
+                    label="Transfer to:"
+                    value={selectedTeamId}
+                    onChange={(e) => setSelectedTeamId(e.target.value)}
+                    disabled={isSubmitting}
+                    options={teamOptions}
+                    error={errors.team}
+                />
             )}
 
             {errors.jersey && <span>{errors.jersey}</span>}
             {errors.general && <span>{errors.general}</span>}
 
+            <div>
+                {/* Only show "Set to Free Agent" if not already one */}
+                {player.teamId !== "free-agent" && (
+                    <Button
+                        styleType="neutral"
+                        type="button"
+                        onClick={freeAgentHandler}
+                        disabled={isSubmitting}
+                    >
+                        Release to Free Agent
+                    </Button>
+                )}
 
-            {/* Only show "Set to Free Agent" if not already one */}
-            {player.teamId !== "free-agent" && (
+                {/* Only show "Transfer" if there are teams to transfer to */}
+                {teams.length > 0 && (
+                    <Button
+                        styleType="positive"
+                        type="submit"
+                        disabled={isSubmitting}
+                    >
+                        {player.teamId === "free-agent" ? "Sign to Team" : "Transfer"}
+                    </Button>
+                )}
+
                 <Button
-                    styleType="neutral"
+                    styleType="negative"
                     type="button"
-                    onClick={freeAgentHandler}
+                    onClick={() => navigate(-1)}
                     disabled={isSubmitting}
                 >
-                    Release to Free Agent
+                    Cancel
                 </Button>
-            )}
-
-            {/* Only show "Transfer" if there are teams to transfer to */}
-            {teams.length > 0 && (
-                <Button
-                    styleType="positive"
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {player.teamId === "free-agent" ? "Sign to Team" : "Transfer"}
-                </Button>
-            )}
-
-            <Button
-                styleType="negative"
-                type="button"
-                onClick={() => navigate(-1)}
-                disabled={isSubmitting}
-            >
-                Cancel
-            </Button>
+            </div>
         </form>
     );
 };

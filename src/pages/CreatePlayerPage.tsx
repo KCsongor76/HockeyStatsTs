@@ -4,6 +4,9 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
+import Checkbox from "../components/Checkbox";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
@@ -79,7 +82,6 @@ const CreatePlayerPage = () => {
         }
     };
 
-    // todo: outsource to Player.ts or Team.ts?
     const readFileAsText = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -129,18 +131,19 @@ const CreatePlayerPage = () => {
         }
     };
 
+    const positionOptions = Object.values(Position).map(p => ({value: p, label: p}));
+    const teamOptions = teams
+        .filter(team => team.id !== "free-agent")
+        .map(team => ({value: team.id, label: team.name}));
+
     return (
         <>
             <h1>Create New Player</h1>
             <h2>Upload Players from File</h2>
 
-            <label htmlFor="fileUpload">Upload player file (.txt)
-                (Line 1: Header/Ignored
-                Line 2: TeamID
-                Line 3+: JerseyNumber | Name | Position):
-            </label>
-            <input
+            <Input
                 id="fileUpload"
+                label="Upload player file (.txt) (Line 1: Header/Ignored, Line 2: TeamID, Line 3+: JerseyNumber | Name | Position):"
                 type="file"
                 accept=".txt"
                 onChange={handleFileUpload}
@@ -151,9 +154,9 @@ const CreatePlayerPage = () => {
 
             <h2>Create Player Manually</h2>
             <form onSubmit={submitHandler}>
-                <label htmlFor="name">Name:</label>
-                <input
+                <Input
                     id="name"
+                    label="Name:"
                     type="text"
                     value={playerData.name}
                     onChange={(e) => {
@@ -161,12 +164,12 @@ const CreatePlayerPage = () => {
                         setErrors(prev => ({...prev, name: ''}));
                     }}
                     required
+                    error={errors.name}
                 />
-                {errors.name && <span>{errors.name}</span>}
 
-                <label htmlFor="jerseyNumber">Jersey number:</label>
-                <input
+                <Input
                     id="jerseyNumber"
+                    label="Jersey number:"
                     type="number"
                     value={playerData.jerseyNumber}
                     onChange={(e) => {
@@ -176,47 +179,40 @@ const CreatePlayerPage = () => {
                     required
                     min={1}
                     max={99}
+                    error={errors.jerseyNumber}
                 />
-                {errors.jerseyNumber && <span>{errors.jerseyNumber}</span>}
 
-                <label htmlFor="position">Position:</label>
-                <select
+                <Select
                     id="position"
+                    label="Position:"
                     value={playerData.position}
                     onChange={(e) => setPlayerData(prev => ({...prev, position: e.target.value as Position}))}
-                >
-                    {Object.values(Position).map(position => (
-                        <option key={position} value={position}>{position}</option>
-                    ))}
-                </select>
+                    options={positionOptions}
+                />
 
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={isFreeAgent}
-                        onChange={() => setIsFreeAgent(!isFreeAgent)}
-                    />
-                    <span>Free Agent</span>
-                </label>
+                <Checkbox
+                    id="freeAgent"
+                    label="Free Agent"
+                    checked={isFreeAgent}
+                    onChange={() => setIsFreeAgent(!isFreeAgent)}
+                />
 
                 {!isFreeAgent && (
-                    <>
-                        <label htmlFor="team">Team:</label>
-                        <select
-                            id="team"
-                            value={playerData.teamId}
-                            onChange={(e) => setPlayerData(prev => ({...prev, teamId: e.target.value}))}
-                        >
-                            {teams.filter(team => team.id !== "free-agent").map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
-                        </select>
-                    </>
+                    <Select
+                        id="team"
+                        label="Team:"
+                        value={playerData.teamId}
+                        onChange={(e) => setPlayerData(prev => ({...prev, teamId: e.target.value}))}
+                        options={teamOptions}
+                    />
                 )}
 
                 {errors.general && <span>{errors.general}</span>}
-                <Button styleType={"positive"} type="submit">Create player</Button>
-                <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
+
+                <div>
+                    <Button styleType={"positive"} type="submit">Create player</Button>
+                    <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
+                </div>
             </form>
         </>
     );

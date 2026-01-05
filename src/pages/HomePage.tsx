@@ -25,11 +25,7 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
 
             <ul>
                 {menuItems.map((item, index) => (
-                    <li
-                        onClick={() => navigate(item.path)}
-                        data-testid="menu-item"
-                        key={index}
-                    >
+                    <li onClick={() => navigate(item.path)} key={index}>
                         <span>{item.icon}</span>
                         <h2>{item.title}</h2>
                         <p>{item.description}</p>

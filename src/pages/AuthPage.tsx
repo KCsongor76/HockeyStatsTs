@@ -7,6 +7,8 @@ import {
 } from 'firebase/auth';
 import {auth} from '../firebase';
 import {isAdmin} from '../admin';
+import Input from "../components/Input";
+import Button from "../components/Button";
 
 const AuthPage = () => {
     const navigate = useNavigate();
@@ -126,7 +128,9 @@ const AuthPage = () => {
                         <p>Check your email for the sign-in link</p>
                         <p>If you're on a different device, enter your email:</p>
                         <form onSubmit={handleEmailSubmit}>
-                            <input
+                            <Input
+                                id="email-verify"
+                                label="Your Email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -139,34 +143,35 @@ const AuthPage = () => {
                                     <option key={i} value={email}/>
                                 ))}
                             </datalist>
-                            <button type="submit">
+                            <Button styleType="positive" type="submit">
                                 Complete Sign-in
-                            </button>
+                            </Button>
                         </form>
                     </div>
                 ) : (
                     <form onSubmit={handleEmailSubmit}>
-                        <div>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Your email"
-                                required
-                                list="email-history"
-                            />
-                            <datalist id="email-history">
-                                {emailHistory.map((email, i) => (
-                                    <option key={i} value={email}/>
-                                ))}
-                            </datalist>
-                        </div>
-                        <button
+                        <Input
+                            id="email-signin"
+                            label="Your Email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Your email"
+                            required
+                            list="email-history"
+                        />
+                        <datalist id="email-history">
+                            {emailHistory.map((email, i) => (
+                                <option key={i} value={email}/>
+                            ))}
+                        </datalist>
+                        <Button
+                            styleType="positive"
                             type="submit"
                             disabled={isProcessing}
                         >
                             Send Sign-in Link
-                        </button>
+                        </Button>
                     </form>
                 )}
             </div>

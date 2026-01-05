@@ -5,6 +5,8 @@ import {Championship} from "../OOP/enums/Championship";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import Button from "../components/Button";
+import Input from "../components/Input";
+import Checkbox from "../components/Checkbox";
 import {ActionType} from "../OOP/enums/ActionType";
 import ExampleIcon from "../components/ExampleIcon";
 
@@ -95,48 +97,42 @@ const CreateTeamPage = () => {
     };
 
     return (
-
         <form onSubmit={submitHandler}>
             <h1>Create New Team</h1>
             {errors.general && <div>{errors.general}</div>}
 
-            <label htmlFor="name">Team Name:</label>
-            <input
+            <Input
                 id="name"
-                name="name"
+                label="Team Name:"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                error={errors.name}
             />
-            {errors.name && <span>{errors.name}</span>}
 
-            <label htmlFor="logo">Team Logo:</label>
-            <input
+            <Input
                 id="logo"
-                name="logo"
+                label="Team Logo:"
                 type="file"
                 accept="image/*"
                 onChange={handleLogoChange}
                 required
+                error={errors.logo}
             />
-            {errors.logo && <span>{errors.logo}</span>}
 
-
-            <label>Team Home Colors:</label>
-            <label htmlFor="homePrimary">Primary</label>
-            <input
+            <h3>Team Home Colors:</h3>
+            <Input
                 id="homePrimary"
-                name="homePrimary"
+                label="Primary"
                 type="color"
                 value={homeColor.primary}
                 onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
             />
 
-            <label htmlFor="homeSecondary">Secondary</label>
-            <input
+            <Input
                 id="homeSecondary"
-                name="homeSecondary"
+                label="Secondary"
                 type="color"
                 value={homeColor.secondary}
                 onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
@@ -149,20 +145,18 @@ const CreateTeamPage = () => {
             />
             {errors.colors && <span>{errors.colors}</span>}
 
-            <label>Team Away Colors:</label>
-            <label htmlFor="awayPrimary">Primary</label>
-            <input
+            <h3>Team Away Colors:</h3>
+            <Input
                 id="awayPrimary"
-                name="awayPrimary"
+                label="Primary"
                 type="color"
                 value={awayColor.primary}
                 onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
             />
 
-            <label htmlFor="awaySecondary">Secondary</label>
-            <input
+            <Input
                 id="awaySecondary"
-                name="awaySecondary"
+                label="Secondary"
                 type="color"
                 value={awayColor.secondary}
                 onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
@@ -174,21 +168,21 @@ const CreateTeamPage = () => {
                 color={awayColor.secondary}
             />
 
-            <label>Championships:</label>
+            <h3>Championships:</h3>
             {Object.values(Championship).map((championship) => (
-                <label key={championship}>
-                    {championship}
-                    <input
-                        type="checkbox"
-                        id={`champ-${championship}`}
-                        checked={championships.includes(championship)}
-                        onChange={() => toggleChampionship(championship)}
-                    />
-                </label>
+                <Checkbox
+                    key={championship}
+                    id={`champ-${championship}`}
+                    label={championship}
+                    checked={championships.includes(championship)}
+                    onChange={() => toggleChampionship(championship)}
+                />
             ))}
 
-            <Button styleType={"positive"} type="submit">Create Team</Button>
-            <Button styleType={"negative"} type="button" onClick={() => navigate("../")}>Go Back</Button>
+            <div>
+                <Button styleType={"positive"} type="submit">Create Team</Button>
+                <Button styleType={"negative"} type="button" onClick={() => navigate("../")}>Go Back</Button>
+            </div>
         </form>
     );
 };
