@@ -10,8 +10,6 @@ import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Position} from "../OOP/enums/Position";
 import Pagination from "../components/Pagination";
 import Button from "../components/Button";
-import Input from "../components/Input";
-import Select from "../components/Select";
 import styles from "./PlayerCRUDPage.module.css"
 import {CREATE} from "../OOP/constants/NavigationNames";
 
@@ -73,64 +71,78 @@ const PlayerCrudPage = () => {
             </div>
 
             <div className={styles.filters}>
-                <Input
-                    label="Search by name"
-                    type="text"
-                    name="nameSearch"
-                    value={filters.search}
-                    onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
-                    placeholder="Search by name"
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="nameSearch" className={styles.label}>Search by name</label>
+                    <input
+                        id="nameSearch"
+                        name="nameSearch"
+                        type="text"
+                        value={filters.search}
+                        onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
+                        placeholder="Search by name"
+                        className={styles.input}
+                    />
+                </div>
 
-                <Input
-                    label="Filter by jersey number"
-                    type="number"
-                    name="numberFilter"
-                    value={filters.jerseyNr}
-                    onChange={e => setFilters(prevState => ({...prevState, jerseyNr: e.target.value}))}
-                    placeholder="Search by jersey number"
-                    min={1}
-                    max={99}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="numberFilter" className={styles.label}>Filter by jersey number</label>
+                    <input
+                        id="numberFilter"
+                        name="numberFilter"
+                        type="number"
+                        value={filters.jerseyNr}
+                        onChange={e => setFilters(prevState => ({...prevState, jerseyNr: e.target.value}))}
+                        placeholder="Search by jersey number"
+                        min={1}
+                        max={99}
+                        className={styles.input}
+                    />
+                </div>
 
-                <Select
-                    label="Filter by team"
-                    value={filters.team}
-                    onChange={e => setFilters(prevState => ({...prevState, team: e.target.value}))}
-                    options={[
-                        {value: "", label: "All Teams"},
-                        ...teams.map(team => ({
-                            value: team.id,
-                            label: team.name
-                        }))
-                    ]}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="teamFilter" className={styles.label}>Filter by team</label>
+                    <select
+                        id="teamFilter"
+                        value={filters.team}
+                        onChange={e => setFilters(prevState => ({...prevState, team: e.target.value}))}
+                        className={styles.select}
+                    >
+                        <option value="">All Teams</option>
+                        {teams.map(team => (
+                            <option key={team.id} value={team.id}>{team.name}</option>
+                        ))}
+                    </select>
+                </div>
 
-                <Select
-                    label="Filter by position"
-                    value={filters.position}
-                    onChange={e => setFilters(prevState => ({...prevState, position: e.target.value}))}
-                    options={[
-                        {value: "", label: "All Positions"},
-                        ...Object.values(Position).map(position => ({
-                            value: position,
-                            label: position
-                        }))
-                    ]}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="positionFilter" className={styles.label}>Filter by position</label>
+                    <select
+                        id="positionFilter"
+                        value={filters.position}
+                        onChange={e => setFilters(prevState => ({...prevState, position: e.target.value}))}
+                        className={styles.select}
+                    >
+                        <option value="">All Positions</option>
+                        {Object.values(Position).map(pos => (
+                            <option key={pos} value={pos}>{pos}</option>
+                        ))}
+                    </select>
+                </div>
 
-                <Select
-                    label="Filter by season"
-                    value={filters.season}
-                    onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
-                    options={[
-                        {value: "", label: "All Seasons"},
-                        ...Object.values(Season).map(season => ({
-                            value: season,
-                            label: season
-                        }))
-                    ]}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="seasonFilter" className={styles.label}>Filter by season</label>
+                    <select
+                        id="seasonFilter"
+                        value={filters.season}
+                        onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
+                        className={styles.select}
+                    >
+                        <option value="">All Seasons</option>
+                        {Object.values(Season).map(season => (
+                            <option key={season} value={season}>{season}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             <ul className={styles.playerList}>

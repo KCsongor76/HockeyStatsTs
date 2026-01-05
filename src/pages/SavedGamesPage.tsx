@@ -8,7 +8,6 @@ import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
-import Select from "../components/Select";
 import styles from "./SavedGamesPage.module.css";
 import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -99,78 +98,93 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         <div className={styles.container}>
             {showFilters && (
                 <div className={styles.filters}>
-                    <Select
-                        label="Home team:"
-                        value={homeTeamId}
-                        onChange={(e) => setHomeTeamId(e.target.value)}
-                        options={[
-                            {value: "", label: "All Teams"},
-                            ...teams.map(team => ({
-                                value: team.id,
-                                label: team.name
-                            }))]}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="homeTeam" className={styles.label}>Home team:</label>
+                        <select
+                            id="homeTeam"
+                            value={homeTeamId}
+                            onChange={(e) => setHomeTeamId(e.target.value)}
+                            className={styles.select}
+                        >
+                            <option value="">All Teams</option>
+                            {teams.map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="Away team:"
-                        value={awayTeamId}
-                        onChange={(e) => setAwayTeamId(e.target.value)}
-                        options={[
-                            {value: "", label: "All Teams"},
-                            ...teams.map(team => ({
-                                value: team.id,
-                                label: team.name
-                            }))]}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="awayTeam" className={styles.label}>Away team:</label>
+                        <select
+                            id="awayTeam"
+                            value={awayTeamId}
+                            onChange={(e) => setAwayTeamId(e.target.value)}
+                            className={styles.select}
+                        >
+                            <option value="">All Teams</option>
+                            {teams.map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="Championship:"
-                        value={championship}
-                        onChange={(e) => setChampionship(e.target.value as Championship)}
-                        options={[
-                            {value: "", label: "All Championships"},
-                            ...Object.values(Championship).map(championship => ({
-                                value: championship,
-                                label: championship
-                            }))
-                        ]}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="championship" className={styles.label}>Championship:</label>
+                        <select
+                            id="championship"
+                            value={championship}
+                            onChange={(e) => setChampionship(e.target.value as Championship)}
+                            className={styles.select}
+                        >
+                            <option value="">All Championships</option>
+                            {Object.values(Championship).map(champ => (
+                                <option key={champ} value={champ}>{champ}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="Season:"
-                        value={season}
-                        onChange={(e) => setSeason(e.target.value as Season)}
-                        options={[
-                            {value: "", label: "All Seasons"},
-                            ...Object.values(Season).map(season => ({
-                                value: season,
-                                label: season
-                            }))
-                        ]}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="season" className={styles.label}>Season:</label>
+                        <select
+                            id="season"
+                            value={season}
+                            onChange={(e) => setSeason(e.target.value as Season)}
+                            className={styles.select}
+                        >
+                            <option value="">All Seasons</option>
+                            {Object.values(Season).map(s => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="GameType:"
-                        value={gameType}
-                        onChange={(e) => setGameType(e.target.value as GameType)}
-                        options={[
-                            {value: "", label: "All GameTypes"},
-                            ...Object.values(GameType).map(gameType => ({
-                                value: gameType,
-                                label: gameType
-                            }))
-                        ]}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="gameType" className={styles.label}>GameType:</label>
+                        <select
+                            id="gameType"
+                            value={gameType}
+                            onChange={(e) => setGameType(e.target.value as GameType)}
+                            className={styles.select}
+                        >
+                            <option value="">All GameTypes</option>
+                            {Object.values(GameType).map(gt => (
+                                <option key={gt} value={gt}>{gt}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="Sort order:"
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
-                        options={[
-                            {value: "newest", label: "Newest First"},
-                            {value: "oldest", label: "Oldest First"}
-                        ]}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="sortOrder" className={styles.label}>Sort order:</label>
+                        <select
+                            id="sortOrder"
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                            className={styles.select}
+                        >
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </div>
                 </div>
             )}
 

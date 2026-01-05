@@ -5,7 +5,6 @@ import {Championship} from "../OOP/enums/Championship";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import Button from "../components/Button";
-import Input from "../components/Input";
 import styles from "./CreateTeamPage.module.css";
 import {ActionType} from "../OOP/enums/ActionType";
 import ExampleIcon from "../components/ExampleIcon";
@@ -102,44 +101,64 @@ const CreateTeamPage = () => {
             <form onSubmit={submitHandler}>
                 {errors.general && <div className="error">{errors.general}</div>}
 
-                <Input
-                    label="Team Name:"
-                    type="text"
-                    name="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    error={errors.name}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="name" className={styles.label}>
+                        Team Name:
+                    </label>
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className={`${styles.input} ${errors.name ? styles.error : ''}`}
+                    />
+                    {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+                </div>
 
-                <Input
-                    label="Team Logo:"
-                    type="file"
-                    name="logo"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    required
-                    error={errors.logo}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="logo" className={styles.label}>
+                        Team Logo:
+                    </label>
+                    <input
+                        id="logo"
+                        name="logo"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        required
+                        className={`${styles.input} ${errors.logo ? styles.error : ''}`}
+                    />
+                    {errors.logo && <span className={styles.errorMessage}>{errors.logo}</span>}
+                </div>
 
                 <div className={styles.colorGroup}>
                     <div>
                         <label>Team Home Colors:</label>
-                        <Input
-                            label="Primary"
-                            type="color"
-                            name="homePrimary"
-                            value={homeColor.primary}
-                            onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="homePrimary" className={styles.label}>Primary</label>
+                            <input
+                                id="homePrimary"
+                                name="homePrimary"
+                                type="color"
+                                value={homeColor.primary}
+                                onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
+                                className={styles.input}
+                            />
+                        </div>
 
-                        <Input
-                            label="Secondary"
-                            type="color"
-                            name="homeSecondary"
-                            value={homeColor.secondary}
-                            onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="homeSecondary" className={styles.label}>Secondary</label>
+                            <input
+                                id="homeSecondary"
+                                name="homeSecondary"
+                                type="color"
+                                value={homeColor.secondary}
+                                onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
+                                className={styles.input}
+                            />
+                        </div>
                         <ExampleIcon
                             actionType={ActionType.GOAL}
                             backgroundColor={homeColor.primary}
@@ -150,21 +169,29 @@ const CreateTeamPage = () => {
 
                     <div>
                         <label>Team Away Colors:</label>
-                        <Input
-                            label="Primary"
-                            type="color"
-                            name="awayPrimary"
-                            value={awayColor.primary}
-                            onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="awayPrimary" className={styles.label}>Primary</label>
+                            <input
+                                id="awayPrimary"
+                                name="awayPrimary"
+                                type="color"
+                                value={awayColor.primary}
+                                onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
+                                className={styles.input}
+                            />
+                        </div>
 
-                        <Input
-                            label="Secondary"
-                            type="color"
-                            name="awaySecondary"
-                            value={awayColor.secondary}
-                            onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="awaySecondary" className={styles.label}>Secondary</label>
+                            <input
+                                id="awaySecondary"
+                                name="awaySecondary"
+                                type="color"
+                                value={awayColor.secondary}
+                                onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
+                                className={styles.input}
+                            />
+                        </div>
                         <ExampleIcon
                             actionType={ActionType.GOAL}
                             backgroundColor={awayColor.primary}

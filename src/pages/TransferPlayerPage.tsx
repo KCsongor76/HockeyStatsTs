@@ -5,7 +5,6 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import {PlayerService} from "../OOP/services/PlayerService";
 import Button from "../components/Button";
-import Select from "../components/Select";
 import styles from "./TransferPlayerPage.module.css"
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
@@ -75,18 +74,20 @@ const TransferPlayerPage = () => {
             </div>
 
             <form onSubmit={submitHandler} className={styles.form}>
-                <Select
-                    label="Transfer to:"
-                    value={selectedTeamId}
-                    onChange={(e) => setSelectedTeamId(e.target.value)}
-                    options={teams.filter(t => t.id !== team.id && t.id !== "free-agent")
-                        .map(t => ({
-                            value: t.id,
-                            label: t.name
-                        }))
-                    }
-                    error={errors.team}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="transferTeam" className={styles.label}>Transfer to:</label>
+                    <select
+                        id="transferTeam"
+                        value={selectedTeamId}
+                        onChange={(e) => setSelectedTeamId(e.target.value)}
+                        className={`${styles.select} ${errors.team ? styles.error : ''}`}
+                    >
+                        {teams.filter(t => t.id !== team.id && t.id !== "free-agent").map(t => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                    </select>
+                    {errors.team && <span className={styles.errorMessage}>{errors.team}</span>}
+                </div>
 
                 {errors.jersey && <span className={styles.error}>{errors.jersey}</span>}
                 {errors.general && <span className={styles.error}>{errors.general}</span>}

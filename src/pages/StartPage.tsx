@@ -8,8 +8,6 @@ import {GameType} from "../OOP/enums/GameType";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../firebase";
 import Button from "../components/Button";
-import Select from "../components/Select";
-import Input from "../components/Input";
 import styles from "./StartPage.module.css"
 import ExampleIcon from "../components/ExampleIcon";
 import {ActionType} from "../OOP/enums/ActionType";
@@ -219,78 +217,102 @@ const StartPage = () => {
         <div className={styles.container}>
             <form onSubmit={submitHandler}>
                 <div className={styles.formGrid}>
-                    <Select
-                        label="Season:"
-                        value={season}
-                        onChange={e => setSeason(e.target.value as Season)}
-                        options={Object.values(Season).map(s => ({
-                            value: s,
-                            label: s
-                        }))}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="season" className={styles.label}>Season:</label>
+                        <select
+                            id="season"
+                            value={season}
+                            onChange={e => setSeason(e.target.value as Season)}
+                            className={styles.select}
+                        >
+                            {Object.values(Season).map(s => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="Championship:"
-                        value={championship}
-                        onChange={e => setChampionship(e.target.value as Championship)}
-                        options={Object.values(Championship).map(ch => ({
-                            value: ch,
-                            label: ch
-                        }))}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="championship" className={styles.label}>Championship:</label>
+                        <select
+                            id="championship"
+                            value={championship}
+                            onChange={e => setChampionship(e.target.value as Championship)}
+                            className={styles.select}
+                        >
+                            {Object.values(Championship).map(ch => (
+                                <option key={ch} value={ch}>{ch}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <Select
-                        label="Home team:"
-                        value={homeTeamId}
-                        onChange={e => setHomeTeamId(e.target.value)}
-                        options={teams.filter(t => t.championships.includes(championship))
-                            .map(team => ({
-                                value: team.id,
-                                label: team.name
-                            }))
-                        }
-                        error={errors.homeTeamId}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="homeTeam" className={styles.label}>Home team:</label>
+                        <select
+                            id="homeTeam"
+                            value={homeTeamId}
+                            onChange={e => setHomeTeamId(e.target.value)}
+                            className={`${styles.select} ${errors.homeTeamId ? styles.error : ''}`}
+                        >
+                            {teams.filter(t => t.championships.includes(championship)).map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                        {errors.homeTeamId && <span className={styles.errorMessage}>{errors.homeTeamId}</span>}
+                    </div>
 
-                    <Select
-                        label="Away team:"
-                        value={awayTeamId}
-                        onChange={e => setAwayTeamId(e.target.value)}
-                        options={teams.filter(t => t.championships.includes(championship))
-                            .map(team => ({
-                                value: team.id,
-                                label: team.name
-                            }))
-                        }
-                        error={errors.awayTeamId}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="awayTeam" className={styles.label}>Away team:</label>
+                        <select
+                            id="awayTeam"
+                            value={awayTeamId}
+                            onChange={e => setAwayTeamId(e.target.value)}
+                            className={`${styles.select} ${errors.awayTeamId ? styles.error : ''}`}
+                        >
+                            {teams.filter(t => t.championships.includes(championship)).map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                        {errors.awayTeamId && <span className={styles.errorMessage}>{errors.awayTeamId}</span>}
+                    </div>
                     {errors.sameTeams && <span className={styles.error}>{errors.sameTeams}</span>}
 
-                    <Select
-                        label="Game type:"
-                        value={gameType}
-                        onChange={e => setGameType(e.target.value as GameType)}
-                        options={Object.values(GameType).map(gt => ({
-                            value: gt,
-                            label: gt
-                        }))}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="gameType" className={styles.label}>Game type:</label>
+                        <select
+                            id="gameType"
+                            value={gameType}
+                            onChange={e => setGameType(e.target.value as GameType)}
+                            className={styles.select}
+                        >
+                            {Object.values(GameType).map(gt => (
+                                <option key={gt} value={gt}>{gt}</option>
+                            ))}
+                        </select>
+                    </div>
 
                     <div className={styles.colorGroup}>
-                        <Input
-                            label="Home Primary color"
-                            type="color"
-                            value={homeColors.primary}
-                            onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="homePrimary" className={styles.label}>Home Primary color</label>
+                            <input
+                                id="homePrimary"
+                                type="color"
+                                value={homeColors.primary}
+                                onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
+                                className={styles.input}
+                            />
+                        </div>
 
-                        <Input
-                            label="Home Secondary color"
-                            type="color"
-                            value={homeColors.secondary}
-                            onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
-                            error={errors.homeColors}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="homeSecondary" className={styles.label}>Home Secondary color</label>
+                            <input
+                                id="homeSecondary"
+                                type="color"
+                                value={homeColors.secondary}
+                                onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
+                                className={`${styles.input} ${errors.homeColors ? styles.error : ''}`}
+                            />
+                            {errors.homeColors && <span className={styles.errorMessage}>{errors.homeColors}</span>}
+                        </div>
 
                         <ExampleIcon
                             actionType={ActionType.GOAL}
@@ -300,20 +322,28 @@ const StartPage = () => {
                     </div>
 
                     <div className={styles.colorGroup}>
-                        <Input
-                            label="Away Primary color"
-                            type="color"
-                            value={awayColors.primary}
-                            onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="awayPrimary" className={styles.label}>Away Primary color</label>
+                            <input
+                                id="awayPrimary"
+                                type="color"
+                                value={awayColors.primary}
+                                onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
+                                className={styles.input}
+                            />
+                        </div>
 
-                        <Input
-                            label="Away Secondary color"
-                            type="color"
-                            value={awayColors.secondary}
-                            onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
-                            error={errors.awayColors}
-                        />
+                        <div className={styles.inputContainer}>
+                            <label htmlFor="awaySecondary" className={styles.label}>Away Secondary color</label>
+                            <input
+                                id="awaySecondary"
+                                type="color"
+                                value={awayColors.secondary}
+                                onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
+                                className={`${styles.input} ${errors.awayColors ? styles.error : ''}`}
+                            />
+                            {errors.awayColors && <span className={styles.errorMessage}>{errors.awayColors}</span>}
+                        </div>
 
                         <ExampleIcon
                             actionType={ActionType.GOAL}

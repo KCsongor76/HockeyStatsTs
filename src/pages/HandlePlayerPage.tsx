@@ -10,12 +10,10 @@ import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import SavedGamesPage from "./SavedGamesPage";
-import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
-import Input from "../components/Input";
-import Select from "../components/Select";
 import styles from "./HandlePlayerPage.module.css"
 import {TRANSFER} from "../OOP/constants/NavigationNames";
+import {Player} from "../OOP/classes/Player";
 
 const HandlePlayerPage = () => {
     const data = useLocation();
@@ -149,29 +147,41 @@ const HandlePlayerPage = () => {
 
             {isEditing ? (
                 <div className={styles.editForm}>
-                    <Input
-                        label="Name:"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="name" className={styles.label}>Name:</label>
+                        <input
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className={styles.input}
+                        />
+                    </div>
 
-                    <Input
-                        label="Jersey number:"
-                        type="number"
-                        value={jerseyNumber}
-                        onChange={(e) => setJerseyNumber(Number(e.target.value))}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="jerseyNumber" className={styles.label}>Jersey number:</label>
+                        <input
+                            id="jerseyNumber"
+                            type="number"
+                            value={jerseyNumber}
+                            onChange={(e) => setJerseyNumber(Number(e.target.value))}
+                            className={styles.input}
+                        />
+                    </div>
 
-                    <Select
-                        label="Position:"
-                        value={position}
-                        onChange={(e) => setPosition(e.target.value as Position)}
-                        options={Object.values(Position).map(position => ({
-                            value: position,
-                            label: position
-                        }))}
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="position" className={styles.label}>Position:</label>
+                        <select
+                            id="position"
+                            value={position}
+                            onChange={(e) => setPosition(e.target.value as Position)}
+                            className={styles.select}
+                        >
+                            {Object.values(Position).map(pos => (
+                                <option key={pos} value={pos}>{pos}</option>
+                            ))}
+                        </select>
+                    </div>
 
                     {error && <p style={{color: 'red'}}>{error}</p>}
                     <div className={styles.buttonGroup}>
@@ -186,42 +196,112 @@ const HandlePlayerPage = () => {
                 </div>
             )}
 
-            <Select
-                label="Season:"
-                value={selectedSeason}
-                onChange={(e) => setSelectedSeason(e.target.value as Season)}
-                options={[
-                    {value: "", label: "All Seasons"},
-                    ...Object.values(Season).map(season => ({
-                        value: season,
-                        label: season
-                    }))
-                ]}
-            />
+            <div className={styles.inputContainer}>
+                <label htmlFor="seasonFilter" className={styles.label}>Season:</label>
+                <select
+                    id="seasonFilter"
+                    value={selectedSeason}
+                    onChange={(e) => setSelectedSeason(e.target.value as Season)}
+                    className={styles.select}
+                >
+                    <option value="">All Seasons</option>
+                    {Object.values(Season).map(season => (
+                        <option key={season} value={season}>{season}</option>
+                    ))}
+                </select>
+            </div>
 
             {availableTeams.length > 1 && (
-                <Select
-                    label="Team:"
-                    value={selectedTeamId}
-                    onChange={(e) => setSelectedTeamId(e.target.value)}
-                    options={[
-                        {value: "", label: "All Teams"},
-                        ...availableTeams.map(team => ({
-                            value: team.id,
-                            label: team.name
-                        }))
-                    ]}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="teamFilter" className={styles.label}>Team:</label>
+                    <select
+                        id="teamFilter"
+                        value={selectedTeamId}
+                        onChange={(e) => setSelectedTeamId(e.target.value)}
+                        className={styles.select}
+                    >
+                        <option value="">All Teams</option>
+                        {availableTeams.map(team => (
+                            <option key={team.id} value={team.id}>{team.name}</option>
+                        ))}
+                    </select>
+                </div>
             )}
 
             <div className={styles.statsSection}>
                 <h3>Regular Season Players Stats</h3>
-                <PlayerTable pageType="player" player={player} games={filteredGamesRegular}/>
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>#</th>
+                            <th>Position</th>
+                            <th>GP</th>
+                            <th>G</th>
+                            <th>A</th>
+                            <th>P</th>
+                            <th>S</th>
+                            <th>H</th>
+                            <th>T</th>
+                            <th>S%</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{player.name}</td>
+                            <td>{player.jerseyNumber}</td>
+                            <td>{player.position}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).gamesPlayed || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).goals || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).assists || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).points || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).shots || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).hits || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesRegular, player).turnovers || 0}</td>
+                            <td>{(Player.getPlayerStats(filteredGamesRegular, player).shotPercentage || 0).toFixed(2)}%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div className={styles.statsSection}>
                 <h3>Playoff Players Stats</h3>
-                <PlayerTable pageType="player" player={player} games={filteredGamesPlayoff}/>
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>#</th>
+                            <th>Position</th>
+                            <th>GP</th>
+                            <th>G</th>
+                            <th>A</th>
+                            <th>P</th>
+                            <th>S</th>
+                            <th>H</th>
+                            <th>T</th>
+                            <th>S%</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{player.name}</td>
+                            <td>{player.jerseyNumber}</td>
+                            <td>{player.position}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).gamesPlayed || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).goals || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).assists || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).points || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).shots || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).hits || 0}</td>
+                            <td>{Player.getPlayerStats(filteredGamesPlayoff, player).turnovers || 0}</td>
+                            <td>{(Player.getPlayerStats(filteredGamesPlayoff, player).shotPercentage || 0).toFixed(2)}%</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div className={styles.statsSection}>

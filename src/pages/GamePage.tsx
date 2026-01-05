@@ -4,6 +4,7 @@ import {useBlocker} from 'react-router-dom';
 import {Season} from "../OOP/enums/Season";
 import {Championship} from "../OOP/enums/Championship";
 import {GameType} from "../OOP/enums/GameType";
+import {RegularPeriod, PlayoffPeriod} from "../OOP/enums/Period";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import styles from "./GamePage.module.css";
 import ActionSelectorModal from "../modals/ActionSelectorModal";
@@ -19,12 +20,9 @@ import {Position} from "../OOP/enums/Position";
 import ActionDetailsModal from "../modals/ActionDetailsModal";
 import {IGame} from "../OOP/interfaces/IGame";
 import {GameService} from "../OOP/services/GameService";
-import PlayerTable from "../components/PlayerTable";
 import Button from "../components/Button";
-import PeriodFilters from "../components/PeriodFilters";
-import ActionTypeFilters from "../components/ActionTypeFilters";
-import ActionsTable from "../components/ActionsTable";
 import {START} from "../OOP/constants/NavigationNames";
+import {Player} from "../OOP/classes/Player";
 
 interface GameSetup {
     season: Season;
@@ -36,6 +34,10 @@ interface GameSetup {
     homeColors: { primary: string; secondary: string };
     awayColors: { primary: string; secondary: string };
 }
+
+type SortField = 'type' | 'period' | 'time' | 'team' | 'player';
+type SortDirection = 'asc' | 'desc';
+type PlayerSortField = 'name' | 'jerseyNumber' | 'goals' | 'assists' | 'points' | 'shots' | 'hits' | 'turnovers' | 'shotPercentage';
 
 const GamePage = () => {
     const location = useLocation();
@@ -73,6 +75,11 @@ const GamePage = () => {
         ({currentLocation, nextLocation}) =>
             !isFinalizing && actions.length > 0 && currentLocation.pathname !== nextLocation.pathname
     );
+
+    const [sortField, setSortField] = useState<SortField>('period');
+    const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+    const [playerSortField, setPlayerSortField] = useState<PlayerSortField>('points');
+    const [playerSortDirection, setPlayerSortDirection] = useState<SortDirection>('desc');
 
     const handleRinkClick = (e: React.MouseEvent<HTMLImageElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -534,6 +541,196 @@ const GamePage = () => {
         saveGameToLocalStorage();
     }, [actions, autosave]);
 
+    const handleSort = (field: SortField) => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    };
+
+    const handlePlayerSort = (field: PlayerSortField) => {
+        if (playerSortField === field) {
+            setPlayerSortDirection(playerSortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setPlayerSortField(field);
+            setPlayerSortDirection('asc');
+        }
+    };
+
+    const getPeriodStartTime = (period: number): number => {
+        if (!gameSetup) return 0;
+        if (gameSetup.gameType === GameType.REGULAR) {
+            switch (period) {
+                case RegularPeriod.FIRST: return 0;
+                case RegularPeriod.SECOND: return 20 * 60;
+                case RegularPeriod.THIRD: return 40 * 60;
+                case RegularPeriod.OT: return 60 * 60;
+                case RegularPeriod.SO: return 65 * 60;
+                default: return (period - 1) * 20 * 60;
+            }
+        } else {
+            switch (period) {
+                case PlayoffPeriod.FIRST: return 0;
+                case PlayoffPeriod.SECOND: return 20 * 60;
+                case PlayoffPeriod.THIRD: return 40 * 60;
+                default:
+                    // Overtime periods: 60 minutes + (period - 3) * 20 minutes
+                    return 60 * 60 + (period - PlayoffPeriod.THIRD) * 20 * 60;
+            }
+        }
+    };
+
+    const getTotalGameTime = (action: IGameAction): number => {
+        const periodStart = getPeriodStartTime(action.period);
+        return periodStart + action.time;
+    };
+
+    const formatGameTime = (totalSeconds: number): string => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const getPeriodLabel = (period: number): string => {
+        if (!gameSetup) return `${period}`;
+        if (gameSetup.gameType === GameType.REGULAR) {
+            switch (period) {
+                case RegularPeriod.FIRST: return '1st';
+                case RegularPeriod.SECOND: return '2nd';
+                case RegularPeriod.THIRD: return '3rd';
+                case RegularPeriod.OT: return 'OT';
+                case RegularPeriod.SO: return 'SO';
+                default: return `${period}`;
+            }
+        } else {
+            switch (period) {
+                case PlayoffPeriod.FIRST: return '1st';
+                case PlayoffPeriod.SECOND: return '2nd';
+                case PlayoffPeriod.THIRD: return '3rd';
+                default: return `OT${period - PlayoffPeriod.THIRD}`;
+            }
+        }
+    };
+
+    const getPeriodFilterLabel = (period: number): string => {
+        if (gameSetup?.gameType === GameType.PLAYOFF) {
+            return PlayoffPeriod[period] || period.toString();
+        } else {
+            return RegularPeriod[period] || period.toString();
+        }
+    };
+
+    const sortedActions = [...actions].sort((a, b) => {
+        let aValue: any, bValue: any;
+
+        switch (sortField) {
+            case 'type':
+                aValue = a.type;
+                bValue = b.type;
+                break;
+            case 'period':
+                aValue = getTotalGameTime(a);
+                bValue = getTotalGameTime(b);
+                break;
+            case 'time':
+                aValue = getTotalGameTime(a);
+                bValue = getTotalGameTime(b);
+                break;
+            case 'team':
+                aValue = a.team.name;
+                bValue = b.team.name;
+                break;
+            case 'player':
+                aValue = a.player.name;
+                bValue = b.player.name;
+                break;
+            default:
+                return 0;
+        }
+
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const sortPlayers = (players: IPlayer[]) => {
+        return [...players].sort((a, b) => {
+            if (!currentGame) return 0;
+            const statsA = Player.getPlayerStats([currentGame], a);
+            const statsB = Player.getPlayerStats([currentGame], b);
+
+            let valueA: any;
+            let valueB: any;
+
+            switch (playerSortField) {
+                case 'name':
+                    valueA = a.name.toLowerCase();
+                    valueB = b.name.toLowerCase();
+                    break;
+                case 'jerseyNumber':
+                    valueA = a.jerseyNumber;
+                    valueB = b.jerseyNumber;
+                    break;
+                case 'goals':
+                    valueA = statsA.goals || 0;
+                    valueB = statsB.goals || 0;
+                    break;
+                case 'assists':
+                    valueA = statsA.assists || 0;
+                    valueB = statsB.assists || 0;
+                    break;
+                case 'points':
+                    valueA = statsA.points || 0;
+                    valueB = statsB.points || 0;
+                    break;
+                case 'shots':
+                    valueA = statsA.shots || 0;
+                    valueB = statsB.shots || 0;
+                    break;
+                case 'hits':
+                    valueA = statsA.hits || 0;
+                    valueB = statsB.hits || 0;
+                    break;
+                case 'turnovers':
+                    valueA = statsA.turnovers || 0;
+                    valueB = statsB.turnovers || 0;
+                    break;
+                case 'shotPercentage':
+                    valueA = statsA.shotPercentage || 0;
+                    valueB = statsB.shotPercentage || 0;
+                    break;
+                default:
+                    return 0;
+            }
+            if (valueA < valueB) return playerSortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return playerSortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    };
+
+    const renderSortableHeader = (field: SortField, label: string) => (
+        <th
+            onClick={() => handleSort(field)}
+            className={styles.sortableHeader}
+        >
+            {label}
+            {sortField === field && (
+                <span className={styles.sortIndicator}>{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>
+            )}
+        </th>
+    );
+
+    const renderPlayerSortableHeader = (field: PlayerSortField, label: string) => (
+        <th onClick={() => handlePlayerSort(field)} className={styles.sortableHeader}>
+            {label}
+            {playerSortField === field && (
+                <span className={styles.sortIndicator}>{playerSortDirection === 'asc' ? ' ↑' : ' ↓'}</span>
+            )}
+        </th>
+    );
+
     if (!gameSetup || !currentGame) {
         return <div>Loading game data...</div>;
     }
@@ -686,19 +883,34 @@ const GamePage = () => {
             </div>
 
             <h3 style={{textAlign: 'center'}}>Available Period Filters</h3>
-            <PeriodFilters
-                availablePeriods={availablePeriods}
-                selectedPeriods={selectedPeriods}
-                togglePeriod={togglePeriod}
-                gameType={gameSetup.gameType}
-            />
+            <div className={styles.filterContainer}>
+                {availablePeriods.length > 0 ? availablePeriods.map(period => (
+                    <Button
+                        styleType={"neutral"}
+                        key={period}
+                        type="button"
+                        className={selectedPeriods.includes(period) ? styles.activeButton : ''}
+                        onClick={() => togglePeriod(period)}
+                    >
+                        {getPeriodFilterLabel(period)}
+                    </Button>
+                )) : <p>No available period data yet.</p>}
+            </div>
 
             <h3 style={{textAlign: 'center'}}>Available Action Type Filters</h3>
-            <ActionTypeFilters
-                availableActionTypes={availableActionTypes}
-                selectedActionTypes={selectedActionTypes}
-                toggleActionType={toggleActionType}
-            />
+            <div className={styles.filterContainer}>
+                {availableActionTypes.length > 0 ? availableActionTypes.map(type => (
+                    <Button
+                        styleType={"neutral"}
+                        key={type}
+                        type="button"
+                        className={selectedActionTypes.includes(type) ? styles.activeButton : ''}
+                        onClick={() => toggleActionType(type)}
+                    >
+                        {type}
+                    </Button>
+                )) : <p>No available action type data yet.</p>}
+            </div>
 
             <div className={styles.rinkContainer}>
                 <img src={gameSetup.rinkImage} alt="rink"/>
@@ -720,32 +932,134 @@ const GamePage = () => {
 
             <h3 style={{textAlign: 'center'}}>Skaters</h3>
             {currentGame && (
-                <PlayerTable
-                    pageType="game"
-                    players={getFilteredPlayers().filter(p => p.position !== Position.GOALIE)}
-                    games={[currentGame]}
-                    selectedPlayer={selectedPlayer}
-                    togglePlayer={togglePlayer}
-                />
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr>
+                            {renderPlayerSortableHeader('name', 'Name')}
+                            {renderPlayerSortableHeader('jerseyNumber', '#')}
+                            {renderPlayerSortableHeader('goals', 'G')}
+                            {renderPlayerSortableHeader('assists', 'A')}
+                            {renderPlayerSortableHeader('points', 'P')}
+                            {renderPlayerSortableHeader('shots', 'S')}
+                            {renderPlayerSortableHeader('hits', 'H')}
+                            {renderPlayerSortableHeader('turnovers', 'T')}
+                            {renderPlayerSortableHeader('shotPercentage', 'S%')}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {sortPlayers(getFilteredPlayers().filter(p => p.position !== Position.GOALIE)).map(player => (
+                            <tr
+                                key={player.id}
+                                className={selectedPlayer === player.id ? styles.selectedRow : ''}
+                                onClick={() => togglePlayer(player.id)}
+                            >
+                                <td>{player.name}</td>
+                                <td>{player.jerseyNumber}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).goals}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).assists}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).points}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).shots}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).hits}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).turnovers}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).shotPercentage.toFixed(2)}%</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
 
             <h3 style={{textAlign: 'center'}}>Goalies</h3>
             {currentGame && (
-                <PlayerTable
-                    pageType="game"
-                    players={getFilteredPlayers().filter(p => p.position === Position.GOALIE)}
-                    games={[currentGame]}
-                    selectedPlayer={selectedPlayer}
-                    togglePlayer={togglePlayer}
-                />
+                <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr>
+                            {renderPlayerSortableHeader('name', 'Name')}
+                            {renderPlayerSortableHeader('jerseyNumber', '#')}
+                            {renderPlayerSortableHeader('goals', 'G')}
+                            {renderPlayerSortableHeader('assists', 'A')}
+                            {renderPlayerSortableHeader('points', 'P')}
+                            {renderPlayerSortableHeader('shots', 'S')}
+                            {renderPlayerSortableHeader('hits', 'H')}
+                            {renderPlayerSortableHeader('turnovers', 'T')}
+                            {renderPlayerSortableHeader('shotPercentage', 'S%')}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {sortPlayers(getFilteredPlayers().filter(p => p.position === Position.GOALIE)).map(player => (
+                            <tr
+                                key={player.id}
+                                className={selectedPlayer === player.id ? styles.selectedRow : ''}
+                                onClick={() => togglePlayer(player.id)}
+                            >
+                                <td>{player.name}</td>
+                                <td>{player.jerseyNumber}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).goals}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).assists}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).points}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).shots}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).hits}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).turnovers}</td>
+                                <td>{Player.getPlayerStats([currentGame], player).shotPercentage.toFixed(2)}%</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
 
-            <ActionsTable
-                actions={actions}
-                gameType={gameSetup.gameType}
-                onActionEdit={handleActionEdit}
-                onActionDelete={handleActionDelete}
-            />
+            <div className={styles.tableContainer}>
+                <h3>All Actions</h3>
+                <table className={styles.table}>
+                    <thead>
+                    <tr>
+                        {renderSortableHeader('type', 'Type')}
+                        {renderSortableHeader('period', 'Period')}
+                        {renderSortableHeader('time', 'Time')}
+                        {renderSortableHeader('team', 'Team')}
+                        {renderSortableHeader('player', 'Player')}
+                        <th>Assists</th>
+                        <th>View</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {sortedActions.map((action, index) => (
+                        <tr key={index}>
+                            <td>{action.type}</td>
+                            <td>{getPeriodLabel(action.period)}</td>
+                            <td>{formatGameTime(getTotalGameTime(action))}</td>
+                            <td>{action.team.name}</td>
+                            <td>#{action.player.jerseyNumber} {action.player.name}</td>
+                            <td>
+                                {action.assists && action.assists.length > 0
+                                    ? action.assists.map(a => `#${a.jerseyNumber} ${a.name}`).join(', ')
+                                    : '-'
+                                }
+                            </td>
+                            <td>
+                                <Button
+                                    styleType="neutral"
+                                    onClick={() => handleActionEdit(action)}
+                                >
+                                    View
+                                </Button>
+                            </td>
+                            <td>
+                                <Button
+                                    styleType="negative"
+                                    onClick={() => handleActionDelete(action)}
+                                >
+                                    Delete
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
 
             <ActionSelectorModal
                 isOpen={modalStep === 'action'}

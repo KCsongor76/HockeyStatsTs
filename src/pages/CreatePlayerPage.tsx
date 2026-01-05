@@ -5,8 +5,6 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import Button from "../components/Button";
-import Input from "../components/Input";
-import Select from "../components/Select";
 import styles from "./CreatePlayerPage.module.css";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
@@ -204,12 +202,16 @@ const CreatePlayerPage = () => {
 
             <div className={styles.uploadSection}>
                 <h2>Upload Players from File</h2>
-                <Input
-                    label="Upload player file (.txt):"
-                    type="file"
-                    accept=".txt"
-                    onChange={handleFileUpload}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="fileUpload" className={styles.label}>Upload player file (.txt):</label>
+                    <input
+                        id="fileUpload"
+                        type="file"
+                        accept=".txt"
+                        onChange={handleFileUpload}
+                        className={styles.input}
+                    />
+                </div>
                 {isUploading && <p>Uploading players...</p>}
                 {uploadStatus && (
                     <p className={uploadStatus.includes('Error') ? styles.errorText : styles.successText}>
@@ -223,43 +225,53 @@ const CreatePlayerPage = () => {
             {/* Manual Player Creation Form */}
             <h2>Create Player Manually</h2>
             <form onSubmit={submitHandler}>
-                <Input
-                    label="Name:"
-                    type="text"
-                    value={playerData.name}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, name: e.target.value}))
-                        setErrors(prev => ({...prev, name: ''}))
-                    }}
-                    required
-                    error={errors.name}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="name" className={styles.label}>Name:</label>
+                    <input
+                        id="name"
+                        type="text"
+                        value={playerData.name}
+                        onChange={(e) => {
+                            setPlayerData(prev => ({...prev, name: e.target.value}))
+                            setErrors(prev => ({...prev, name: ''}))
+                        }}
+                        required
+                        className={`${styles.input} ${errors.name ? styles.error : ''}`}
+                    />
+                    {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+                </div>
 
-                <Input
-                    label="Jersey number:"
-                    type="number"
-                    value={playerData.jerseyNumber}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, jerseyNumber: Number(e.target.value)}))
-                        setErrors(prev => ({...prev, jerseyNumber: ''}))
-                    }}
-                    required
-                    min={1}
-                    max={99}
-                    error={errors.jerseyNumber}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="jerseyNumber" className={styles.label}>Jersey number:</label>
+                    <input
+                        id="jerseyNumber"
+                        type="number"
+                        value={playerData.jerseyNumber}
+                        onChange={(e) => {
+                            setPlayerData(prev => ({...prev, jerseyNumber: Number(e.target.value)}))
+                            setErrors(prev => ({...prev, jerseyNumber: ''}))
+                        }}
+                        required
+                        min={1}
+                        max={99}
+                        className={`${styles.input} ${errors.jerseyNumber ? styles.error : ''}`}
+                    />
+                    {errors.jerseyNumber && <span className={styles.errorMessage}>{errors.jerseyNumber}</span>}
+                </div>
 
-                <Select
-                    label="Position:"
-                    value={playerData.position}
-                    onChange={(e) => {
-                        setPlayerData(prev => ({...prev, position: e.target.value as Position}))
-                    }}
-                    options={Object.values(Position).map(position => ({
-                        value: position,
-                        label: position
-                    }))}
-                />
+                <div className={styles.inputContainer}>
+                    <label htmlFor="position" className={styles.label}>Position:</label>
+                    <select
+                        id="position"
+                        value={playerData.position}
+                        onChange={(e) => setPlayerData(prev => ({...prev, position: e.target.value as Position}))}
+                        className={styles.select}
+                    >
+                        {Object.values(Position).map(position => (
+                            <option key={position} value={position}>{position}</option>
+                        ))}
+                    </select>
+                </div>
 
                 {/* Fixed checkbox with proper styling */}
                 <div className={styles.formGroup}>
@@ -280,20 +292,19 @@ const CreatePlayerPage = () => {
                 </div>
 
                 {!isFreeAgent && (
-                    <Select
-                        label="Team:"
-                        value={playerData.teamId}
-                        onChange={(e) => {
-                            setPlayerData(prev => ({...prev, teamId: e.target.value}))
-                        }}
-                        options={teams
-                            .filter(team => team.id !== "free-agent")
-                            .map(team => ({
-                                value: team.id,
-                                label: team.name
-                            }))
-                        }
-                    />
+                    <div className={styles.inputContainer}>
+                        <label htmlFor="team" className={styles.label}>Team:</label>
+                        <select
+                            id="team"
+                            value={playerData.teamId}
+                            onChange={(e) => setPlayerData(prev => ({...prev, teamId: e.target.value}))}
+                            className={styles.select}
+                        >
+                            {teams.filter(team => team.id !== "free-agent").map(team => (
+                                <option key={team.id} value={team.id}>{team.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 )}
 
                 {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
