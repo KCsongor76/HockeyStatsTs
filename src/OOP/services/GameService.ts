@@ -1,41 +1,44 @@
 import {collection, deleteDoc, doc, getDocs, setDoc} from "firebase/firestore";
 import {db} from "../../firebase";
 import {IGame} from "../interfaces/IGame";
+import {Game} from "../classes/Game";
 
 export class GameService {
     private static collectionRef = collection(db, 'games');
 
-    static saveGame = async (game: IGame) => {
-        const docRef = doc(this.collectionRef); // Generate ID upfront
+    static saveGame = async (game: IGame): Promise<Game> => {
+        const docRef = doc(this.collectionRef);
         const gameWithId = {...game, id: docRef.id};
-        await setDoc(docRef, gameWithId); // Single write operation
-        return gameWithId as IGame;
+        await setDoc(docRef, gameWithId);
+        return new Game(gameWithId);
     }
 
-    static getAllGames = async () => {
+    static getAllGames = async (): Promise<Game[]> => {
         const querySnapshot = await getDocs(this.collectionRef);
-        return querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()} as IGame));
+        return querySnapshot.docs.map(doc =>
+            new Game({id: doc.id, ...doc.data()} as IGame)
+        );
     }
 
     static deleteGame = async (game: IGame) => {
-        const id = game.id;
-        const docRef = doc(this.collectionRef, id);
+        if (!game.id) return;
+        const docRef = doc(this.collectionRef, game.id);
         await deleteDoc(docRef);
     }
 
-    static updateGame = async (game: IGame) => {
+    static updateGame = async (game: IGame): Promise<Game> => {
         if (!game.id) {
             throw new Error("Cannot update game without an ID");
         }
 
         const docRef = doc(this.collectionRef, game.id);
-
-        // Using setDoc with merge: true will update existing fields and add new ones
-        await setDoc(docRef, {
+        const updatedData = {
             ...game,
             timestamp: new Date().toISOString()
-        }, { merge: true });
+        };
 
-        return game;
+        await setDoc(docRef, updatedData, {merge: true});
+
+        return new Game(updatedData);
     }
 }

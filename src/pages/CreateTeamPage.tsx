@@ -95,125 +95,101 @@ const CreateTeamPage = () => {
     };
 
     return (
-        <div>
+
+        <form onSubmit={submitHandler}>
             <h1>Create New Team</h1>
-            <form onSubmit={submitHandler}>
-                {errors.general && <div>{errors.general}</div>}
+            {errors.general && <div>{errors.general}</div>}
 
-                <div>
-                    <label htmlFor="name">
-                        Team Name:
-                    </label>
+            <label htmlFor="name">Team Name:</label>
+            <input
+                id="name"
+                name="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+            />
+            {errors.name && <span>{errors.name}</span>}
+
+            <label htmlFor="logo">Team Logo:</label>
+            <input
+                id="logo"
+                name="logo"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                required
+            />
+            {errors.logo && <span>{errors.logo}</span>}
+
+
+            <label>Team Home Colors:</label>
+            <label htmlFor="homePrimary">Primary</label>
+            <input
+                id="homePrimary"
+                name="homePrimary"
+                type="color"
+                value={homeColor.primary}
+                onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
+            />
+
+            <label htmlFor="homeSecondary">Secondary</label>
+            <input
+                id="homeSecondary"
+                name="homeSecondary"
+                type="color"
+                value={homeColor.secondary}
+                onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
+            />
+
+            <ExampleIcon
+                actionType={ActionType.GOAL}
+                backgroundColor={homeColor.primary}
+                color={homeColor.secondary}
+            />
+            {errors.colors && <span>{errors.colors}</span>}
+
+            <label>Team Away Colors:</label>
+            <label htmlFor="awayPrimary">Primary</label>
+            <input
+                id="awayPrimary"
+                name="awayPrimary"
+                type="color"
+                value={awayColor.primary}
+                onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
+            />
+
+            <label htmlFor="awaySecondary">Secondary</label>
+            <input
+                id="awaySecondary"
+                name="awaySecondary"
+                type="color"
+                value={awayColor.secondary}
+                onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
+            />
+
+            <ExampleIcon
+                actionType={ActionType.GOAL}
+                backgroundColor={awayColor.primary}
+                color={awayColor.secondary}
+            />
+
+            <label>Championships:</label>
+            {Object.values(Championship).map((championship) => (
+                <label key={championship}>
+                    {championship}
                     <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
+                        type="checkbox"
+                        id={`champ-${championship}`}
+                        checked={championships.includes(championship)}
+                        onChange={() => toggleChampionship(championship)}
                     />
-                    {errors.name && <span>{errors.name}</span>}
-                </div>
+                </label>
+            ))}
 
-                <div>
-                    <label htmlFor="logo">
-                        Team Logo:
-                    </label>
-                    <input
-                        id="logo"
-                        name="logo"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoChange}
-                        required
-                    />
-                    {errors.logo && <span>{errors.logo}</span>}
-                </div>
-
-                <div>
-                    <div>
-                        <label>Team Home Colors:</label>
-                        <div>
-                            <label htmlFor="homePrimary">Primary</label>
-                            <input
-                                id="homePrimary"
-                                name="homePrimary"
-                                type="color"
-                                value={homeColor.primary}
-                                onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="homeSecondary">Secondary</label>
-                            <input
-                                id="homeSecondary"
-                                name="homeSecondary"
-                                type="color"
-                                value={homeColor.secondary}
-                                onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
-                            />
-                        </div>
-                        <ExampleIcon
-                            actionType={ActionType.GOAL}
-                            backgroundColor={homeColor.primary}
-                            color={homeColor.secondary}
-                        />
-                        {errors.colors && <span>{errors.colors}</span>}
-                    </div>
-
-                    <div>
-                        <label>Team Away Colors:</label>
-                        <div>
-                            <label htmlFor="awayPrimary">Primary</label>
-                            <input
-                                id="awayPrimary"
-                                name="awayPrimary"
-                                type="color"
-                                value={awayColor.primary}
-                                onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="awaySecondary">Secondary</label>
-                            <input
-                                id="awaySecondary"
-                                name="awaySecondary"
-                                type="color"
-                                value={awayColor.secondary}
-                                onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
-                            />
-                        </div>
-                        <ExampleIcon
-                            actionType={ActionType.GOAL}
-                            backgroundColor={awayColor.primary}
-                            color={awayColor.secondary}
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label>Championships:</label>
-                    {Object.values(Championship).map((championship) => (
-                        <label key={championship}>
-                            {championship}
-                            <input
-                                type="checkbox"
-                                id={`champ-${championship}`}
-                                checked={championships.includes(championship)}
-                                onChange={() => toggleChampionship(championship)}
-                            />
-                        </label>
-                    ))}
-                </div>
-
-                <div>
-                    <Button styleType={"positive"} type="submit">Create Team</Button>
-                    <Button styleType={"negative"} type="button" onClick={() => navigate("../")}>Go Back</Button>
-                </div>
-            </form>
-        </div>
+            <Button styleType={"positive"} type="submit">Create Team</Button>
+            <Button styleType={"negative"} type="button" onClick={() => navigate("../")}>Go Back</Button>
+        </form>
     );
 };
 

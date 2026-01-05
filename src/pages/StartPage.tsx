@@ -2,641 +2,290 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {TeamService} from "../OOP/services/TeamService";
 import {Season} from "../OOP/enums/Season";
-import {Championship} from "../OOP/enums/Championship";
-import {ITeam} from "../OOP/interfaces/ITeam";
+import {Championship, CHAMPIONSHIP_RULES} from "../OOP/enums/Championship";
+import {Team} from "../OOP/classes/Team";
 import {GameType} from "../OOP/enums/GameType";
+import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../firebase";
 import Button from "../components/Button";
 import ExampleIcon from "../components/ExampleIcon";
 import {ActionType} from "../OOP/enums/ActionType";
 import {GAME} from "../OOP/constants/NavigationNames";
+import {TeamRosterSelector} from "../components/TeamRosterSelector";
+import {GameSetupValidator} from "../OOP/classes/GameSetupValidator";
 
 const StartPage = () => {
-    const loaderData = useLoaderData();
-    const teamsFromLoader = loaderData.teams as ITeam[]
-    const [teams, setTeams] = useState<ITeam[]>(teamsFromLoader.map(t => ({...t, roster: t.roster || []})));
+    const loaderData = useLoaderData() as { teams: Team[], rinkDown: string, rinkUp: string };
     const rinkImages = {rinkUp: loaderData.rinkUp, rinkDown: loaderData.rinkDown};
+
+    const [gameType, setGameType] = useState<GameType>(GameType.REGULAR);
+
+    const [teams, setTeams] = useState<Team[]>(loaderData.teams);
+    const defaultTeams = teams.filter(t => t.championships.includes(championship));
 
     const [season, setSeason] = useState<Season>(Season.SEASON_2025_2026);
     const [championship, setChampionship] = useState<Championship>(Championship.ERSTE_LEAGUE);
-    const [gameType, setGameType] = useState<GameType>(GameType.REGULAR);
-    const [homeTeamId, setHomeTeamId] = useState<string>(teams.filter(t => t.championships.includes(championship))[0]?.id || '');
-    const [awayTeamId, setAwayTeamId] = useState<string>(teams.filter(t => t.championships.includes(championship))[1]?.id || '');
+    const [homeTeamId, setHomeTeamId] = useState<string>(defaultTeams[0]?.id || '');
+    const [awayTeamId, setAwayTeamId] = useState<string>(defaultTeams[1]?.id || '');
     const [homeColors, setHomeColors] = useState({primary: "#000000", secondary: "#ffffff"});
     const [awayColors, setAwayColors] = useState({primary: "#ffffff", secondary: "#000000"});
     const [selectedImage, setSelectedImage] = useState(rinkImages.rinkUp);
     const [showRosters, setShowRosters] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+
     const navigate = useNavigate();
+    const hasCheckedForSavedGame = useRef(false);
 
-    // Helper function to get team by ID
-    const getTeamById = (id: string): ITeam | undefined => {
-        return teams.find(t => t.id === id);
-    };
+    const getTeamById = (id: string): Team | undefined => teams.find(t => t.id === id);
 
-    // Update colors when teams change
-    useEffect(() => {
-        if (homeTeamId) {
-            const homeTeam = getTeamById(homeTeamId);
-            if (homeTeam) {
-                setHomeColors({
-                    primary: homeTeam.homeColor.primary,
-                    secondary: homeTeam.homeColor.secondary
-                });
+    const updateTeamRoster = (teamId: string, newRoster: IPlayer[]) => {
+        setTeams(prev => prev.map(team => {
+            if (team.id === teamId) {
+                return new Team({...team, roster: newRoster});
             }
-        }
-    }, [homeTeamId]);
-
-    useEffect(() => {
-        if (awayTeamId) {
-            const awayTeam = getTeamById(awayTeamId);
-            if (awayTeam) {
-                setAwayColors({
-                    primary: awayTeam.awayColor.primary,
-                    secondary: awayTeam.awayColor.secondary
-                });
-            }
-        }
-    }, [awayTeamId]);
-
-    // Update teams when championship changes
-    useEffect(() => {
-        const championshipTeams = teams.filter(t => t.championships.includes(championship));
-
-        // Update the home team if the current selection is not in the new championship
-        if (homeTeamId && !championshipTeams.some(t => t.id === homeTeamId)) {
-            setHomeTeamId(championshipTeams[0]?.id || '');
-        }
-
-        // Update away team if current selection is not in the new championship
-        if (awayTeamId && !championshipTeams.some(t => t.id === awayTeamId)) {
-            setAwayTeamId(championshipTeams[1]?.id || '');
-        }
-    }, [championship, teams, homeTeamId, awayTeamId]);
-
-    // Helper function to count players by position
-    const getPositionCounts = (roster: any[]) => {
-        return {
-            forwards: roster.filter(p => p.position === 'Forward').length,
-            defenders: roster.filter(p => p.position === 'Defender').length,
-            goalies: roster.filter(p => p.position === 'Goalie').length
-        };
-    };
-
-    const updateTeamRoster = (teamId: string, newRoster: any[]) => {
-        setTeams(prev =>
-            prev.map(team =>
-                team.id === teamId ? {...team, roster: newRoster} : team
-            )
-        );
-    };
-
-    const addToRoster = (teamId: string, player: any) => {
-        const team = teams.find(t => t.id === teamId);
-        if (!team) return;
-
-        const currentRoster = team.roster || [];
-        updateTeamRoster(teamId, [...currentRoster, player]);
-    };
-
-    const removeFromRoster = (teamId: string, playerId: string) => {
-        const currentRoster = teams.find(t => t.id === teamId)?.roster || [];
-
-        updateTeamRoster(
-            teamId,
-            currentRoster.filter(p => p.id !== playerId)
-        );
+            return team;
+        }));
     };
 
     const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
-        const newErrors: Record<string, string> = {};
 
-        // Validate team selection
-        if (!homeTeamId) newErrors.homeTeamId = "Home team must be selected";
-        if (!awayTeamId) newErrors.awayTeamId = "Away team must be selected";
-        if (homeTeamId && awayTeamId && homeTeamId === awayTeamId) newErrors.sameTeams = "Home and away teams cannot be the same";
+        const homeTeam = getTeamById(homeTeamId);
+        const awayTeam = getTeamById(awayTeamId);
 
-        // Validate colors (different within a team)
-        if (homeColors.primary.toLowerCase() === homeColors.secondary.toLowerCase()) newErrors.homeColors = "Home team's primary and secondary colors cannot be the same";
-        if (awayColors.primary.toLowerCase() === awayColors.secondary.toLowerCase()) newErrors.awayColors = "Away team's primary and secondary colors cannot be the same";
-        // Validate colors (different across teams)
-        if (homeColors.primary.toLowerCase() === awayColors.primary.toLowerCase() && homeColors.secondary.toLowerCase() === awayColors.secondary.toLowerCase()) newErrors.sameColors = "Home and away team colors cannot be identical";
+        const setupErrors = GameSetupValidator.validateGameSetup({
+            homeTeamId,
+            awayTeamId,
+            homeColors,
+            awayColors,
+            rinkImage: selectedImage
+        });
 
-        // Validate rosters with position constraints
-        const homeRoster = getSelectedPlayers(homeTeamId);
-        const awayRoster = getSelectedPlayers(awayTeamId);
+        const rules = CHAMPIONSHIP_RULES[championship];
+        const rosterErrors: Record<string, string> = {};
 
-        const homeCounts = getPositionCounts(homeRoster);
-        const awayCounts = getPositionCounts(awayRoster);
-
-        const minSkatersLength = 15
-        let maxSkatersLength
-        if (championship === Championship.ERSTE_LEAGUE) {
-            maxSkatersLength = 19
-        } else {
-            maxSkatersLength = 20
+        if (homeTeam) {
+            const err = homeTeam.validateRoster(rules);
+            if (err) rosterErrors.homeRoster = `Home: ${err}`;
+        }
+        if (awayTeam) {
+            const err = awayTeam.validateRoster(rules);
+            if (err) rosterErrors.awayRoster = `Away: ${err}`;
         }
 
-        if (homeCounts.goalies !== 2) newErrors.homeRoster = "Home team must have exactly 2 goalies!"
-        if (awayCounts.goalies !== 2) newErrors.awayRoster = "Away team must have exactly 2 goalies!"
+        const combinedErrors = {...setupErrors, ...rosterErrors};
 
-        if (homeCounts.defenders + homeCounts.forwards < minSkatersLength) newErrors.homeRoster = `Home team must have at least ${minSkatersLength} skaters in the roster`;
-        if (awayCounts.defenders + awayCounts.forwards < minSkatersLength) newErrors.awayRoster = `Away team must have at least ${minSkatersLength} skaters in the roster`;
-
-        if (homeCounts.defenders + homeCounts.forwards > maxSkatersLength) newErrors.homeRoster = `Home team must have at most ${maxSkatersLength} skaters in the roster`;
-        if (awayCounts.defenders + awayCounts.forwards > maxSkatersLength) newErrors.awayRoster = `Away team must have at most ${maxSkatersLength} skaters in the roster`;
-
-        // Validate rink image
-        if (!selectedImage) newErrors.rinkImage = "You must select a rink image";
-
-        // If there are errors, set them and return
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
+        if (Object.keys(combinedErrors).length > 0) {
+            setErrors(combinedErrors);
             return;
         }
 
-        const homeTeamData = teams.filter(t => t.id === homeTeamId)[0] as ITeam
-        const awayTeamData = teams.filter(t => t.id === awayTeamId)[0] as ITeam
-        const homeTeam = {...homeTeamData, roster: homeRoster} as ITeam
-        const awayTeam = {...awayTeamData, roster: awayRoster} as ITeam
-
-        const setup = {
-            season,
-            championship,
-            gameType,
-            homeTeam,
-            awayTeam,
-            homeColors,
-            awayColors,
-            rinkImage: selectedImage,
+        if (homeTeam && awayTeam) {
+            navigate(`/${GAME}`, {
+                state: {
+                    season,
+                    championship,
+                    gameType,
+                    homeTeam: homeTeam, // Pass the full object
+                    awayTeam: awayTeam,
+                    homeColors,
+                    awayColors,
+                    rinkImage: selectedImage,
+                }
+            });
         }
-
-        navigate(`/${GAME}`, {state: setup});
     };
 
-    const getAvailablePlayers = (teamId: string) => {
-        const team = teams.find(t => t.id === teamId);
-        if (!team) return [];
-        return team.players
-            .filter(player => !(team.roster || []).some(rp => rp.id === player.id))
-            .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
-    };
-
-    const getSelectedPlayers = (teamId: string) => {
-        return teams
-                .find(t => t.id === teamId)?.roster
-                .sort((a, b) => a.jerseyNumber - b.jerseyNumber)
-            || [];
-    };
-
-    const hasCheckedForSavedGame = useRef(false);
+    // Sync colors on team change
+    useEffect(() => {
+        const team = getTeamById(homeTeamId);
+        if (team) setHomeColors({...team.homeColor});
+    }, [homeTeamId]);
 
     useEffect(() => {
+        const team = getTeamById(awayTeamId);
+        if (team) setAwayColors({...team.awayColor});
+    }, [awayTeamId]);
+
+    // Update teams when championship changes
+    useEffect(() => {
+        const validTeams = teams.filter(t => t.championships.includes(championship));
+        const isAvailable = (id: string) => validTeams.some(t => t.id === id);
+
+        if (homeTeamId && !isAvailable(homeTeamId)) setHomeTeamId(validTeams[0]?.id || '');
+        if (awayTeamId && !isAvailable(awayTeamId)) setAwayTeamId(validTeams[1]?.id || '');
+    }, [championship]);
+
+    // Check saved game
+    useEffect(() => {
         if (hasCheckedForSavedGame.current) return;
-
-        const checkForSavedGame = () => {
-            const savedGame = localStorage.getItem('unfinishedGame');
-            if (savedGame) {
-                if (window.confirm('An unfinished game was found. Do you want to continue?')) {
-                    hasCheckedForSavedGame.current = true;
-                    navigate(`/${GAME}`, {state: JSON.parse(savedGame as string)});
-                } else {
-                    localStorage.removeItem('unfinishedGame');
-                    hasCheckedForSavedGame.current = true;
-                }
+        const savedGame = localStorage.getItem('unfinishedGame');
+        if (savedGame) {
+            if (window.confirm('An unfinished game was found. Do you want to continue?')) {
+                navigate(`/${GAME}`, {state: JSON.parse(savedGame)});
+            } else {
+                localStorage.removeItem('unfinishedGame');
             }
-        };
-
-        checkForSavedGame();
+            hasCheckedForSavedGame.current = true;
+        }
     }, [navigate]);
 
     return (
-        <div>
-            <form onSubmit={submitHandler}>
-                <div>
-                    <div>
-                        <label htmlFor="season">Season:</label>
-                        <select
-                            id="season"
-                            value={season}
-                            onChange={e => setSeason(e.target.value as Season)}
-                        >
-                            {Object.values(Season).map(s => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
-                    </div>
+        <form onSubmit={submitHandler}>
+            <label htmlFor="season">Season:</label>
+            <select id="season" value={season} onChange={e => setSeason(e.target.value as Season)}>
+                {Object.values(Season).map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
 
-                    <div>
-                        <label htmlFor="championship">Championship:</label>
-                        <select
-                            id="championship"
-                            value={championship}
-                            onChange={e => setChampionship(e.target.value as Championship)}
-                        >
-                            {Object.values(Championship).map(ch => (
-                                <option key={ch} value={ch}>{ch}</option>
-                            ))}
-                        </select>
-                    </div>
+            <label htmlFor="championship">Championship:</label>
+            <select id="championship" value={championship}
+                    onChange={e => setChampionship(e.target.value as Championship)}>
+                {Object.values(Championship).map(ch => <option key={ch} value={ch}>{ch}</option>)}
+            </select>
 
-                    <div>
-                        <label htmlFor="homeTeam">Home team:</label>
-                        <select
-                            id="homeTeam"
-                            value={homeTeamId}
-                            onChange={e => setHomeTeamId(e.target.value)}
-                        >
-                            {teams.filter(t => t.championships.includes(championship)).map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
-                        </select>
-                        {errors.homeTeamId && <span>{errors.homeTeamId}</span>}
-                    </div>
+            {/* Team Selectors */}
+            <label htmlFor="homeTeam">Home team:</label>
+            <select id="homeTeam" value={homeTeamId} onChange={e => setHomeTeamId(e.target.value)}>
+                {teams.filter(t => t.championships.includes(championship)).map(team => (
+                    <option key={team.id} value={team.id}>{team.name}</option>
+                ))}
+            </select>
+            {errors.homeTeamId && <span className="error">{errors.homeTeamId}</span>}
 
-                    <div>
-                        <label htmlFor="awayTeam">Away team:</label>
-                        <select
-                            id="awayTeam"
-                            value={awayTeamId}
-                            onChange={e => setAwayTeamId(e.target.value)}
-                        >
-                            {teams.filter(t => t.championships.includes(championship)).map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
-                        </select>
-                        {errors.awayTeamId && <span>{errors.awayTeamId}</span>}
-                    </div>
-                    {errors.sameTeams && <span>{errors.sameTeams}</span>}
+            <label htmlFor="awayTeam">Away team:</label>
+            <select id="awayTeam" value={awayTeamId} onChange={e => setAwayTeamId(e.target.value)}>
+                {teams.filter(t => t.championships.includes(championship)).map(team => (
+                    <option key={team.id} value={team.id}>{team.name}</option>
+                ))}
+            </select>
+            {errors.awayTeamId && <span className="error">{errors.awayTeamId}</span>}
+            {errors.sameTeams && <span className="error">{errors.sameTeams}</span>}
 
-                    <div>
-                        <label htmlFor="gameType">Game type:</label>
-                        <select
-                            id="gameType"
-                            value={gameType}
-                            onChange={e => setGameType(e.target.value as GameType)}
-                        >
-                            {Object.values(GameType).map(gt => (
-                                <option key={gt} value={gt}>{gt}</option>
-                            ))}
-                        </select>
-                    </div>
+            <label htmlFor="gameType">Game type:</label>
+            <select id="gameType" value={gameType} onChange={e => setGameType(e.target.value as GameType)}>
+                {Object.values(GameType).map(gt => <option key={gt} value={gt}>{gt}</option>)}
+            </select>
 
-                    <div>
-                        <div>
-                            <label htmlFor="homePrimary">Home Primary color</label>
-                            <input
-                                id="homePrimary"
-                                type="color"
-                                value={homeColors.primary}
-                                onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
-                            />
-                        </div>
+            {/* Colors Section */}
+            <label htmlFor="homePrimary">Home Primary color</label>
+            <input
+                id="homePrimary"
+                type="color"
+                value={homeColors.primary}
+                onChange={e => setHomeColors(p => ({...p, primary: e.target.value}))}
+            />
 
-                        <div>
-                            <label htmlFor="homeSecondary">Home Secondary color</label>
-                            <input
-                                id="homeSecondary"
-                                type="color"
-                                value={homeColors.secondary}
-                                onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
-                            />
-                            {errors.homeColors && <span>{errors.homeColors}</span>}
-                        </div>
+            <label htmlFor="homeSecondary">Home Secondary color</label>
+            <input
+                id="homeSecondary"
+                type="color"
+                value={homeColors.secondary}
+                onChange={e => setHomeColors(p => ({...p, secondary: e.target.value}))}
+            />
+            {errors.homeColors && <span className="error">{errors.homeColors}</span>}
 
-                        <ExampleIcon
-                            actionType={ActionType.GOAL}
-                            backgroundColor={homeColors.primary}
-                            color={homeColors.secondary}
-                        />
-                    </div>
+            <ExampleIcon
+                actionType={ActionType.GOAL}
+                backgroundColor={homeColors.primary}
+                color={homeColors.secondary}
+            />
 
-                    <div>
-                        <div>
-                            <label htmlFor="awayPrimary">Away Primary color</label>
-                            <input
-                                id="awayPrimary"
-                                type="color"
-                                value={awayColors.primary}
-                                onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
-                            />
-                        </div>
+            <label htmlFor="awayPrimary">Away Primary color</label>
+            <input
+                id="awayPrimary"
+                type="color"
+                value={awayColors.primary}
+                onChange={e => setAwayColors(p => ({...p, primary: e.target.value}))}
+            />
 
-                        <div>
-                            <label htmlFor="awaySecondary">Away Secondary color</label>
-                            <input
-                                id="awaySecondary"
-                                type="color"
-                                value={awayColors.secondary}
-                                onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
-                            />
-                            {errors.awayColors && <span>{errors.awayColors}</span>}
-                        </div>
+            <label htmlFor="awaySecondary">Away Secondary color</label>
+            <input
+                id="awaySecondary"
+                type="color"
+                value={awayColors.secondary}
+                onChange={e => setAwayColors(p => ({...p, secondary: e.target.value}))}
+            />
+            {errors.awayColors && <span className="error">{errors.awayColors}</span>}
 
-                        <ExampleIcon
-                            actionType={ActionType.GOAL}
-                            backgroundColor={awayColors.primary}
-                            color={awayColors.secondary}
-                        />
-                    </div>
-                    {errors.sameColors && <span>{errors.sameColors}</span>}
-                </div>
+            <ExampleIcon
+                actionType={ActionType.GOAL}
+                backgroundColor={awayColors.primary}
+                color={awayColors.secondary}
+            />
 
-                <div>
-                    <label>
-                        <input
-                            type="radio"
-                            name="rinkImage"
-                            value={rinkImages.rinkUp}
-                            checked={selectedImage === rinkImages.rinkUp}
-                            onChange={(e) => setSelectedImage(e.target.value)}
-                        />
-                        Up
-                        <img src={rinkImages.rinkUp || undefined} alt="Up"/>
-                    </label>
+            {errors.sameColors && <span className="error">{errors.sameColors}</span>}
 
-                    <label>
-                        <input
-                            type="radio"
-                            name="rinkImage"
-                            value={rinkImages.rinkDown}
-                            checked={selectedImage === rinkImages.rinkDown}
-                            onChange={(e) => setSelectedImage(e.target.value)}
-                        />
-                        Down
-                        <img src={rinkImages.rinkDown || undefined} alt="Down"/>
-                    </label>
-                </div>
-                {errors.rinkImage && <span>{errors.rinkImage}</span>}
+            {/* Rink Images */}
+            <label>
+                <input
+                    type="radio"
+                    name="rinkImage"
+                    value={rinkImages.rinkUp}
+                    checked={selectedImage === rinkImages.rinkUp}
+                    onChange={(e) => setSelectedImage(e.target.value)}
+                />
+                Up
+                <img src={rinkImages.rinkUp || undefined} alt="Up"/>
+            </label>
+            <label>
+                <input
+                    type="radio"
+                    name="rinkImage"
+                    value={rinkImages.rinkDown}
+                    checked={selectedImage === rinkImages.rinkDown}
+                    onChange={(e) => setSelectedImage(e.target.value)}
+                />
+                Down
+                <img src={rinkImages.rinkDown || undefined} alt="Down"/>
+            </label>
+            {errors.rinkImage && <span className="error">{errors.rinkImage}</span>}
 
-                <Button
-                    styleType={showRosters ? "negative" : "positive"}
-                    type="button"
-                    onClick={() => setShowRosters(!showRosters)}
-                >
-                    {showRosters ? 'Hide Rosters' : 'Show Rosters'}
-                </Button>
+            {/* Roster Section */}
+            <Button styleType={showRosters ? "negative" : "positive"} type="button"
+                    onClick={() => setShowRosters(!showRosters)}>
+                {showRosters ? 'Hide Rosters' : 'Show Rosters'}
+            </Button>
 
-                {showRosters && (
-                    <div>
-                        <div>
-                            <h3>Team Rosters</h3>
-                        </div>
-                        <div>
-                            {/* Home Team Roster */}
-                            <div>
-                                <h4>Home Roster</h4>
+            {showRosters && (
+                <>
+                    <TeamRosterSelector
+                        teamName="Home Roster"
+                        allPlayers={getTeamById(homeTeamId)?.players || []}
+                        currentRoster={getTeamById(homeTeamId)?.roster || []}
+                        onChange={(newRoster) => updateTeamRoster(homeTeamId, newRoster)}
+                        rules={CHAMPIONSHIP_RULES[championship]}
+                        error={errors.homeRoster}
+                    />
 
-                                {/* Available Players */}
-                                <h5>Available Players</h5>
-                                <div>
-                                    <h6>Goalies</h6>
-                                    {getAvailablePlayers(homeTeamId)
-                                        .filter(player => player.position === 'Goalie')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => addToRoster(homeTeamId, player)}
-                                            >
-                                                <div>+</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Defenders</h6>
-                                    {getAvailablePlayers(homeTeamId)
-                                        .filter(player => player.position === 'Defender')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => addToRoster(homeTeamId, player)}
-                                            >
-                                                <div>+</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Forwards</h6>
-                                    {getAvailablePlayers(homeTeamId)
-                                        .filter(player => player.position === 'Forward')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => addToRoster(homeTeamId, player)}
-                                            >
-                                                <div>+</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
+                    <TeamRosterSelector
+                        teamName="Away Roster"
+                        allPlayers={getTeamById(awayTeamId)?.players || []}
+                        currentRoster={getTeamById(awayTeamId)?.roster || []}
+                        onChange={(newRoster) => updateTeamRoster(awayTeamId, newRoster)}
+                        rules={CHAMPIONSHIP_RULES[championship]}
+                        error={errors.awayRoster}
+                    />
+                </>
+            )}
 
-                                {/* Selected Players */}
-                                <h5>Selected Players</h5>
-                                <div>
-                                    <h6>Goalies</h6>
-                                    {getSelectedPlayers(homeTeamId)
-                                        .filter(player => player.position === 'Goalie')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => removeFromRoster(homeTeamId, player.id)}
-                                            >
-                                                <div>×</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Defenders</h6>
-                                    {getSelectedPlayers(homeTeamId)
-                                        .filter(player => player.position === 'Defender')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => removeFromRoster(homeTeamId, player.id)}
-                                            >
-                                                <div>×</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Forwards</h6>
-                                    {getSelectedPlayers(homeTeamId)
-                                        .filter(player => player.position === 'Forward')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => removeFromRoster(homeTeamId, player.id)}
-                                            >
-                                                <div>×</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
+            {(errors.homeRoster || errors.awayRoster) &&
+                <span className="error">Please check the rosters for errors.</span>}
 
-                                {/* Home Team Roster Summary */}
-                                <div>
-                                    {(() => {
-                                        const homeRoster = getSelectedPlayers(homeTeamId);
-                                        const counts = getPositionCounts(homeRoster);
-                                        const minSkaters = 15;
-                                        const maxSkaters = championship === Championship.ERSTE_LEAGUE ? 19 : 20;
-                                        const totalSkaters = counts.defenders + counts.forwards;
-
-                                        return (
-                                            <>
-                                                <div>Goalies: {counts.goalies}/2</div>
-                                                <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
-                                                {errors.homeRoster &&
-                                                    <span>{errors.homeRoster}</span>}
-                                            </>
-                                        );
-                                    })()}
-                                </div>
-                            </div>
-
-                            {/* Away Team Roster */}
-                            <div>
-                                <h4>Away Roster</h4>
-
-                                {/* Available Players */}
-                                <h5>Available Players</h5>
-                                <div>
-                                    <h6>Goalies</h6>
-                                    {getAvailablePlayers(awayTeamId)
-                                        .filter(player => player.position === 'Goalie')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => addToRoster(awayTeamId, player)}
-                                            >
-                                                <div>+</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Defenders</h6>
-                                    {getAvailablePlayers(awayTeamId)
-                                        .filter(player => player.position === 'Defender')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => addToRoster(awayTeamId, player)}
-                                            >
-                                                <div>+</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Forwards</h6>
-                                    {getAvailablePlayers(awayTeamId)
-                                        .filter(player => player.position === 'Forward')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => addToRoster(awayTeamId, player)}
-                                            >
-                                                <div>+</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-
-                                {/* Selected Players */}
-                                <h5>Selected Players</h5>
-                                <div>
-                                    <h6>Goalies</h6>
-                                    {getSelectedPlayers(awayTeamId)
-                                        .filter(player => player.position === 'Goalie')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => removeFromRoster(awayTeamId, player.id)}
-                                            >
-                                                <div>×</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Defenders</h6>
-                                    {getSelectedPlayers(awayTeamId)
-                                        .filter(player => player.position === 'Defender')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => removeFromRoster(awayTeamId, player.id)}
-                                            >
-                                                <div>×</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-                                <div>
-                                    <h6>Forwards</h6>
-                                    {getSelectedPlayers(awayTeamId)
-                                        .filter(player => player.position === 'Forward')
-                                        .map(player => (
-                                            <div
-                                                key={player.id}
-                                                onClick={() => removeFromRoster(awayTeamId, player.id)}
-                                            >
-                                                <div>×</div>
-                                                #{player.jerseyNumber} - {player.name}
-                                            </div>
-                                        ))}
-                                </div>
-
-                                {/* Away Team Roster Summary */}
-                                <div>
-                                    {(() => {
-                                        const awayRoster = getSelectedPlayers(awayTeamId);
-                                        const counts = getPositionCounts(awayRoster);
-                                        const minSkaters = 15;
-                                        const maxSkaters = championship === Championship.ERSTE_LEAGUE ? 19 : 20;
-                                        const totalSkaters = counts.defenders + counts.forwards;
-
-                                        return (
-                                            <>
-                                                <div>Goalies: {counts.goalies}/2</div>
-                                                <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
-                                                {errors.awayRoster &&
-                                                    <span>{errors.awayRoster}</span>}
-                                            </>
-                                        );
-                                    })()}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {(errors.homeRoster || errors.awayRoster) &&
-                    <span>Some roster related error has occurred.</span>}
-
-                <div>
-                    <Button styleType={"positive"} type="submit">Start Game</Button>
-                    <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
-                </div>
-            </form>
-        </div>
+            <Button styleType={"positive"} type="submit">Start Game</Button>
+            <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
+        </form>
     );
 };
 
 export default StartPage;
 
 export const loader = async () => {
-    const teamsData = await TeamService.getAllTeams() as ITeam[];
+    const teamsData = await TeamService.getAllTeams();
     const [rinkDown, rinkUp] = await Promise.all([
         getDownloadURL(ref(storage, "rink-images/icerink_down.jpg")),
         getDownloadURL(ref(storage, "rink-images/icerink_up.jpg")),
     ]);
-    const teams = teamsData.filter(t => t.id !== "free-agent")
+    const teams = teamsData.filter(t => t.id !== "free-agent");
     return {teams, rinkDown, rinkUp};
 }

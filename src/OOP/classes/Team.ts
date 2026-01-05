@@ -6,6 +6,7 @@ import {storage} from "../../firebase";
 import {IGame} from "../interfaces/IGame";
 import {GameType} from "../enums/GameType";
 import {PlayoffPeriod, RegularPeriod} from "../enums/Period";
+import {Position} from "../enums/Position";
 
 export class Team implements ITeam {
     id: string;
@@ -39,6 +40,35 @@ export class Team implements ITeam {
             players: this.players,
             roster: this.roster,
         };
+    }
+
+    getRosterCounts() {
+        return {
+            forwards: this.roster.filter(p => p.position === Position.FORWARD).length,
+            defenders: this.roster.filter(p => p.position === Position.DEFENDER).length,
+            goalies: this.roster.filter(p => p.position === Position.GOALIE).length
+        };
+    }
+
+    validateRoster(rules: { minSkaters: number, maxSkaters: number, goalies: number }): string | null {
+        const counts = this.getRosterCounts();
+        const totalSkaters = counts.defenders + counts.forwards;
+
+        if (counts.goalies !== rules.goalies) {
+            return `Team must have exactly ${rules.goalies} goalies!`; // Message can be generic or passed in
+        }
+        if (totalSkaters < rules.minSkaters) {
+            return `Team must have at least ${rules.minSkaters} skaters`;
+        }
+        if (totalSkaters > rules.maxSkaters) {
+            return `Team must have at most ${rules.maxSkaters} skaters`;
+        }
+        return null;
+    }
+
+    getAvailablePlayers(): IPlayer[] {
+        const rosterIds = new Set(this.roster.map(p => p.id));
+        return this.players.filter(p => !rosterIds.has(p.id));
     }
 
     static validateName(name: string, existingTeams: ITeam[]): string | null {
@@ -208,4 +238,30 @@ export class Team implements ITeam {
             shotPercentage
         };
     };
+
+    static getParticipatingPlayers(
+        teamId: string,
+        games: IGame[],
+        currentRoster: IPlayer[] = []
+    ): IPlayer[] {
+        const uniquePlayers = new Map<string, IPlayer>();
+
+        // 1. Add players from games
+        games.forEach(game => {
+            const roster = game.teams.home.id === teamId
+                ? game.teams.home.roster
+                : (game.teams.away.id === teamId ? game.teams.away.roster : []);
+
+            roster?.forEach(p => {
+                if (!uniquePlayers.has(p.id)) uniquePlayers.set(p.id, p);
+            });
+        });
+
+        // 2. Add current roster (if filters allow or if needed as fallback)
+        currentRoster.forEach(p => {
+            if (!uniquePlayers.has(p.id)) uniquePlayers.set(p.id, p);
+        });
+
+        return Array.from(uniquePlayers.values());
+    }
 }

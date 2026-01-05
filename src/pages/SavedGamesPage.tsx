@@ -1,228 +1,165 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {TeamService} from "../OOP/services/TeamService";
 import {GameService} from "../OOP/services/GameService";
 import {useNavigate} from "react-router-dom";
-import {ITeam} from "../OOP/interfaces/ITeam";
-import {IGame} from "../OOP/interfaces/IGame";
 import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
 import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
 import LoadingSpinner from "../components/LoadingSpinner";
+import {Team} from "../OOP/classes/Team";
+import {Game, GameFilterCriteria} from "../OOP/classes/Game";
 
 interface SavedGamesPageProps {
-    playerGames?: IGame[];
+    playerGames?: Game[];
     showFilters?: boolean;
 }
 
 const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
-    const [teams, setTeams] = useState<ITeam[]>([]);
-    const [games, setGames] = useState<IGame[]>(playerGames || []);
+    const [teams, setTeams] = useState<Team[]>([]);
+    const [games, setGames] = useState<Game[]>(playerGames || []);
     const [error, setError] = useState<string | null>(null);
-    const [homeTeamId, setHomeTeamId] = useState<string>("");
-    const [awayTeamId, setAwayTeamId] = useState<string>("");
-    const [championship, setChampionship] = useState<Championship | "">("")
-    const [season, setSeason] = useState<Season | "">("");
-    const [gameType, setGameType] = useState<GameType | "">("");
-    const [sortOrder, setSortOrder] = useState('newest');
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Filter States
+    const [filters, setFilters] = useState<GameFilterCriteria>({
+        homeTeamId: "",
+        awayTeamId: "",
+        championship: "",
+        season: "",
+        gameType: ""
+    });
+
+    const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
     const [pagination, setPagination] = useState({page: 1, perPage: 10});
-    const [isLoading, setIsLoading] = useState(true); // Add loading state
 
     const navigate = useNavigate();
 
-    const formatDate = (timestamp: string) => {
-        const date = new Date(timestamp);
-        return date.toISOString().split('T')[0];
+    // Use Memoization for expensive filtering/sorting operations
+    const processedGames = useMemo(() => {
+        const filtered = Game.filter(games, filters);
+        return Game.sort(filtered, sortOrder);
+    }, [games, filters, sortOrder]);
+
+    // Pagination Logic
+    const {currentGames, totalPages} = useMemo(() => {
+        const indexOfLastGame = pagination.page * pagination.perPage;
+        const indexOfFirstGame = indexOfLastGame - pagination.perPage;
+        return {
+            currentGames: processedGames.slice(indexOfFirstGame, indexOfLastGame),
+            totalPages: Math.ceil(processedGames.length / pagination.perPage)
+        };
+    }, [processedGames, pagination]);
+
+    const handleFilterChange = (key: keyof GameFilterCriteria, value: any) => {
+        setFilters(prev => ({...prev, [key]: value}));
+        setPagination(prev => ({...prev, page: 1})); // Reset to page 1 on filter change
     };
-
-    const filteredGames = games.filter(game => {
-        return (
-            (!homeTeamId || game.teams.home.id === homeTeamId) &&
-            (!awayTeamId || game.teams.away.id === awayTeamId) &&
-            (!championship || game.championship === championship) &&
-            (!gameType || game.type === gameType) &&
-            (!season || game.season === season)
-        );
-    });
-
-    const sortedGames = [...filteredGames].sort((a, b) => {
-        const dateA = new Date(a.timestamp).getTime();
-        const dateB = new Date(b.timestamp).getTime();
-        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-    });
-
-    const indexOfLastGame = pagination.page * pagination.perPage;
-    const indexOfFirstGame = indexOfLastGame - pagination.perPage;
-    const currentGames = sortedGames.slice(indexOfFirstGame, indexOfLastGame);
-    const totalPages = Math.ceil(sortedGames.length / pagination.perPage);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setError(null);
-                setIsLoading(true); // Start loading
+                setIsLoading(true);
+
+                // Fetch teams regardless (needed for dropdowns)
+                const teamsData = await TeamService.getAllTeams();
+                setTeams(teamsData);
 
                 if (!playerGames) {
-                    const [teamsData, gamesData] = await Promise.all([
-                        TeamService.getAllTeams(),
-                        GameService.getAllGames()
-                    ]);
-                    setTeams(teamsData);
+                    const gamesData = await GameService.getAllGames();
                     setGames(gamesData);
-                } else {
-                    const teamsData = await TeamService.getAllTeams();
-                    setTeams(teamsData);
                 }
             } catch (err) {
                 console.error("Failed to fetch data:", err);
                 setError("Failed to load games data. Please try again later.");
             } finally {
-                setIsLoading(false); // End loading
+                setIsLoading(false);
             }
         };
 
         fetchData();
     }, [playerGames]);
 
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
+    if (isLoading) return <LoadingSpinner/>;
+    if (error) return <div>{error}</div>;
 
     return (
-        <div>
+        <>
             {showFilters && (
-                <div>
-                    <div>
-                        <label htmlFor="homeTeam">Home team:</label>
-                        <select
-                            id="homeTeam"
-                            value={homeTeamId}
-                            onChange={(e) => setHomeTeamId(e.target.value)}
-                        >
+                <>
+                    <label>Home team:
+                        <select value={filters.homeTeamId}
+                                onChange={(e) => handleFilterChange('homeTeamId', e.target.value)}>
                             <option value="">All Teams</option>
-                            {teams.map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
+                            {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                         </select>
-                    </div>
+                    </label>
 
-                    <div>
-                        <label htmlFor="awayTeam">Away team:</label>
-                        <select
-                            id="awayTeam"
-                            value={awayTeamId}
-                            onChange={(e) => setAwayTeamId(e.target.value)}
-                        >
+                    <label>Away team:
+                        <select value={filters.awayTeamId}
+                                onChange={(e) => handleFilterChange('awayTeamId', e.target.value)}>
                             <option value="">All Teams</option>
-                            {teams.map(team => (
-                                <option key={team.id} value={team.id}>{team.name}</option>
-                            ))}
+                            {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                         </select>
-                    </div>
+                    </label>
 
-                    <div>
-                        <label htmlFor="championship">Championship:</label>
-                        <select
-                            id="championship"
-                            value={championship}
-                            onChange={(e) => setChampionship(e.target.value as Championship)}
-                        >
+                    <label>Championship:
+                        <select value={filters.championship}
+                                onChange={(e) => handleFilterChange('championship', e.target.value)}>
                             <option value="">All Championships</option>
-                            {Object.values(Championship).map(champ => (
-                                <option key={champ} value={champ}>{champ}</option>
-                            ))}
+                            {Object.values(Championship).map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
-                    </div>
+                    </label>
 
-                    <div>
-                        <label htmlFor="season">Season:</label>
-                        <select
-                            id="season"
-                            value={season}
-                            onChange={(e) => setSeason(e.target.value as Season)}
-                        >
+                    <label>Season:
+                        <select value={filters.season} onChange={(e) => handleFilterChange('season', e.target.value)}>
                             <option value="">All Seasons</option>
-                            {Object.values(Season).map(s => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
+                            {Object.values(Season).map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
-                    </div>
+                    </label>
 
-                    <div>
-                        <label htmlFor="gameType">GameType:</label>
-                        <select
-                            id="gameType"
-                            value={gameType}
-                            onChange={(e) => setGameType(e.target.value as GameType)}
-                        >
+                    <label>GameType:
+                        <select value={filters.gameType}
+                                onChange={(e) => handleFilterChange('gameType', e.target.value)}>
                             <option value="">All GameTypes</option>
-                            {Object.values(GameType).map(gt => (
-                                <option key={gt} value={gt}>{gt}</option>
-                            ))}
+                            {Object.values(GameType).map(gt => <option key={gt} value={gt}>{gt}</option>)}
                         </select>
-                    </div>
+                    </label>
 
-                    <div>
-                        <label htmlFor="sortOrder">Sort order:</label>
-                        <select
-                            id="sortOrder"
-                            value={sortOrder}
-                            onChange={(e) => setSortOrder(e.target.value)}
-                        >
+                    <label>Sort order:
+                        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}>
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
                         </select>
-                    </div>
-                </div>
+                    </label>
+                </>
             )}
 
             <ul>
                 {currentGames.length > 0 ? (
-                    currentGames.map((game: IGame) => (
-                        <li
-                            key={game.id}
-                            onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}
-                        >
-                            <div>
-                                <div>
-                                    <img
-                                        src={game.teams.home.logo}
-                                        alt={game.teams.home.name}
-                                    />
-                                    <span>{game.teams.home.name}</span>
-                                </div>
+                    currentGames.map((game) => (
+                        <li key={game.id} onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}>
+                            <img src={game.teams.home.logo} alt={game.teams.home.name}/>
+                            <span>{game.teams.home.name}</span>
 
-                                <div>
-                                    <span>
-                                        {game.score.home.goals} - {game.score.away.goals}
-                                    </span>
-                                    <span>{formatDate(game.timestamp)}</span>
-                                    <span>Type: {game.type}</span>
-                                    <span>Season: {game.season || "Not specified"}</span>
-                                </div>
+                            <span>{game.score.home.goals} - {game.score.away.goals}</span>
 
-                                <div>
-                                    <img
-                                        src={game.teams.away.logo}
-                                        alt={game.teams.away.name}
-                                    />
-                                    <span>{game.teams.away.name}</span>
-                                </div>
-                            </div>
+                            <span>{game.formattedDate}</span>
+
+                            <span>Championship: {game.championship}</span>
+                            <span>Type: {game.type}</span>
+                            <span>Season: {game.season || "Not specified"}</span>
+
+                            <img src={game.teams.away.logo} alt={game.teams.away.name}/>
+                            <span>{game.teams.away.name}</span>
                         </li>
                     ))
                 ) : <p>No games found.</p>}
             </ul>
-
-            <div>
-                <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
-            </div>
-        </div>
+            <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
+        </>
     );
 };
 

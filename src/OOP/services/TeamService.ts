@@ -65,21 +65,12 @@ export class TeamService {
         await Promise.all(transferPromises);
 
         const teamDocRef = doc(this.collectionRef, id);
-
-        // First get the team data to check for a logo
         const teamSnap = await getDoc(teamDocRef);
         const teamData = teamSnap.data() as ITeam | undefined;
-
-        // Reference to the "players" subcollection
         const playersCollectionRef = collection(teamDocRef, "players");
-
-        // Get all documents in the "players" subcollection
         const playersSnapshot = await getDocs(playersCollectionRef);
-
-        // Delete each document in the "players" subcollection
         const deletePromises = playersSnapshot.docs.map((playerDoc) => deleteDoc(playerDoc.ref));
 
-        // Wait for all player documents to be deleted
         await Promise.all(deletePromises);
 
         // Delete the team's logo if it exists
@@ -96,7 +87,7 @@ export class TeamService {
         await deleteDoc(teamDocRef);
     }
 
-    static getAllTeams = async (): Promise<ITeam[]> => {
+    static getAllTeams = async (): Promise<Team[]> => {
         // Fetch all teams and players in parallel
         const teamsSnapshot = await getDocs(this.collectionRef);
         const teamsData = teamsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()} as ITeam));
@@ -120,7 +111,10 @@ export class TeamService {
 
         // Sort teams alphabetically
         teams.sort((a, b) => a.name.localeCompare(b.name));
-        return teams;
+        return teamsData.map(teamData => new Team({
+            ...teamData,
+            players: playersByTeamId[teamData.id] || []
+        }));
     }
 
     static uploadLogo = async (logo: File) => {

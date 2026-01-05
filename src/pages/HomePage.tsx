@@ -19,29 +19,24 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
     }, [isSignedIn]);
 
     return (
-        <div>
-            <header>
-                <h1>Hockey Game Tracker</h1>
-                <p>Your comprehensive hockey game management platform</p>
-            </header>
+        <>
+            <h1>Hockey Game Tracker</h1>
+            <p>Your comprehensive hockey game management platform</p>
 
             <ul>
                 {menuItems.map((item, index) => (
-                    // <MenuItem key={index} item={item}/>
                     <li
                         onClick={() => navigate(item.path)}
                         data-testid="menu-item"
                         key={index}
                     >
                         <span>{item.icon}</span>
-                        <div>
-                            <h2>{item.title}</h2>
-                            <p>{item.description}</p>
-                        </div>
+                        <h2>{item.title}</h2>
+                        <p>{item.description}</p>
                     </li>
                 ))}
             </ul>
-        </div>
+        </>
     );
 };
 
