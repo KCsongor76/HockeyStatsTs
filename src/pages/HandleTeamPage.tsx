@@ -10,7 +10,6 @@ import {TeamService} from "../OOP/services/TeamService";
 import SavedGamesPage from "./SavedGamesPage";
 import {Player} from "../OOP/classes/Player";
 import Button from "../components/Button";
-import styles from "./HandleTeamPage.module.css"
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
@@ -273,7 +272,7 @@ const HandleTeamPage = () => {
     };
 
     const renderPlayerSortableHeader = (field: PlayerSortField, label: string) => (
-        <th onClick={() => handlePlayerSort(field)} className={styles.sortableHeader} style={{cursor: 'pointer'}}>
+        <th onClick={() => handlePlayerSort(field)}>
             {label}
             {playerSortField === field && (
                 <span>{playerSortDirection === 'asc' ? ' ↑' : ' ↓'}</span>
@@ -282,42 +281,40 @@ const HandleTeamPage = () => {
     );
 
     return (
-        <div className={styles.teamContainer}>
-            <div className={styles.teamHeader}>
+        <div>
+            <div>
                 {team.logo && team.id !== 'free-agent' && (
-                    <img src={team.logo} alt={team.name} className={styles.teamLogo}/>
+                    <img src={team.logo} alt={team.name}/>
                 )}
                 <h1>{team.name}</h1>
             </div>
 
             {isEditing ? (
-                <div className={styles.editForm}>
+                <div>
                     <div>
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="teamName" className={styles.label}>Team name:</label>
+                        <div>
+                            <label htmlFor="teamName">Team name:</label>
                             <input
                                 id="teamName"
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className={`${styles.input} ${errors.name ? styles.error : ''}`}
                             />
-                            {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+                            {errors.name && <span>{errors.name}</span>}
                         </div>
 
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="teamLogo" className={styles.label}>Upload new logo:</label>
+                        <div>
+                            <label htmlFor="teamLogo">Upload new logo:</label>
                             <input
                                 id="teamLogo"
                                 type="file"
                                 accept="image/*"
                                 onChange={handleLogoChange}
-                                className={`${styles.input} ${errors.logo ? styles.error : ''}`}
                             />
-                            {errors.logo && <span className={styles.errorMessage}>{errors.logo}</span>}
+                            {errors.logo && <span>{errors.logo}</span>}
                         </div>
 
-                        <div className={styles.championshipGroup}>
+                        <div>
                             <label>Championships:</label>
                             {Object.values(Championship).map((championship) => (
                                 <label key={championship}>
@@ -333,8 +330,8 @@ const HandleTeamPage = () => {
                         </div>
                     </div>
 
-                    {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
-                    <div className={styles.buttonGroup}>
+                    {errors.general && <span>{errors.general}</span>}
+                    <div>
                         <Button styleType={"positive"} type="button" onClick={handleSave}>
                             Save Changes
                         </Button>
@@ -345,7 +342,7 @@ const HandleTeamPage = () => {
                 </div>
             ) : (
                 team.id !== 'free-agent' && (
-                    <div className={styles.buttonGroup}>
+                    <div>
                         <Button styleType={"neutral"} type="button" onClick={handleEdit}>
                             Edit Team
                         </Button>
@@ -353,13 +350,12 @@ const HandleTeamPage = () => {
                 )
             )}
 
-            <div className={styles.inputContainer}>
-                <label htmlFor="seasonFilter" className={styles.label}>Season:</label>
+            <div>
+                <label htmlFor="seasonFilter">Season:</label>
                 <select
                     id="seasonFilter"
                     value={selectedSeason || "All"}
                     onChange={e => setSelectedSeason(e.target.value as Season | 'All')}
-                    className={styles.select}
                 >
                     <option value="All">All Seasons</option>
                     {Object.values(Season).map(season => (
@@ -368,13 +364,12 @@ const HandleTeamPage = () => {
                 </select>
             </div>
 
-            <div className={styles.inputContainer}>
-                <label htmlFor="championshipFilter" className={styles.label}>Championship:</label>
+            <div>
+                <label htmlFor="championshipFilter">Championship:</label>
                 <select
                     id="championshipFilter"
                     value={selectedChampionship || "All"}
                     onChange={e => setSelectedChampionship(e.target.value as Championship | 'All')}
-                    className={styles.select}
                 >
                     <option value="All">All Championships</option>
                     {Object.values(Championship).map(champ => (
@@ -383,8 +378,8 @@ const HandleTeamPage = () => {
                 </select>
             </div>
 
-            <div className={styles.statsSection}>
-                <div className={styles.statsHeader} onClick={() => setShowPlayers(!showPlayers)}>
+            <div>
+                <div onClick={() => setShowPlayers(!showPlayers)}>
                     <h3>Players {filteredPlayers.length > 0 && `(${filteredPlayers.length})`}</h3>
                     <span>{showPlayers ? '▲' : '▼'}</span>
                 </div>
@@ -394,8 +389,8 @@ const HandleTeamPage = () => {
                             <>
                                 <div>
                                     <h3>Regular Season Players Stats</h3>
-                                    <div className={styles.tableContainer}>
-                                        <table className={styles.table}>
+                                    <div>
+                                        <table>
                                             <thead>
                                             <tr>
                                                 {renderPlayerSortableHeader('name', 'Name')}
@@ -442,8 +437,8 @@ const HandleTeamPage = () => {
 
                                 <div>
                                     <h3>Playoff Players Stats</h3>
-                                    <div className={styles.tableContainer}>
-                                        <table className={styles.table}>
+                                    <div>
+                                        <table>
                                             <thead>
                                             <tr>
                                                 {renderPlayerSortableHeader('name', 'Name')}
@@ -487,7 +482,7 @@ const HandleTeamPage = () => {
                                         </table>
                                     </div>
                                     {/* Add distinctive line under the playoff stats table */}
-                                    <hr style={{margin: '2rem 0', border: '2px solid #ccc'}}/>
+                                    <hr/>
                                 </div>
                             </>
                         )}
@@ -495,11 +490,11 @@ const HandleTeamPage = () => {
                 )}
             </div>
 
-            <div className={styles.statsSection}>
+            <div>
                 <h3>Regular Season Team Stats</h3>
                 {/*<TeamTable stats={regularTeamStats}/>*/}
-                <div className={styles.tableContainer}>
-                    <table className={styles.table}>
+                <div>
+                    <table>
                         <thead>
                         <tr>
                             <th>GP</th>
@@ -536,8 +531,8 @@ const HandleTeamPage = () => {
 
                 <h3>Playoff Team Stats</h3>
                 {/*<TeamTable stats={playoffTeamStats}/>*/}
-                <div className={styles.tableContainer}>
-                    <table className={styles.table}>
+                <div>
+                    <table>
                         <thead>
                         <tr>
                             <th>GP</th>
@@ -573,8 +568,8 @@ const HandleTeamPage = () => {
 
             </div>
 
-            <div className={styles.statsSection}>
-                <div className={styles.statsHeader} onClick={() => setShowGames(!showGames)}>
+            <div>
+                <div onClick={() => setShowGames(!showGames)}>
                     <h3>Team Games {getFilteredGames().length > 0 && `(${getFilteredGames().length})`}</h3>
                     <span>{showGames ? '▲' : '▼'}</span>
                 </div>
@@ -587,7 +582,7 @@ const HandleTeamPage = () => {
                 )}
             </div>
 
-            <div className={styles.buttonGroup}>
+            <div>
                 <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
             </div>
         </div>

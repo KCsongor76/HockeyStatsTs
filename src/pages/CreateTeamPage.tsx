@@ -5,7 +5,6 @@ import {Championship} from "../OOP/enums/Championship";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import Button from "../components/Button";
-import styles from "./CreateTeamPage.module.css";
 import {ActionType} from "../OOP/enums/ActionType";
 import ExampleIcon from "../components/ExampleIcon";
 
@@ -96,13 +95,13 @@ const CreateTeamPage = () => {
     };
 
     return (
-        <div className={styles.formContainer}>
-            <h1 className={styles.formTitle}>Create New Team</h1>
+        <div>
+            <h1>Create New Team</h1>
             <form onSubmit={submitHandler}>
-                {errors.general && <div className="error">{errors.general}</div>}
+                {errors.general && <div>{errors.general}</div>}
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="name" className={styles.label}>
+                <div>
+                    <label htmlFor="name">
                         Team Name:
                     </label>
                     <input
@@ -112,13 +111,12 @@ const CreateTeamPage = () => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        className={`${styles.input} ${errors.name ? styles.error : ''}`}
                     />
-                    {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+                    {errors.name && <span>{errors.name}</span>}
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="logo" className={styles.label}>
+                <div>
+                    <label htmlFor="logo">
                         Team Logo:
                     </label>
                     <input
@@ -128,35 +126,32 @@ const CreateTeamPage = () => {
                         accept="image/*"
                         onChange={handleLogoChange}
                         required
-                        className={`${styles.input} ${errors.logo ? styles.error : ''}`}
                     />
-                    {errors.logo && <span className={styles.errorMessage}>{errors.logo}</span>}
+                    {errors.logo && <span>{errors.logo}</span>}
                 </div>
 
-                <div className={styles.colorGroup}>
+                <div>
                     <div>
                         <label>Team Home Colors:</label>
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="homePrimary" className={styles.label}>Primary</label>
+                        <div>
+                            <label htmlFor="homePrimary">Primary</label>
                             <input
                                 id="homePrimary"
                                 name="homePrimary"
                                 type="color"
                                 value={homeColor.primary}
                                 onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
-                                className={styles.input}
                             />
                         </div>
 
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="homeSecondary" className={styles.label}>Secondary</label>
+                        <div>
+                            <label htmlFor="homeSecondary">Secondary</label>
                             <input
                                 id="homeSecondary"
                                 name="homeSecondary"
                                 type="color"
                                 value={homeColor.secondary}
                                 onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
-                                className={styles.input}
                             />
                         </div>
                         <ExampleIcon
@@ -164,32 +159,30 @@ const CreateTeamPage = () => {
                             backgroundColor={homeColor.primary}
                             color={homeColor.secondary}
                         />
-                        {errors.colors && <span className="error">{errors.colors}</span>}
+                        {errors.colors && <span>{errors.colors}</span>}
                     </div>
 
                     <div>
                         <label>Team Away Colors:</label>
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="awayPrimary" className={styles.label}>Primary</label>
+                        <div>
+                            <label htmlFor="awayPrimary">Primary</label>
                             <input
                                 id="awayPrimary"
                                 name="awayPrimary"
                                 type="color"
                                 value={awayColor.primary}
                                 onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
-                                className={styles.input}
                             />
                         </div>
 
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="awaySecondary" className={styles.label}>Secondary</label>
+                        <div>
+                            <label htmlFor="awaySecondary">Secondary</label>
                             <input
                                 id="awaySecondary"
                                 name="awaySecondary"
                                 type="color"
                                 value={awayColor.secondary}
                                 onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
-                                className={styles.input}
                             />
                         </div>
                         <ExampleIcon
@@ -200,7 +193,7 @@ const CreateTeamPage = () => {
                     </div>
                 </div>
 
-                <div className={styles.championshipGroup}>
+                <div>
                     <label>Championships:</label>
                     {Object.values(Championship).map((championship) => (
                         <label key={championship}>
@@ -215,7 +208,7 @@ const CreateTeamPage = () => {
                     ))}
                 </div>
 
-                <div className={styles.buttonGroup}>
+                <div>
                     <Button styleType={"positive"} type="submit">Create Team</Button>
                     <Button styleType={"negative"} type="button" onClick={() => navigate("../")}>Go Back</Button>
                 </div>

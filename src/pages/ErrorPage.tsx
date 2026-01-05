@@ -1,7 +1,6 @@
 import React from 'react';
 import {useRouteError, isRouteErrorResponse, useNavigate} from 'react-router-dom';
 import Button from '../components/Button';
-import styles from './ErrorPage.module.css';
 
 const ErrorPage: React.FC = () => {
     const error = useRouteError();
@@ -14,15 +13,15 @@ const ErrorPage: React.FC = () => {
     }
 
     return (
-        <div className={styles.errorContainer}>
-            <div className={styles.errorContent}>
-                <h1 className={styles.errorTitle}>
+        <div>
+            <div>
+                <h1>
                     {errorStatus ? `Error ${errorStatus}` : 'Oops!'}
                 </h1>
-                <p className={styles.errorMessage}>
+                <p>
                     Something went wrong!
                 </p>
-                <div className={styles.errorActions}>
+                <div>
                     <Button
                         styleType="positive"
                         onClick={() => navigate('/')}

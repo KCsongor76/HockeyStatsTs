@@ -5,7 +5,6 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {PlayerService} from "../OOP/services/PlayerService";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import Button from "../components/Button";
-import styles from "./CreatePlayerPage.module.css";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
 const CreatePlayerPage = () => {
@@ -197,36 +196,35 @@ const CreatePlayerPage = () => {
     }
 
     return (
-        <div className={styles.formContainer}>
-            <h1 className={styles.formTitle}>Create New Player</h1>
+        <div>
+            <h1>Create New Player</h1>
 
-            <div className={styles.uploadSection}>
+            <div>
                 <h2>Upload Players from File</h2>
-                <div className={styles.inputContainer}>
-                    <label htmlFor="fileUpload" className={styles.label}>Upload player file (.txt):</label>
+                <div>
+                    <label htmlFor="fileUpload">Upload player file (.txt):</label>
                     <input
                         id="fileUpload"
                         type="file"
                         accept=".txt"
                         onChange={handleFileUpload}
-                        className={styles.input}
                     />
                 </div>
                 {isUploading && <p>Uploading players...</p>}
                 {uploadStatus && (
-                    <p className={uploadStatus.includes('Error') ? styles.errorText : styles.successText}>
+                    <p>
                         {uploadStatus}
                     </p>
                 )}
             </div>
 
-            <hr className={styles.divider}/>
+            <hr/>
 
             {/* Manual Player Creation Form */}
             <h2>Create Player Manually</h2>
             <form onSubmit={submitHandler}>
-                <div className={styles.inputContainer}>
-                    <label htmlFor="name" className={styles.label}>Name:</label>
+                <div>
+                    <label htmlFor="name">Name:</label>
                     <input
                         id="name"
                         type="text"
@@ -236,13 +234,12 @@ const CreatePlayerPage = () => {
                             setErrors(prev => ({...prev, name: ''}))
                         }}
                         required
-                        className={`${styles.input} ${errors.name ? styles.error : ''}`}
                     />
-                    {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
+                    {errors.name && <span>{errors.name}</span>}
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="jerseyNumber" className={styles.label}>Jersey number:</label>
+                <div>
+                    <label htmlFor="jerseyNumber">Jersey number:</label>
                     <input
                         id="jerseyNumber"
                         type="number"
@@ -254,18 +251,16 @@ const CreatePlayerPage = () => {
                         required
                         min={1}
                         max={99}
-                        className={`${styles.input} ${errors.jerseyNumber ? styles.error : ''}`}
                     />
-                    {errors.jerseyNumber && <span className={styles.errorMessage}>{errors.jerseyNumber}</span>}
+                    {errors.jerseyNumber && <span>{errors.jerseyNumber}</span>}
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="position" className={styles.label}>Position:</label>
+                <div>
+                    <label htmlFor="position">Position:</label>
                     <select
                         id="position"
                         value={playerData.position}
                         onChange={(e) => setPlayerData(prev => ({...prev, position: e.target.value as Position}))}
-                        className={styles.select}
                     >
                         {Object.values(Position).map(position => (
                             <option key={position} value={position}>{position}</option>
@@ -274,31 +269,26 @@ const CreatePlayerPage = () => {
                 </div>
 
                 {/* Fixed checkbox with proper styling */}
-                <div className={styles.formGroup}>
-                    <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
+                <div>
+                    <label>
                         <input
                             type="checkbox"
                             checked={isFreeAgent}
                             onChange={() => setIsFreeAgent(!isFreeAgent)}
-                            style={{
-                                width: 'auto',
-                                marginRight: '0.5rem'
-                            }}
                         />
-                        <span style={{fontWeight: 500, color: '#374151', fontSize: '0.875rem'}}>
+                        <span>
                             Free Agent
                         </span>
                     </label>
                 </div>
 
                 {!isFreeAgent && (
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="team" className={styles.label}>Team:</label>
+                    <div>
+                        <label htmlFor="team">Team:</label>
                         <select
                             id="team"
                             value={playerData.teamId}
                             onChange={(e) => setPlayerData(prev => ({...prev, teamId: e.target.value}))}
-                            className={styles.select}
                         >
                             {teams.filter(team => team.id !== "free-agent").map(team => (
                                 <option key={team.id} value={team.id}>{team.name}</option>
@@ -307,9 +297,9 @@ const CreatePlayerPage = () => {
                     </div>
                 )}
 
-                {errors.general && <span style={{color: 'red'}}>{errors.general}</span>}
+                {errors.general && <span>{errors.general}</span>}
 
-                <div className={styles.buttonGroup}>
+                <div>
                     <Button styleType={"positive"} type="submit">Create player</Button>
                     <Button styleType={"negative"} type="button" onClick={() => navigate(-1)}>Go Back</Button>
                 </div>

@@ -5,7 +5,6 @@ import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import {PlayerService} from "../OOP/services/PlayerService";
 import Button from "../components/Button";
-import styles from "./TransferPlayerPage.module.css"
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 
 const TransferPlayerPage = () => {
@@ -63,36 +62,35 @@ const TransferPlayerPage = () => {
     }, []);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
+        <div>
+            <div>
                 <h1>Transfer Player</h1>
             </div>
 
-            <div className={styles.playerInfo}>
+            <div>
                 <p>Player: {player.name}</p>
                 <p>Current Team: {team.name}</p>
             </div>
 
-            <form onSubmit={submitHandler} className={styles.form}>
-                <div className={styles.inputContainer}>
-                    <label htmlFor="transferTeam" className={styles.label}>Transfer to:</label>
+            <form onSubmit={submitHandler}>
+                <div>
+                    <label htmlFor="transferTeam">Transfer to:</label>
                     <select
                         id="transferTeam"
                         value={selectedTeamId}
                         onChange={(e) => setSelectedTeamId(e.target.value)}
-                        className={`${styles.select} ${errors.team ? styles.error : ''}`}
                     >
                         {teams.filter(t => t.id !== team.id && t.id !== "free-agent").map(t => (
                             <option key={t.id} value={t.id}>{t.name}</option>
                         ))}
                     </select>
-                    {errors.team && <span className={styles.errorMessage}>{errors.team}</span>}
+                    {errors.team && <span>{errors.team}</span>}
                 </div>
 
-                {errors.jersey && <span className={styles.error}>{errors.jersey}</span>}
-                {errors.general && <span className={styles.error}>{errors.general}</span>}
+                {errors.jersey && <span>{errors.jersey}</span>}
+                {errors.general && <span>{errors.general}</span>}
 
-                <div className={styles.buttonGroup}>
+                <div>
                     {!isFreeAgent && (
                         <Button
                             styleType={"neutral"}

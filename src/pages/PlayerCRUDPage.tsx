@@ -10,7 +10,6 @@ import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {Position} from "../OOP/enums/Position";
 import Pagination from "../components/Pagination";
 import Button from "../components/Button";
-import styles from "./PlayerCRUDPage.module.css"
 import {CREATE} from "../OOP/constants/NavigationNames";
 
 const PlayerCrudPage = () => {
@@ -59,8 +58,8 @@ const PlayerCrudPage = () => {
     }, []);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
+        <div>
+            <div>
                 <h1>Players Management</h1>
                 <Button
                     styleType={"positive"}
@@ -70,9 +69,9 @@ const PlayerCrudPage = () => {
                 </Button>
             </div>
 
-            <div className={styles.filters}>
-                <div className={styles.inputContainer}>
-                    <label htmlFor="nameSearch" className={styles.label}>Search by name</label>
+            <div>
+                <div>
+                    <label htmlFor="nameSearch">Search by name</label>
                     <input
                         id="nameSearch"
                         name="nameSearch"
@@ -80,12 +79,11 @@ const PlayerCrudPage = () => {
                         value={filters.search}
                         onChange={e => setFilters(prevState => ({...prevState, search: e.target.value}))}
                         placeholder="Search by name"
-                        className={styles.input}
                     />
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="numberFilter" className={styles.label}>Filter by jersey number</label>
+                <div>
+                    <label htmlFor="numberFilter">Filter by jersey number</label>
                     <input
                         id="numberFilter"
                         name="numberFilter"
@@ -95,17 +93,15 @@ const PlayerCrudPage = () => {
                         placeholder="Search by jersey number"
                         min={1}
                         max={99}
-                        className={styles.input}
                     />
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="teamFilter" className={styles.label}>Filter by team</label>
+                <div>
+                    <label htmlFor="teamFilter">Filter by team</label>
                     <select
                         id="teamFilter"
                         value={filters.team}
                         onChange={e => setFilters(prevState => ({...prevState, team: e.target.value}))}
-                        className={styles.select}
                     >
                         <option value="">All Teams</option>
                         {teams.map(team => (
@@ -114,13 +110,12 @@ const PlayerCrudPage = () => {
                     </select>
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="positionFilter" className={styles.label}>Filter by position</label>
+                <div>
+                    <label htmlFor="positionFilter">Filter by position</label>
                     <select
                         id="positionFilter"
                         value={filters.position}
                         onChange={e => setFilters(prevState => ({...prevState, position: e.target.value}))}
-                        className={styles.select}
                     >
                         <option value="">All Positions</option>
                         {Object.values(Position).map(pos => (
@@ -129,13 +124,12 @@ const PlayerCrudPage = () => {
                     </select>
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="seasonFilter" className={styles.label}>Filter by season</label>
+                <div>
+                    <label htmlFor="seasonFilter">Filter by season</label>
                     <select
                         id="seasonFilter"
                         value={filters.season}
                         onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
-                        className={styles.select}
                     >
                         <option value="">All Seasons</option>
                         {Object.values(Season).map(season => (
@@ -145,13 +139,13 @@ const PlayerCrudPage = () => {
                 </div>
             </div>
 
-            <ul className={styles.playerList}>
+            <ul>
                 {paginatedPlayers.length > 0 ? paginatedPlayers.map((player: IPlayer) =>
-                    <li key={player.id} className={styles.playerItem}>
-                        <div className={styles.playerInfo}>
+                    <li key={player.id}>
+                        <div>
                             <p>{player.name} - #{player.jerseyNumber} ({player.position})</p>
                         </div>
-                        <div className={styles.playerActions}>
+                        <div>
                             <Button
                                 styleType={"neutral"}
                                 onClick={() => navigate(`${player.id}`, {state: {player, games}})}

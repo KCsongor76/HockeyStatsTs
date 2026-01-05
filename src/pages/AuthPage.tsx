@@ -7,7 +7,6 @@ import {
 } from 'firebase/auth';
 import {auth} from '../firebase';
 import {isAdmin} from '../admin';
-import styles from './AuthPage.module.css';
 
 const AuthPage = () => {
     const navigate = useNavigate();
@@ -110,29 +109,28 @@ const AuthPage = () => {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.card}>
-                <h1 className={styles.title}>Admin Login</h1>
+        <div>
+            <div>
+                <h1>Admin Login</h1>
 
                 {message && (
-                    <p className={message.includes('⛔') ? styles.error : styles.message}>
+                    <p>
                         {message}
                     </p>
                 )}
 
                 {isProcessing ? (
-                    <p className={styles.message}>Processing...</p>
+                    <p>Processing...</p>
                 ) : isSignInWithEmailLink(auth, window.location.href) ? (
                     <div>
                         <p>Check your email for the sign-in link</p>
                         <p>If you're on a different device, enter your email:</p>
-                        <form onSubmit={handleEmailSubmit} className={styles.form}>
+                        <form onSubmit={handleEmailSubmit}>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Your email"
-                                className={styles.input}
                                 required
                                 list="email-history"
                             />
@@ -141,20 +139,19 @@ const AuthPage = () => {
                                     <option key={i} value={email}/>
                                 ))}
                             </datalist>
-                            <button type="submit" className={styles.button}>
+                            <button type="submit">
                                 Complete Sign-in
                             </button>
                         </form>
                     </div>
                 ) : (
-                    <form onSubmit={handleEmailSubmit} className={styles.form}>
-                        <div className={styles.inputContainer}>
+                    <form onSubmit={handleEmailSubmit}>
+                        <div>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Your email"
-                                className={styles.input}
                                 required
                                 list="email-history"
                             />
@@ -166,7 +163,6 @@ const AuthPage = () => {
                         </div>
                         <button
                             type="submit"
-                            className={styles.button}
                             disabled={isProcessing}
                         >
                             Send Sign-in Link

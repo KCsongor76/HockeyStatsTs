@@ -11,7 +11,6 @@ import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import SavedGamesPage from "./SavedGamesPage";
 import Button from "../components/Button";
-import styles from "./HandlePlayerPage.module.css"
 import {TRANSFER} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 
@@ -134,10 +133,10 @@ const HandlePlayerPage = () => {
     }, [player.teamId]);
 
     return (
-        <div className={styles.playerContainer}>
-            <div className={styles.playerHeader}>
+        <div>
+            <div>
                 <h1>Player Details</h1>
-                <div className={styles.playerInfo}>
+                <div>
                     <p>Name: {player.name}</p>
                     <p>Current team: {team?.name}</p>
                     <p>Position: {player.position}</p>
@@ -146,36 +145,33 @@ const HandlePlayerPage = () => {
             </div>
 
             {isEditing ? (
-                <div className={styles.editForm}>
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="name" className={styles.label}>Name:</label>
+                <div>
+                    <div>
+                        <label htmlFor="name">Name:</label>
                         <input
                             id="name"
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className={styles.input}
                         />
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="jerseyNumber" className={styles.label}>Jersey number:</label>
+                    <div>
+                        <label htmlFor="jerseyNumber">Jersey number:</label>
                         <input
                             id="jerseyNumber"
                             type="number"
                             value={jerseyNumber}
                             onChange={(e) => setJerseyNumber(Number(e.target.value))}
-                            className={styles.input}
                         />
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="position" className={styles.label}>Position:</label>
+                    <div>
+                        <label htmlFor="position">Position:</label>
                         <select
                             id="position"
                             value={position}
                             onChange={(e) => setPosition(e.target.value as Position)}
-                            className={styles.select}
                         >
                             {Object.values(Position).map(pos => (
                                 <option key={pos} value={pos}>{pos}</option>
@@ -183,26 +179,25 @@ const HandlePlayerPage = () => {
                         </select>
                     </div>
 
-                    {error && <p style={{color: 'red'}}>{error}</p>}
-                    <div className={styles.buttonGroup}>
+                    {error && <p>{error}</p>}
+                    <div>
                         <Button styleType={"positive"} type="button" onClick={saveHandler}>Save Changes</Button>
                         <Button styleType={"negative"} type="button" onClick={() => setIsEditing(false)}>Discard
                             Changes</Button>
                     </div>
                 </div>
             ) : (
-                <div className={styles.buttonGroup}>
+                <div>
                     <Button styleType={"neutral"} type="button" onClick={() => setIsEditing(true)}>Edit player</Button>
                 </div>
             )}
 
-            <div className={styles.inputContainer}>
-                <label htmlFor="seasonFilter" className={styles.label}>Season:</label>
+            <div>
+                <label htmlFor="seasonFilter">Season:</label>
                 <select
                     id="seasonFilter"
                     value={selectedSeason}
                     onChange={(e) => setSelectedSeason(e.target.value as Season)}
-                    className={styles.select}
                 >
                     <option value="">All Seasons</option>
                     {Object.values(Season).map(season => (
@@ -212,13 +207,12 @@ const HandlePlayerPage = () => {
             </div>
 
             {availableTeams.length > 1 && (
-                <div className={styles.inputContainer}>
-                    <label htmlFor="teamFilter" className={styles.label}>Team:</label>
+                <div>
+                    <label htmlFor="teamFilter">Team:</label>
                     <select
                         id="teamFilter"
                         value={selectedTeamId}
                         onChange={(e) => setSelectedTeamId(e.target.value)}
-                        className={styles.select}
                     >
                         <option value="">All Teams</option>
                         {availableTeams.map(team => (
@@ -228,10 +222,10 @@ const HandlePlayerPage = () => {
                 </div>
             )}
 
-            <div className={styles.statsSection}>
+            <div>
                 <h3>Regular Season Players Stats</h3>
-                <div className={styles.tableContainer}>
-                    <table className={styles.table}>
+                <div>
+                    <table>
                         <thead>
                         <tr>
                             <th>Name</th>
@@ -266,10 +260,10 @@ const HandlePlayerPage = () => {
                 </div>
             </div>
 
-            <div className={styles.statsSection}>
+            <div>
                 <h3>Playoff Players Stats</h3>
-                <div className={styles.tableContainer}>
-                    <table className={styles.table}>
+                <div>
+                    <table>
                         <thead>
                         <tr>
                             <th>Name</th>
@@ -304,8 +298,8 @@ const HandlePlayerPage = () => {
                 </div>
             </div>
 
-            <div className={styles.statsSection}>
-                <div className={styles.statsHeader} onClick={() => setShowGames(!showGames)}>
+            <div>
+                <div onClick={() => setShowGames(!showGames)}>
                     <h3>Games Played {getFilteredGames().length > 0 && `(${getFilteredGames().length})`}</h3>
                     <span>{showGames ? '▲' : '▼'}</span>
                 </div>
@@ -318,7 +312,7 @@ const HandlePlayerPage = () => {
                 )}
             </div>
 
-            <div className={styles.buttonGroup}>
+            <div>
                 <Button
                     styleType={"positive"}
                     type="button"

@@ -8,7 +8,6 @@ import {GameService} from "../OOP/services/GameService";
 import {TeamService} from "../OOP/services/TeamService";
 import Pagination from "../components/Pagination";
 import Button from "../components/Button";
-import styles from "./TeamCRUDPage.module.css"
 import {CREATE} from "../OOP/constants/NavigationNames";
 
 const TeamCrudPage = () => {
@@ -55,8 +54,8 @@ const TeamCrudPage = () => {
     }, []);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
+        <div>
+            <div>
                 <h1>Teams Management</h1>
                 <Button
                     styleType={"positive"}
@@ -66,25 +65,23 @@ const TeamCrudPage = () => {
                 </Button>
             </div>
 
-            <div className={styles.filters}>
-                <div className={styles.inputContainer}>
-                    <label htmlFor="nameSearch" className={styles.label}>Search by name</label>
+            <div>
+                <div>
+                    <label htmlFor="nameSearch">Search by name</label>
                     <input
                         id="nameSearch"
                         value={filters.name}
                         onChange={(e) => setFilters(prevState => ({...prevState, name: e.target.value}))}
                         placeholder="Search by name"
-                        className={styles.input}
                     />
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="seasonFilter" className={styles.label}>Filter by season</label>
+                <div>
+                    <label htmlFor="seasonFilter">Filter by season</label>
                     <select
                         id="seasonFilter"
                         value={filters.season}
                         onChange={e => setFilters(prevState => ({...prevState, season: e.target.value}))}
-                        className={styles.select}
                     >
                         <option value="">All Seasons</option>
                         {Object.values(Season).map(season => (
@@ -93,13 +90,12 @@ const TeamCrudPage = () => {
                     </select>
                 </div>
 
-                <div className={styles.inputContainer}>
-                    <label htmlFor="championshipFilter" className={styles.label}>Filter by championship</label>
+                <div>
+                    <label htmlFor="championshipFilter">Filter by championship</label>
                     <select
                         id="championshipFilter"
                         value={filters.championship}
                         onChange={e => setFilters(prevState => ({...prevState, championship: e.target.value}))}
-                        className={styles.select}
                     >
                         <option value="">All Championships</option>
                         {Object.values(Championship).map(champ => (
@@ -109,16 +105,16 @@ const TeamCrudPage = () => {
                 </div>
             </div>
 
-            <ul className={styles.teamList}>
+            <ul>
                 {paginatedTeams.length > 0 ? (
                     <>
                         {/* Free Agent item - always shown first */}
                         {paginatedTeams.filter(t => t.id === "free-agent").map((team: ITeam) => (
-                            <li key={team.id} className={styles.teamItem}>
-                                <div className={styles.teamInfo}>
+                            <li key={team.id}>
+                                <div>
                                     <p>{team.name}</p>
                                 </div>
-                                <div className={styles.teamActions}>
+                                <div>
                                     <Button styleType={"neutral"}
                                             onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
                                         View
@@ -132,11 +128,11 @@ const TeamCrudPage = () => {
                         {paginatedTeams
                             .filter(t => t.id !== "free-agent")
                             .map((team: ITeam) => (
-                                <li key={team.id} className={styles.teamItem}>
-                                    <div className={styles.teamInfo}>
+                                <li key={team.id}>
+                                    <div>
                                         <p>{team.name}</p>
                                     </div>
-                                    <div className={styles.teamActions}>
+                                    <div>
                                         <Button styleType={"neutral"}
                                                 onClick={() => navigate(`${team.id}`, {state: {team, games}})}>
                                             View
@@ -152,7 +148,7 @@ const TeamCrudPage = () => {
                 ) : <p>No teams found</p>}
             </ul>
 
-            <div className={styles.pagination}>
+            <div>
                 <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
             </div>
 

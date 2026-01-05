@@ -8,7 +8,6 @@ import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import Pagination from "../components/Pagination";
-import styles from "./SavedGamesPage.module.css";
 import {SAVED_GAMES} from "../OOP/constants/NavigationNames";
 import LoadingSpinner from "../components/LoadingSpinner";
 
@@ -95,16 +94,15 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
     }
 
     return (
-        <div className={styles.container}>
+        <div>
             {showFilters && (
-                <div className={styles.filters}>
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="homeTeam" className={styles.label}>Home team:</label>
+                <div>
+                    <div>
+                        <label htmlFor="homeTeam">Home team:</label>
                         <select
                             id="homeTeam"
                             value={homeTeamId}
                             onChange={(e) => setHomeTeamId(e.target.value)}
-                            className={styles.select}
                         >
                             <option value="">All Teams</option>
                             {teams.map(team => (
@@ -113,13 +111,12 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="awayTeam" className={styles.label}>Away team:</label>
+                    <div>
+                        <label htmlFor="awayTeam">Away team:</label>
                         <select
                             id="awayTeam"
                             value={awayTeamId}
                             onChange={(e) => setAwayTeamId(e.target.value)}
-                            className={styles.select}
                         >
                             <option value="">All Teams</option>
                             {teams.map(team => (
@@ -128,13 +125,12 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="championship" className={styles.label}>Championship:</label>
+                    <div>
+                        <label htmlFor="championship">Championship:</label>
                         <select
                             id="championship"
                             value={championship}
                             onChange={(e) => setChampionship(e.target.value as Championship)}
-                            className={styles.select}
                         >
                             <option value="">All Championships</option>
                             {Object.values(Championship).map(champ => (
@@ -143,13 +139,12 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="season" className={styles.label}>Season:</label>
+                    <div>
+                        <label htmlFor="season">Season:</label>
                         <select
                             id="season"
                             value={season}
                             onChange={(e) => setSeason(e.target.value as Season)}
-                            className={styles.select}
                         >
                             <option value="">All Seasons</option>
                             {Object.values(Season).map(s => (
@@ -158,13 +153,12 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="gameType" className={styles.label}>GameType:</label>
+                    <div>
+                        <label htmlFor="gameType">GameType:</label>
                         <select
                             id="gameType"
                             value={gameType}
                             onChange={(e) => setGameType(e.target.value as GameType)}
-                            className={styles.select}
                         >
                             <option value="">All GameTypes</option>
                             {Object.values(GameType).map(gt => (
@@ -173,13 +167,12 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="sortOrder" className={styles.label}>Sort order:</label>
+                    <div>
+                        <label htmlFor="sortOrder">Sort order:</label>
                         <select
                             id="sortOrder"
                             value={sortOrder}
                             onChange={(e) => setSortOrder(e.target.value)}
-                            className={styles.select}
                         >
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
@@ -188,26 +181,24 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                 </div>
             )}
 
-            <ul className={styles.gameList}>
+            <ul>
                 {currentGames.length > 0 ? (
                     currentGames.map((game: IGame) => (
                         <li
                             key={game.id}
-                            className={styles.gameItem}
                             onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}
                         >
-                            <div className={styles.gameTeams}>
-                                <div className={styles.gameTeam}>
+                            <div>
+                                <div>
                                     <img
                                         src={game.teams.home.logo}
                                         alt={game.teams.home.name}
-                                        className={styles.gameLogo}
                                     />
                                     <span>{game.teams.home.name}</span>
                                 </div>
 
-                                <div className={styles.gameInfo}>
-                                    <span className={styles.gameScore}>
+                                <div>
+                                    <span>
                                         {game.score.home.goals} - {game.score.away.goals}
                                     </span>
                                     <span>{formatDate(game.timestamp)}</span>
@@ -215,11 +206,10 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                                     <span>Season: {game.season || "Not specified"}</span>
                                 </div>
 
-                                <div className={styles.gameTeam}>
+                                <div>
                                     <img
                                         src={game.teams.away.logo}
                                         alt={game.teams.away.name}
-                                        className={styles.gameLogo}
                                     />
                                     <span>{game.teams.away.name}</span>
                                 </div>
@@ -229,7 +219,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                 ) : <p>No games found.</p>}
             </ul>
 
-            <div className={styles.pagination}>
+            <div>
                 <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
             </div>
         </div>

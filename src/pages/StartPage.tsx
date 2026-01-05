@@ -8,7 +8,6 @@ import {GameType} from "../OOP/enums/GameType";
 import {getDownloadURL, ref} from "firebase/storage";
 import {storage} from "../firebase";
 import Button from "../components/Button";
-import styles from "./StartPage.module.css"
 import ExampleIcon from "../components/ExampleIcon";
 import {ActionType} from "../OOP/enums/ActionType";
 import {GAME} from "../OOP/constants/NavigationNames";
@@ -214,16 +213,15 @@ const StartPage = () => {
     }, [navigate]);
 
     return (
-        <div className={styles.container}>
+        <div>
             <form onSubmit={submitHandler}>
-                <div className={styles.formGrid}>
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="season" className={styles.label}>Season:</label>
+                <div>
+                    <div>
+                        <label htmlFor="season">Season:</label>
                         <select
                             id="season"
                             value={season}
                             onChange={e => setSeason(e.target.value as Season)}
-                            className={styles.select}
                         >
                             {Object.values(Season).map(s => (
                                 <option key={s} value={s}>{s}</option>
@@ -231,13 +229,12 @@ const StartPage = () => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="championship" className={styles.label}>Championship:</label>
+                    <div>
+                        <label htmlFor="championship">Championship:</label>
                         <select
                             id="championship"
                             value={championship}
                             onChange={e => setChampionship(e.target.value as Championship)}
-                            className={styles.select}
                         >
                             {Object.values(Championship).map(ch => (
                                 <option key={ch} value={ch}>{ch}</option>
@@ -245,44 +242,41 @@ const StartPage = () => {
                         </select>
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="homeTeam" className={styles.label}>Home team:</label>
+                    <div>
+                        <label htmlFor="homeTeam">Home team:</label>
                         <select
                             id="homeTeam"
                             value={homeTeamId}
                             onChange={e => setHomeTeamId(e.target.value)}
-                            className={`${styles.select} ${errors.homeTeamId ? styles.error : ''}`}
                         >
                             {teams.filter(t => t.championships.includes(championship)).map(team => (
                                 <option key={team.id} value={team.id}>{team.name}</option>
                             ))}
                         </select>
-                        {errors.homeTeamId && <span className={styles.errorMessage}>{errors.homeTeamId}</span>}
+                        {errors.homeTeamId && <span>{errors.homeTeamId}</span>}
                     </div>
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="awayTeam" className={styles.label}>Away team:</label>
+                    <div>
+                        <label htmlFor="awayTeam">Away team:</label>
                         <select
                             id="awayTeam"
                             value={awayTeamId}
                             onChange={e => setAwayTeamId(e.target.value)}
-                            className={`${styles.select} ${errors.awayTeamId ? styles.error : ''}`}
                         >
                             {teams.filter(t => t.championships.includes(championship)).map(team => (
                                 <option key={team.id} value={team.id}>{team.name}</option>
                             ))}
                         </select>
-                        {errors.awayTeamId && <span className={styles.errorMessage}>{errors.awayTeamId}</span>}
+                        {errors.awayTeamId && <span>{errors.awayTeamId}</span>}
                     </div>
-                    {errors.sameTeams && <span className={styles.error}>{errors.sameTeams}</span>}
+                    {errors.sameTeams && <span>{errors.sameTeams}</span>}
 
-                    <div className={styles.inputContainer}>
-                        <label htmlFor="gameType" className={styles.label}>Game type:</label>
+                    <div>
+                        <label htmlFor="gameType">Game type:</label>
                         <select
                             id="gameType"
                             value={gameType}
                             onChange={e => setGameType(e.target.value as GameType)}
-                            className={styles.select}
                         >
                             {Object.values(GameType).map(gt => (
                                 <option key={gt} value={gt}>{gt}</option>
@@ -290,28 +284,26 @@ const StartPage = () => {
                         </select>
                     </div>
 
-                    <div className={styles.colorGroup}>
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="homePrimary" className={styles.label}>Home Primary color</label>
+                    <div>
+                        <div>
+                            <label htmlFor="homePrimary">Home Primary color</label>
                             <input
                                 id="homePrimary"
                                 type="color"
                                 value={homeColors.primary}
                                 onChange={e => setHomeColors(prev => ({...prev, primary: e.target.value}))}
-                                className={styles.input}
                             />
                         </div>
 
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="homeSecondary" className={styles.label}>Home Secondary color</label>
+                        <div>
+                            <label htmlFor="homeSecondary">Home Secondary color</label>
                             <input
                                 id="homeSecondary"
                                 type="color"
                                 value={homeColors.secondary}
                                 onChange={e => setHomeColors(prev => ({...prev, secondary: e.target.value}))}
-                                className={`${styles.input} ${errors.homeColors ? styles.error : ''}`}
                             />
-                            {errors.homeColors && <span className={styles.errorMessage}>{errors.homeColors}</span>}
+                            {errors.homeColors && <span>{errors.homeColors}</span>}
                         </div>
 
                         <ExampleIcon
@@ -321,28 +313,26 @@ const StartPage = () => {
                         />
                     </div>
 
-                    <div className={styles.colorGroup}>
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="awayPrimary" className={styles.label}>Away Primary color</label>
+                    <div>
+                        <div>
+                            <label htmlFor="awayPrimary">Away Primary color</label>
                             <input
                                 id="awayPrimary"
                                 type="color"
                                 value={awayColors.primary}
                                 onChange={e => setAwayColors(prev => ({...prev, primary: e.target.value}))}
-                                className={styles.input}
                             />
                         </div>
 
-                        <div className={styles.inputContainer}>
-                            <label htmlFor="awaySecondary" className={styles.label}>Away Secondary color</label>
+                        <div>
+                            <label htmlFor="awaySecondary">Away Secondary color</label>
                             <input
                                 id="awaySecondary"
                                 type="color"
                                 value={awayColors.secondary}
                                 onChange={e => setAwayColors(prev => ({...prev, secondary: e.target.value}))}
-                                className={`${styles.input} ${errors.awayColors ? styles.error : ''}`}
                             />
-                            {errors.awayColors && <span className={styles.errorMessage}>{errors.awayColors}</span>}
+                            {errors.awayColors && <span>{errors.awayColors}</span>}
                         </div>
 
                         <ExampleIcon
@@ -351,39 +341,35 @@ const StartPage = () => {
                             color={awayColors.secondary}
                         />
                     </div>
-                    {errors.sameColors && <span className={styles.error}>{errors.sameColors}</span>}
+                    {errors.sameColors && <span>{errors.sameColors}</span>}
                 </div>
 
-                <div className={styles.rinkImages}>
-                    <label
-                        className={`${styles.rinkOption} ${selectedImage === rinkImages.rinkUp ? styles.selected : ''}`}>
+                <div>
+                    <label>
                         <input
                             type="radio"
                             name="rinkImage"
                             value={rinkImages.rinkUp}
                             checked={selectedImage === rinkImages.rinkUp}
                             onChange={(e) => setSelectedImage(e.target.value)}
-                            style={{display: 'none'}}
                         />
                         Up
                         <img src={rinkImages.rinkUp || undefined} alt="Up"/>
                     </label>
 
-                    <label
-                        className={`${styles.rinkOption} ${selectedImage === rinkImages.rinkDown ? styles.selected : ''}`}>
+                    <label>
                         <input
                             type="radio"
                             name="rinkImage"
                             value={rinkImages.rinkDown}
                             checked={selectedImage === rinkImages.rinkDown}
                             onChange={(e) => setSelectedImage(e.target.value)}
-                            style={{display: 'none'}}
                         />
                         Down
                         <img src={rinkImages.rinkDown || undefined} alt="Down"/>
                     </label>
                 </div>
-                {errors.rinkImage && <span className={styles.error}>{errors.rinkImage}</span>}
+                {errors.rinkImage && <span>{errors.rinkImage}</span>}
 
                 <Button
                     styleType={showRosters ? "negative" : "positive"}
@@ -394,58 +380,55 @@ const StartPage = () => {
                 </Button>
 
                 {showRosters && (
-                    <div className={styles.rosterSection}>
-                        <div className={styles.rosterHeader}>
+                    <div>
+                        <div>
                             <h3>Team Rosters</h3>
                         </div>
-                        <div className={styles.rosterContent}>
+                        <div>
                             {/* Home Team Roster */}
                             <div>
                                 <h4>Home Roster</h4>
 
                                 {/* Available Players */}
                                 <h5>Available Players</h5>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Goalies</h6>
                                     {getAvailablePlayers(homeTeamId)
                                         .filter(player => player.position === 'Goalie')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => addToRoster(homeTeamId, player)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                <div>+</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Defenders</h6>
                                     {getAvailablePlayers(homeTeamId)
                                         .filter(player => player.position === 'Defender')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => addToRoster(homeTeamId, player)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                <div>+</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Forwards</h6>
                                     {getAvailablePlayers(homeTeamId)
                                         .filter(player => player.position === 'Forward')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => addToRoster(homeTeamId, player)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                <div>+</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
@@ -453,54 +436,51 @@ const StartPage = () => {
 
                                 {/* Selected Players */}
                                 <h5>Selected Players</h5>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Goalies</h6>
                                     {getSelectedPlayers(homeTeamId)
                                         .filter(player => player.position === 'Goalie')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => removeFromRoster(homeTeamId, player.id)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                <div>×</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Defenders</h6>
                                     {getSelectedPlayers(homeTeamId)
                                         .filter(player => player.position === 'Defender')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => removeFromRoster(homeTeamId, player.id)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                <div>×</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Forwards</h6>
                                     {getSelectedPlayers(homeTeamId)
                                         .filter(player => player.position === 'Forward')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => removeFromRoster(homeTeamId, player.id)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                <div>×</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
 
                                 {/* Home Team Roster Summary */}
-                                <div className={styles.rosterSummary}>
+                                <div>
                                     {(() => {
                                         const homeRoster = getSelectedPlayers(homeTeamId);
                                         const counts = getPositionCounts(homeRoster);
@@ -513,7 +493,7 @@ const StartPage = () => {
                                                 <div>Goalies: {counts.goalies}/2</div>
                                                 <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
                                                 {errors.homeRoster &&
-                                                    <span className={styles.error}>{errors.homeRoster}</span>}
+                                                    <span>{errors.homeRoster}</span>}
                                             </>
                                         );
                                     })()}
@@ -526,47 +506,44 @@ const StartPage = () => {
 
                                 {/* Available Players */}
                                 <h5>Available Players</h5>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Goalies</h6>
                                     {getAvailablePlayers(awayTeamId)
                                         .filter(player => player.position === 'Goalie')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => addToRoster(awayTeamId, player)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                <div>+</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Defenders</h6>
                                     {getAvailablePlayers(awayTeamId)
                                         .filter(player => player.position === 'Defender')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => addToRoster(awayTeamId, player)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                <div>+</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Forwards</h6>
                                     {getAvailablePlayers(awayTeamId)
                                         .filter(player => player.position === 'Forward')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => addToRoster(awayTeamId, player)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.available}`}>+</div>
+                                                <div>+</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
@@ -574,54 +551,51 @@ const StartPage = () => {
 
                                 {/* Selected Players */}
                                 <h5>Selected Players</h5>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Goalies</h6>
                                     {getSelectedPlayers(awayTeamId)
                                         .filter(player => player.position === 'Goalie')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => removeFromRoster(awayTeamId, player.id)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                <div>×</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Defenders</h6>
                                     {getSelectedPlayers(awayTeamId)
                                         .filter(player => player.position === 'Defender')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => removeFromRoster(awayTeamId, player.id)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                <div>×</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
-                                <div className={styles.positionGroup}>
+                                <div>
                                     <h6>Forwards</h6>
                                     {getSelectedPlayers(awayTeamId)
                                         .filter(player => player.position === 'Forward')
                                         .map(player => (
                                             <div
                                                 key={player.id}
-                                                className={styles.playerItem}
                                                 onClick={() => removeFromRoster(awayTeamId, player.id)}
                                             >
-                                                <div className={`${styles.playerStatus} ${styles.selected}`}>×</div>
+                                                <div>×</div>
                                                 #{player.jerseyNumber} - {player.name}
                                             </div>
                                         ))}
                                 </div>
 
                                 {/* Away Team Roster Summary */}
-                                <div className={styles.rosterSummary}>
+                                <div>
                                     {(() => {
                                         const awayRoster = getSelectedPlayers(awayTeamId);
                                         const counts = getPositionCounts(awayRoster);
@@ -634,7 +608,7 @@ const StartPage = () => {
                                                 <div>Goalies: {counts.goalies}/2</div>
                                                 <div>Skaters: {totalSkaters}/{minSkaters}-{maxSkaters}</div>
                                                 {errors.awayRoster &&
-                                                    <span className={styles.error}>{errors.awayRoster}</span>}
+                                                    <span>{errors.awayRoster}</span>}
                                             </>
                                         );
                                     })()}
@@ -644,9 +618,9 @@ const StartPage = () => {
                     </div>
                 )}
                 {(errors.homeRoster || errors.awayRoster) &&
-                    <span className={styles.error}>Some roster related error has occurred.</span>}
+                    <span>Some roster related error has occurred.</span>}
 
-                <div className={styles.buttonGroup}>
+                <div>
                     <Button styleType={"positive"} type="submit">Start Game</Button>
                     <Button styleType={"negative"} type="button" onClick={() => navigate('/')}>Go Back</Button>
                 </div>
