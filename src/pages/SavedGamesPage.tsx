@@ -12,6 +12,8 @@ import {Game, GameFilterCriteria} from "../OOP/classes/Game";
 import {useFilterPagination} from "../hooks/useFilterPagination";
 import SavedGameListItem from "../components/SavedGameListItem";
 
+// todo: not playerGames, just games
+
 interface SavedGamesPageProps {
     playerGames?: Game[];
     showFilters?: boolean;

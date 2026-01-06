@@ -1,4 +1,4 @@
-import {collection, deleteDoc, doc, getDocs, setDoc} from "firebase/firestore";
+import {collection, deleteDoc, doc, getDocs, query, setDoc, where, or} from "firebase/firestore";
 import {db} from "../../firebase";
 import {IGame} from "../interfaces/IGame";
 import {Game} from "../classes/Game";
@@ -15,6 +15,25 @@ export class GameService {
 
     static getAllGames = async (): Promise<Game[]> => {
         const querySnapshot = await getDocs(this.collectionRef);
+        return querySnapshot.docs.map(doc =>
+            new Game({id: doc.id, ...doc.data()} as IGame)
+        );
+    }
+
+    static getGamesByTeamId = async (teamId: string): Promise<Game[]> => {
+        if (!teamId) throw new Error("Team ID is required");
+
+        // Query checks if teamId matches either home or away nested ID
+        const q = query(
+            this.collectionRef,
+            or(
+                where('teams.home.id', '==', teamId),
+                where('teams.away.id', '==', teamId)
+            )
+        );
+
+        const querySnapshot = await getDocs(q);
+
         return querySnapshot.docs.map(doc =>
             new Game({id: doc.id, ...doc.data()} as IGame)
         );

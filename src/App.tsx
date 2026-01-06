@@ -17,9 +17,10 @@ import PlayerCRUDPage from "./pages/PlayerCRUDPage";
 import CreatePlayerPage from "./pages/CreatePlayerPage";
 import TransferPlayerPage from "./pages/TransferPlayerPage";
 import HandlePlayerPage from "./pages/HandlePlayerPage";
-import {loader as teamCRUDPageLoader} from "./pages/TeamCRUDPage";
+import {loader as teamCRUDPageLoader} from "./pages/TeamCRUDPage2";
 import {loader as playerCRUDPageLoader} from "./pages/PlayerCRUDPage";
 import {loader as startPageLoader} from "./pages/StartPage";
+import {loader as handleTeamPageLoader} from "./pages/HandleTeamPage2";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
 import {
@@ -34,6 +35,9 @@ import {
     START, TRANSFER_ID
 } from "./OOP/constants/NavigationNames";
 import LoadingSpinner from "./components/LoadingSpinner";
+import TeamCrudPage2 from "./pages/TeamCRUDPage2";
+import EditTeamPage from "./pages/EditTeamPage";
+import HandleTeamPage2 from "./pages/HandleTeamPage2";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -73,9 +77,10 @@ function App() {
                 {
                     path: HANDLE_TEAMS,
                     children: [
-                        {index: true, element: <TeamCRUDPage/>, loader: teamCRUDPageLoader},
+                        {index: true, element: <TeamCrudPage2/>, loader: teamCRUDPageLoader},
                         {path: CREATE, element: <CreateTeamPage/>,},
-                        {path: ID, element: <HandleTeamPage/>},
+                        {path: ID, element: <HandleTeamPage2/>, loader: handleTeamPageLoader},
+                        {path: `${ID}/edit`, element: <EditTeamPage/>},
                     ],
                 },
                 {
