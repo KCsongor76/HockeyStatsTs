@@ -4,7 +4,7 @@ import {useLoaderData, useNavigate} from "react-router-dom";
 import {CREATE} from "../OOP/constants/NavigationNames";
 import {Team} from "../OOP/classes/Team";
 import {TeamService} from "../OOP/services/TeamService";
-
+// todo: searching/filtering
 
 const TeamCrudPage2 = () => {
     const loaderData = useLoaderData() as Team[];

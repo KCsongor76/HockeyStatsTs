@@ -8,6 +8,7 @@ import {Player} from "../OOP/classes/Player";
 import {Position} from "../OOP/enums/Position";
 import Button from "../components/Button";
 import {ActionType} from "../OOP/enums/ActionType";
+// todo: searching/filtering
 
 interface TeamStats {
     gp: number;
@@ -249,7 +250,7 @@ const HandleTeamPage2 = () => {
                 </thead>
 
                 <tbody>
-                {playerStats.map(playerStat => <tr>
+                {playerStats.map((playerStat, index) => <tr key={index}>
                     <td>{playerStat.name}</td>
                     <td>{playerStat.jerseyNumber}</td>
                     <td>{playerStat.position}</td>
