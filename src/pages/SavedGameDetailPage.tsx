@@ -35,7 +35,7 @@ type PlayerSortField =
     | 'turnovers'
     | 'shotPercentage';
 
-const SavedGameDetailPage2 = () => {
+const SavedGameDetailPage = () => {
     const locationData = useLocation();
     const [game, setGame] = useState<IGame>(locationData.state as IGame);
     const [teamView, setTeamView] = useState<"all" | "home" | "away">("all")
@@ -509,4 +509,4 @@ const SavedGameDetailPage2 = () => {
     );
 };
 
-export default SavedGameDetailPage2;
+export default SavedGameDetailPage;

@@ -21,6 +21,7 @@ import {loader as teamCRUDPageLoader} from "./pages/TeamCRUDPage2";
 import {loader as playerCRUDPageLoader} from "./pages/PlayerCRUDPage2";
 import {loader as startPageLoader} from "./pages/StartPage";
 import {loader as handleTeamPageLoader} from "./pages/HandleTeamPage2";
+import {loader as handlePlayerPageLoader} from "./pages/HandlePlayerPage2";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
 import {
@@ -40,6 +41,8 @@ import EditTeamPage from "./pages/EditTeamPage";
 import HandleTeamPage2 from "./pages/HandleTeamPage2";
 import PlayerCRUDPage2 from "./pages/PlayerCRUDPage2";
 import EditPlayerPage from "./pages/EditPlayerPage";
+import SavedGamesPage2 from "./pages/SavedGamesPage2";
+import HandlePlayerPage2 from "./pages/HandlePlayerPage2";
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -74,7 +77,7 @@ function App() {
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
                 {path: START, element: <StartPage/>, loader: startPageLoader},
                 {path: GAME, element: <GamePage/>},
-                {path: SAVED_GAMES, element: <SavedGamesPage showFilters={true}/>},
+                {path: SAVED_GAMES, element: <SavedGamesPage2 showFilters={true}/>},
                 {path: SAVED_GAMES_GAME_ID, element: <SavedGameDetailPage/>},
                 {
                     path: HANDLE_TEAMS,
@@ -90,7 +93,7 @@ function App() {
                     children: [
                         {index: true, element: <PlayerCRUDPage2/>, loader: playerCRUDPageLoader},
                         {path: CREATE, element: <CreatePlayerPage/>},
-                        {path: ID, element: <HandlePlayerPage/>},
+                        {path: ID, element: <HandlePlayerPage2/>, loader: handlePlayerPageLoader},
                         {path: `${ID}/edit`, element: <EditPlayerPage/>},
                         {path: TRANSFER_ID, element: <TransferPlayerPage/>},
                     ],

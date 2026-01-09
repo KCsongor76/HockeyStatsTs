@@ -17,6 +17,7 @@ import {Player} from "../OOP/classes/Player";
 import {Game} from "../OOP/classes/Game";
 import PlayerForm, {PlayerFormData} from "../components/forms/PlayerForm";
 import PlayerStatsTable, {PlayerStatsData} from "../components/tables/PlayerStatsTable";
+import SavedGamesPage2 from "./SavedGamesPage2";
 
 const HandlePlayerPage = () => {
     const data = useLocation();
@@ -225,7 +226,7 @@ const HandlePlayerPage = () => {
             </div>
 
             {showGames && (
-                <SavedGamesPage
+                <SavedGamesPage2
                     key={`${selectedSeason}-${selectedTeamId}-${relevantGames.length}`}
                     playerGames={relevantGames}
                     showFilters={false}

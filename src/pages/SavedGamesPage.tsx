@@ -12,7 +12,7 @@ import {Game, GameFilterCriteria} from "../OOP/classes/Game";
 import {useFilterPagination} from "../hooks/useFilterPagination";
 import SavedGameListItem from "../components/SavedGameListItem";
 
-// todo: not playerGames, just games
+// todo: not playerGames, just games or existingGames or something
 
 interface SavedGamesPageProps {
     playerGames?: Game[];

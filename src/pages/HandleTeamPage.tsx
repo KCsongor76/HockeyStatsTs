@@ -16,6 +16,7 @@ import {Game} from "../OOP/classes/Game";
 import TeamForm, {TeamFormData} from "../components/forms/TeamForm";
 import TeamStatsTable, {TeamStatsData} from "../components/tables/TeamStatsTable";
 import PlayerStatsTable, {PlayerStatsData} from "../components/tables/PlayerStatsTable";
+import SavedGamesPage2 from "./SavedGamesPage2";
 
 type SortDirection = 'asc' | 'desc';
 
@@ -244,7 +245,7 @@ const HandleTeamPage = () => {
             </div>
 
             {showGames && (
-                <SavedGamesPage
+                <SavedGamesPage2
                     key={getFilteredGames().map(g => g.id).join('-')}
                     playerGames={getFilteredGames()}
                     showFilters={false}

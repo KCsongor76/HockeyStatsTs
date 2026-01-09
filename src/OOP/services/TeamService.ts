@@ -9,6 +9,7 @@ import {IPlayer} from "../interfaces/IPlayer";
 import {ITeam} from "../interfaces/ITeam";
 import {Team} from "../classes/Team";
 import {PlayerService} from "./PlayerService";
+import {GameService} from "./GameService";
 
 export class TeamService {
     private static collectionRef = collection(db, 'teams');
@@ -57,12 +58,19 @@ export class TeamService {
     }
 
     static deleteTeam = async (id: string) => {
+        // Ensure destination exists for players
+        await this.createFreeAgentTeamIfNotExists();
+
         // Move players to free agent team
         const players = await PlayerService.getPlayersByTeam(id);
         const transferPromises = players.map(player =>
             PlayerService.transferPlayer(id, "free-agent", player)
         );
         await Promise.all(transferPromises);
+
+        // Check if team has games to decide on logo deletion
+        const teamGames = await GameService.getGamesByTeamId(id);
+        const hasGames = teamGames.length > 0;
 
         const teamDocRef = doc(this.collectionRef, id);
         const teamSnap = await getDoc(teamDocRef);
@@ -73,8 +81,9 @@ export class TeamService {
 
         await Promise.all(deletePromises);
 
-        // Delete the team's logo if it exists
-        if (teamData?.logo) {
+        // Delete the team's logo ONLY if it exists AND the team has no games history.
+        // If they have games, we keep the logo so historical games don't show broken images.
+        if (teamData?.logo && !hasGames) {
             try {
                 await this.deleteLogo(teamData.logo);
             } catch (error) {
@@ -111,10 +120,7 @@ export class TeamService {
 
         // Sort teams alphabetically
         teams.sort((a, b) => a.name.localeCompare(b.name));
-        return teamsData.map(teamData => new Team({
-            ...teamData,
-            players: playersByTeamId[teamData.id] || []
-        }));
+        return teams.map(team => new Team(team));
     }
 
     static uploadLogo = async (logo: File) => {
