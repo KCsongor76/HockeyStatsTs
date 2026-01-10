@@ -1,31 +1,22 @@
-.container {
-    width: 100%;
+.tableContainer {
     overflow-x: auto;
-    background-color: white;
-    border-radius: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
-    padding: 1rem;
-    box-sizing: border-box;
-}
-
-.title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #111827;
-    margin: 0 0 1rem 0;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
+    background-color: white;
     font-size: 0.875rem;
-    min-width: 800px;
+    text-align: left;
 }
 
 .table th,
 .table td {
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid #e5e7eb;
     white-space: nowrap;
 }
@@ -33,7 +24,16 @@
 .table th {
     background-color: #f9fafb;
     font-weight: 600;
+    color: #374151;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     font-size: 0.75rem;
-    cursor: pointer;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover {
+    background-color: #f9fafb;
 }

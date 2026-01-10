@@ -1,18 +1,36 @@
-.homeContainer {
+.container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-}
-
-.header {
     text-align: center;
 }
 
-.menuGrid {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-content: center;
+.title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 3rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    list-style: none;
     padding: 0;
-    gap: 1rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    .title {
+        font-size: 2rem;
+    }
 }

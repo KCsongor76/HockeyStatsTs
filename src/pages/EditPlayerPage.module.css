@@ -7,10 +7,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
 }
 
-.card {
+.formCard {
     width: 100%;
     max-width: 800px;
     background-color: #ffffff;
@@ -29,36 +28,23 @@
     letter-spacing: -0.025em;
 }
 
-.sectionTitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.uploadSection {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.statusMessage {
-    margin-top: 1rem;
+.errorContainer {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
     padding: 1rem;
     border-radius: 0.5rem;
-    background-color: #f3f4f6;
-    color: #374151;
-    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 500;
 }
 
 @media (max-width: 640px) {
     .pageContainer {
         padding: 1rem;
     }
-
-    .card {
+    
+    .formCard {
         padding: 1.5rem;
     }
 }

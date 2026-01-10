@@ -12,6 +12,8 @@ import Select from "../components/Select";
 import {Season} from "../OOP/enums/Season";
 import {Championship} from "../OOP/enums/Championship";
 import PaginatedList from "../components/PaginatedList";
+import CrudListItem from "../components/CrudListItem";
+import styles from "./TeamCRUDPage.module.css";
 
 interface LoaderData {
     teams: Team[];
@@ -74,15 +76,18 @@ const TeamCRUDPage = () => {
     ];
 
     return (
-        <>
-            <Button
-                styleType={"positive"}
-                onClick={() => navigate(CREATE, {state: {teams}})}
-            >
-                Create new Team
-            </Button>
+        <div className={styles.pageContainer}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Manage Teams</h1>
+                <Button
+                    styleType={"positive"}
+                    onClick={() => navigate(CREATE, {state: {teams}})}
+                >
+                    Create new Team
+                </Button>
+            </div>
 
-            <div>
+            <div className={styles.filtersSection}>
                 <Input
                     id="search"
                     label="Search by Name"
@@ -110,39 +115,26 @@ const TeamCRUDPage = () => {
                 />
             </div>
 
-            <PaginatedList
-                data={filteredTeams}
-                renderEmpty={() => <p>No teams found.</p>}
-                renderItem={(team: Team) => (
-                    <li key={team.id}>
-                        {team.name}
+            <div className={styles.listSection}>
+                <PaginatedList
+                    data={filteredTeams}
+                    renderEmpty={() => <p>No teams found.</p>}
+                    renderItem={(team: Team) => (
+                        <CrudListItem
+                            key={team.id}
+                            label={team.name}
+                            onView={() => navigate(`${team.id}`, {state: {team}})}
+                            onEdit={() => navigate(`${team.id}/edit`, {state: {team}})}
+                            onDelete={() => deleteHandler(team)}
+                        />
+                    )}
+                />
+            </div>
 
-                        <Button
-                            styleType={"positive"}
-                            onClick={() => navigate(`${team.id}`, {state: {team}})}
-                        >
-                            View
-                        </Button>
-
-                        <Button
-                            styleType={"neutral"}
-                            onClick={() => navigate(`${team.id}/edit`, {state: {team}})}
-                        >
-                            Edit
-                        </Button>
-
-                        <Button
-                            styleType={"negative"}
-                            onClick={() => deleteHandler(team)}
-                        >
-                            Delete
-                        </Button>
-                    </li>
-                )}
-            />
-
-            <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
-        </>
+            <div className={styles.footer}>
+                <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
+            </div>
+        </div>
     );
 };
 

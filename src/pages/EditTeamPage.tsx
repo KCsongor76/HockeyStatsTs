@@ -4,6 +4,7 @@ import {Team} from "../OOP/classes/Team";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import TeamForm, {TeamFormData} from "../components/forms/TeamForm";
+import styles from "./EditTeamPage.module.css";
 
 const EditTeamPage = () => {
     const location = useLocation();
@@ -50,19 +51,23 @@ const EditTeamPage = () => {
     };
 
     return (
-        <>
-            {team.logo && team.id !== 'free-agent' && (<img src={team.logo} alt={team.name}/>)}
-            <h1>Edit {team.name}</h1>
-            {errors.general && <span>{errors.general}</span>}
-            <TeamForm
-                initialData={team}
-                onSubmit={handleSave}
-                onCancel={() => navigate(-1)}
-                submitLabel="Save Changes"
-                errors={errors}
-                setErrors={setErrors}
-            />
-        </>
+        <div className={styles.pageContainer}>
+            <div className={styles.formCard}>
+                <div className={styles.header}>
+                    {team.logo && team.id !== 'free-agent' && (<img src={team.logo} alt={team.name} className={styles.logo}/>)}
+                    <h1 className={styles.title}>Edit {team.name}</h1>
+                </div>
+                {errors.general && <div className={styles.errorContainer}>{errors.general}</div>}
+                <TeamForm
+                    initialData={team}
+                    onSubmit={handleSave}
+                    onCancel={() => navigate(-1)}
+                    submitLabel="Save Changes"
+                    errors={errors}
+                    setErrors={setErrors}
+                />
+            </div>
+        </div>
     );
 };
 

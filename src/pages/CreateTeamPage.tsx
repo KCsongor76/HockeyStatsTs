@@ -4,6 +4,7 @@ import {Team} from "../OOP/classes/Team";
 import {ITeam} from "../OOP/interfaces/ITeam";
 import {TeamService} from "../OOP/services/TeamService";
 import TeamForm, {TeamFormData} from "../components/forms/TeamForm";
+import styles from "./CreateTeamPage.module.css";
 
 const CreateTeamPage = () => {
     const location = useLocation();
@@ -62,16 +63,18 @@ const CreateTeamPage = () => {
     };
 
     return (
-        <div>
-            <h1>Create New Team</h1>
-            {errors.general && <div>{errors.general}</div>}
-            <TeamForm
-                onSubmit={submitHandler}
-                onCancel={() => navigate("../")}
-                submitLabel="Create Team"
-                errors={errors}
-                setErrors={setErrors}
-            />
+        <div className={styles.pageContainer}>
+            <div className={styles.formCard}>
+                <h1 className={styles.title}>Create New Team</h1>
+                {errors.general && <div className={styles.errorContainer}>{errors.general}</div>}
+                <TeamForm
+                    onSubmit={submitHandler}
+                    onCancel={() => navigate("../")}
+                    submitLabel="Create Team"
+                    errors={errors}
+                    setErrors={setErrors}
+                />
+            </div>
         </div>
     );
 };

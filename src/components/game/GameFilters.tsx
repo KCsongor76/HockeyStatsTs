@@ -12,7 +12,7 @@ interface TeamFilterProps {
 }
 
 export const TeamFilter: React.FC<TeamFilterProps> = ({teamView, setTeamView}) => (
-    <div className={styles.filterContainer}>
+    <div className={styles.container}>
         <Button
             styleType={"neutral"}
             type="button"
@@ -54,7 +54,7 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({
                                                                 useDefaultAway,
                                                                 setUseDefaultAway
                                                             }) => (
-    <div className={styles.controlsContainer}>
+    <div className={styles.container}>
         <Button
             styleType={useDefaultHome ? 'positive' : 'neutral'}
             onClick={() => setUseDefaultHome(!useDefaultHome)}
@@ -85,7 +85,7 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = ({
                                                               togglePeriod,
                                                               gameType
                                                           }) => (
-    <div className={styles.filterContainer}>
+    <div className={styles.container}>
         {availablePeriods.length > 0 ? availablePeriods.map(period => (
             <Button
                 styleType={"neutral"}
@@ -112,7 +112,7 @@ export const ActionTypeFilter: React.FC<ActionTypeFilterProps> = ({
                                                                       selectedActionTypes,
                                                                       toggleActionType
                                                                   }) => (
-    <div className={styles.filterContainer}>
+    <div className={styles.container}>
         {availableActionTypes.length > 0 ? availableActionTypes.map(type => (
             <Button
                 styleType={"neutral"}

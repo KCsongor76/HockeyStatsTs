@@ -13,19 +13,8 @@ import Select from "../components/Select";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import SavedGamesPage from "./SavedGamesPage";
-
-interface PlayerStats {
-    name: Player["name"]
-    jerseyNumber: Player["jerseyNumber"]
-    position: Player["position"]
-    gp: number;
-    g: number;
-    a: number;
-    p: number;
-    s: number;
-    h: number;
-    t: number;
-}
+import HandlePlayerStatsTable, {HandlePlayerStatsData} from "../components/tables/HandlePlayerStatsTable";
+import styles from "./HandlePlayerPage.module.css";
 
 const HandlePlayerPage = () => {
     const navigate = useNavigate();
@@ -76,11 +65,14 @@ const HandlePlayerPage = () => {
             if (filters.season && game.season !== filters.season) return false;
             if (filters.gameType && game.type !== filters.gameType) return false;
             if (filters.team && game.teams.home.id !== filters.team && game.teams.away.id !== filters.team) return false;
-            return true;
-        });
-    }, [games, filters]);
 
-    const playerStats = useMemo(() => {
+            const homeRoster = game.teams.home.roster || [];
+            const awayRoster = game.teams.away.roster || [];
+            return homeRoster.some(p => p.id === player.id) || awayRoster.some(p => p.id === player.id);
+        });
+    }, [games, filters, player.id]);
+
+    const playerStats: HandlePlayerStatsData[] = useMemo(() => {
         let gp = 0;
         let g = 0;
         let a = 0;
@@ -120,6 +112,7 @@ const HandlePlayerPage = () => {
         p = g + a;
 
         return [{
+            id: player.id,
             name: player.name,
             jerseyNumber: player.jerseyNumber,
             position: player.position,
@@ -141,14 +134,30 @@ const HandlePlayerPage = () => {
     ];
 
     return (
-        <>
-            <h1>Player Details</h1>
-            <p>Name: {player.name}</p>
-            <p>Current team: {team.name}</p>
-            <p>Position: {player.position}</p>
-            <p>Jersey number: {player.jerseyNumber}</p>
+        <div className={styles.pageContainer}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Player Details</h1>
+                <div className={styles.infoGrid}>
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoLabel}>Name</span>
+                        <span className={styles.infoValue}>{player.name}</span>
+                    </div>
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoLabel}>Current Team</span>
+                        <span className={styles.infoValue}>{team.name}</span>
+                    </div>
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoLabel}>Position</span>
+                        <span className={styles.infoValue}>{player.position}</span>
+                    </div>
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoLabel}>Jersey Number</span>
+                        <span className={styles.infoValue}>#{player.jerseyNumber}</span>
+                    </div>
+                </div>
+            </div>
 
-            <div>
+            <div className={styles.filtersSection}>
                 <Select
                     id="season"
                     label="Season"
@@ -172,55 +181,33 @@ const HandlePlayerPage = () => {
                 />
             </div>
 
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>#</th>
-                    <th>Position</th>
-                    <th>GP</th>
-                    <th>G</th>
-                    <th>A</th>
-                    <th>P</th>
-                    <th>S</th>
-                    <th>H</th>
-                    <th>T</th>
-                </tr>
-                </thead>
+            <div>
+                <h2 className={styles.sectionTitle}>Statistics</h2>
+                <HandlePlayerStatsTable players={playerStats}/>
+            </div>
 
-                <tbody>
-                {playerStats.map((playerStat, index) => <tr key={index}>
-                    <td>{playerStat.name}</td>
-                    <td>{playerStat.jerseyNumber}</td>
-                    <td>{playerStat.position}</td>
-                    <td>{playerStat.gp}</td>
-                    <td>{playerStat.g}</td>
-                    <td>{playerStat.a}</td>
-                    <td>{playerStat.p}</td>
-                    <td>{playerStat.s}</td>
-                    <td>{playerStat.h}</td>
-                    <td>{playerStat.t}</td>
-                </tr>)}
-                </tbody>
-            </table>
+            <div>
+                <h2 className={styles.sectionTitle}>Game History</h2>
+                <SavedGamesPage playerGames={filteredGames}/>
+            </div>
 
-            <SavedGamesPage playerGames={filteredGames}/>
-
-            <Button
-                styleType={"positive"}
-                type="button"
-                onClick={() => navigate(`../${TRANSFER}/${player.id}`, {state: {player, team}})}
-            >
-                Transfer
-            </Button>
-            <Button
-                styleType={"negative"}
-                type="button"
-                onClick={() => navigate(-1)}
-            >
-                Go back
-            </Button>
-        </>
+            <div className={styles.footer}>
+                <Button
+                    styleType={"positive"}
+                    type="button"
+                    onClick={() => navigate(`../${TRANSFER}/${player.id}`, {state: {player, team}})}
+                >
+                    Transfer
+                </Button>
+                <Button
+                    styleType={"negative"}
+                    type="button"
+                    onClick={() => navigate(-1)}
+                >
+                    Go back
+                </Button>
+            </div>
+        </div>
     );
 };
 

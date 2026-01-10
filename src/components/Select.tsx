@@ -1,4 +1,5 @@
 import React, {SelectHTMLAttributes} from 'react';
+import styles from './Select.module.css';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
     id: string;
@@ -10,14 +11,16 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 const Select: React.FC<SelectProps> = ({id, label, error, options, hideLabel, className, ...props}) => {
     return (
-        <div>
+        <div className={`${styles.container} ${className || ''}`}>
             <label
                 htmlFor={id}
+                className={hideLabel ? styles.hiddenLabel : styles.label}
             >
                 {label}
             </label>
             <select
                 id={id}
+                className={styles.select}
                 {...props}
             >
                 {options.map((opt) => (
@@ -26,7 +29,7 @@ const Select: React.FC<SelectProps> = ({id, label, error, options, hideLabel, cl
                     </option>
                 ))}
             </select>
-            {error && <span>{error}</span>}
+            {error && <span className={styles.error}>{error}</span>}
         </div>
     );
 };

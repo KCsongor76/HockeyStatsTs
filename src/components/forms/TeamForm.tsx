@@ -7,6 +7,7 @@ import ExampleIcon from "../ExampleIcon";
 import {ActionType} from "../../OOP/enums/ActionType";
 import Checkbox from "../Checkbox";
 import Button from "../Button";
+import styles from "./TeamForm.module.css";
 
 export interface TeamFormData {
     name: string;
@@ -67,80 +68,105 @@ const TeamForm: React.FC<TeamFormProps> = ({initialData, onSubmit, onCancel, sub
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Input
-                id="name"
-                label="Team Name:"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                error={errors.name}
-            />
+        <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>General Information</h3>
+                <div className={styles.row}>
+                    <Input
+                        id="name"
+                        label="Team Name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        error={errors.name}
+                    />
 
-            <Input
-                id="logo"
-                label={initialData?.logo ? "Update Logo (Optional):" : "Team Logo:"}
-                type="file"
-                accept="image/*"
-                onChange={handleLogoChange}
-                required={!initialData?.logo}
-                error={errors.logo}
-            />
+                    <Input
+                        id="logo"
+                        label={initialData?.logo ? "Update Logo (Optional)" : "Team Logo"}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        required={!initialData?.logo}
+                        error={errors.logo}
+                    />
+                </div>
+            </div>
 
-            <h3>Team Home Colors:</h3>
-            <Input
-                id="homePrimary"
-                label="Primary"
-                type="color"
-                value={homeColor.primary}
-                onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
-            />
-            <Input
-                id="homeSecondary"
-                label="Secondary"
-                type="color"
-                value={homeColor.secondary}
-                onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
-            />
-            <ExampleIcon actionType={ActionType.GOAL} backgroundColor={homeColor.primary} color={homeColor.secondary}/>
+            <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Team Colors</h3>
+                <div className={styles.colorsContainer}>
+                    <div className={styles.colorCard}>
+                        <h4 className={styles.colorCardTitle}>Home Kit</h4>
+                        <div className={styles.colorInputs}>
+                            <Input
+                                id="homePrimary"
+                                label="Primary"
+                                type="color"
+                                value={homeColor.primary}
+                                onChange={(e) => setHomeColor(prev => ({...prev, primary: e.target.value}))}
+                            />
+                            <Input
+                                id="homeSecondary"
+                                label="Secondary"
+                                type="color"
+                                value={homeColor.secondary}
+                                onChange={(e) => setHomeColor(prev => ({...prev, secondary: e.target.value}))}
+                            />
+                        </div>
+                        <div className={styles.previewContainer}>
+                            <ExampleIcon actionType={ActionType.GOAL} backgroundColor={homeColor.primary} color={homeColor.secondary}/>
+                        </div>
+                    </div>
 
-            <h3>Team Away Colors:</h3>
-            <Input
-                id="awayPrimary"
-                label="Primary"
-                type="color"
-                value={awayColor.primary}
-                onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
-            />
-            <Input
-                id="awaySecondary"
-                label="Secondary"
-                type="color"
-                value={awayColor.secondary}
-                onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
-            />
-            <ExampleIcon actionType={ActionType.GOAL} backgroundColor={awayColor.primary} color={awayColor.secondary}/>
-            
-            {errors.colors && <span>{errors.colors}</span>}
+                    <div className={styles.colorCard}>
+                        <h4 className={styles.colorCardTitle}>Away Kit</h4>
+                        <div className={styles.colorInputs}>
+                            <Input
+                                id="awayPrimary"
+                                label="Primary"
+                                type="color"
+                                value={awayColor.primary}
+                                onChange={(e) => setAwayColor(prev => ({...prev, primary: e.target.value}))}
+                            />
+                            <Input
+                                id="awaySecondary"
+                                label="Secondary"
+                                type="color"
+                                value={awayColor.secondary}
+                                onChange={(e) => setAwayColor(prev => ({...prev, secondary: e.target.value}))}
+                            />
+                        </div>
+                        <div className={styles.previewContainer}>
+                            <ExampleIcon actionType={ActionType.GOAL} backgroundColor={awayColor.primary} color={awayColor.secondary}/>
+                        </div>
+                    </div>
+                </div>
+                {errors.colors && <span className={styles.error}>{errors.colors}</span>}
+            </div>
 
-            <h3>Championships:</h3>
-            {Object.values(Championship).map((championship) => (
-                <Checkbox
-                    key={championship}
-                    id={`champ-${championship}`}
-                    label={championship}
-                    checked={championships.includes(championship)}
-                    onChange={() => toggleChampionship(championship)}
-                />
-            ))}
-            {errors.championships && <span>{errors.championships}</span>}
+            <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Championships</h3>
+                <div className={styles.championshipGrid}>
+                    {Object.values(Championship).map((championship) => (
+                        <Checkbox
+                            key={championship}
+                            id={`champ-${championship}`}
+                            label={championship}
+                            checked={championships.includes(championship)}
+                            onChange={() => toggleChampionship(championship)}
+                        />
+                    ))}
+                </div>
+                {errors.championships && <span className={styles.error}>{errors.championships}</span>}
+            </div>
 
-            <div>
-                <Button styleType={"positive"} type="submit">{submitLabel}</Button>
+            <div className={styles.buttonGroup}>
                 <Button styleType={"negative"} type="button" onClick={onCancel}>
                     {initialData ? "Discard Changes" : "Go Back"}
                 </Button>
+                <Button styleType={"positive"} type="submit">{submitLabel}</Button>
             </div>
         </form>
     );

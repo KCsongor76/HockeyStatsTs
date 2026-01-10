@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {ADMIN_ITEMS, NORMAL_ITEMS, START_ITEM} from "../OOP/constants/MenuItems";
 import {useNavigate} from "react-router-dom";
+import MenuItem from "../components/MenuItem";
+import styles from "./HomePage.module.css";
 
 interface HomePageProps {
     isSignedIn: boolean | undefined;
@@ -19,20 +21,16 @@ const HomePage: React.FC<HomePageProps> = ({isSignedIn}) => {
     }, [isSignedIn]);
 
     return (
-        <>
-            <h1>Hockey Game Tracker</h1>
-            <p>Your comprehensive hockey game management platform</p>
+        <div className={styles.container}>
+            <h1 className={styles.title}>Hockey Game Tracker</h1>
+            <p className={styles.subtitle}>Your comprehensive hockey game management platform</p>
 
-            <ul>
+            <ul className={styles.grid}>
                 {menuItems.map((item, index) => (
-                    <li onClick={() => navigate(item.path)} key={index}>
-                        <span>{item.icon}</span>
-                        <h2>{item.title}</h2>
-                        <p>{item.description}</p>
-                    </li>
+                    <MenuItem key={index} item={item} onClick={() => navigate(item.path)} />
                 ))}
             </ul>
-        </>
+        </div>
     );
 };
 

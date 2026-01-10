@@ -28,6 +28,7 @@ import {ActionTypeFilter, ColorSelector, PeriodFilter, TeamFilter} from "../comp
 import RinkMap from "../components/game/RinkMap";
 import ActionTable from "../components/game/ActionTable";
 import PlayerStatsTable, {RosterPlayer} from "../components/tables/PlayerStatsTable";
+import styles from "./GamePage.module.css";
 
 interface GameSetup {
     season: Season;
@@ -606,19 +607,22 @@ const GamePage = () => {
     }
 
     return (
-        <>
-            <InteractiveRink
-                rinkImage={gameSetup.rinkImage}
-                actions={actions}
-                onRinkClick={handleRinkClick}
-                getIconColors={getIconColors}
-                onIconClick={handleIconClick}
-                showDetails={showDetails}
-            />
+        <div className={styles.pageContainer}>
+            <div className={styles.scrollContainer}>
+                <InteractiveRink
+                    rinkImage={gameSetup.rinkImage}
+                    actions={actions}
+                    onRinkClick={handleRinkClick}
+                    getIconColors={getIconColors}
+                    onIconClick={handleIconClick}
+                    showDetails={showDetails}
+                />
+            </div>
 
             <GameHeader game={currentGame}/>
 
-            <h3 style={{textAlign: 'center'}}>Game Controls</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Game Controls</h3>
             <GameControls
                 onSaveLocally={saveGameLocally}
                 autosave={autosave}
@@ -627,42 +631,54 @@ const GamePage = () => {
                 showDetails={showDetails}
                 onToggleDetails={() => setShowDetails(!showDetails)}
             />
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Team Filters</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Team Filters</h3>
             <TeamFilter teamView={teamView} setTeamView={setTeamView}/>
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Color Selectors</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Color Selectors</h3>
             <ColorSelector
                 useDefaultHome={useDefaultHomeTeamColors}
                 setUseDefaultHome={setUseDefaultHomeTeamColors}
                 useDefaultAway={useDefaultAwayTeamColors}
                 setUseDefaultAway={setUseDefaultAwayTeamColors}
             />
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Available Period Filters</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Available Period Filters</h3>
             <PeriodFilter
                 availablePeriods={availablePeriods}
                 selectedPeriods={selectedPeriods}
                 togglePeriod={togglePeriod}
                 gameType={gameSetup.gameType}
             />
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Available Action Type Filters</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Available Action Type Filters</h3>
             <ActionTypeFilter
                 availableActionTypes={availableActionTypes}
                 selectedActionTypes={selectedActionTypes}
                 toggleActionType={toggleActionType}
             />
+            </div>
 
-            <RinkMap
-                rinkImage={gameSetup.rinkImage}
-                actions={getFilteredActions()}
-                getIconColors={getIconColors}
-                onIconClick={handleIconClick}
-            />
+            <div className={styles.scrollContainer}>
+                <RinkMap
+                    rinkImage={gameSetup.rinkImage}
+                    actions={getFilteredActions()}
+                    getIconColors={getIconColors}
+                    onIconClick={handleIconClick}
+                />
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Skaters</h3>
-            <div style={{width: '100%', overflowX: 'auto'}}>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Skaters</h3>
+            <div className={styles.tableSection}>
                 <PlayerStatsTable
                     title=""
                     variant="roster"
@@ -670,11 +686,14 @@ const GamePage = () => {
                     sortConfig={{field: playerSortField, direction: playerSortDirection}}
                     onSort={handlePlayerSort}
                     onView={(id) => togglePlayer(id)}
+                    selectedPlayerId={selectedPlayer}
                 />
             </div>
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Goalies</h3>
-            <div style={{width: '100%', overflowX: 'auto'}}>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Goalies</h3>
+            <div className={styles.tableSection}>
                 <PlayerStatsTable
                     title=""
                     variant="roster"
@@ -682,18 +701,22 @@ const GamePage = () => {
                     sortConfig={{field: playerSortField, direction: playerSortDirection}}
                     onSort={handlePlayerSort}
                     onView={(id) => togglePlayer(id)}
+                    selectedPlayerId={selectedPlayer}
                 />
             </div>
+            </div>
 
-            <ActionTable
-                actions={sortedActions}
-                gameType={gameSetup.gameType}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                onView={handleActionEdit}
-                onDelete={handleActionDelete}
-            />
+            <div className={styles.scrollContainer}>
+                <ActionTable
+                    actions={sortedActions}
+                    gameType={gameSetup.gameType}
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                    onView={handleActionEdit}
+                    onDelete={handleActionDelete}
+                />
+            </div>
 
             <ActionSelectorModal
                 isOpen={modalStep === 'action'}
@@ -737,7 +760,7 @@ const GamePage = () => {
                 onClose={() => setSelectedAction(null)}
                 action={selectedAction}
             />
-        </>
+        </div>
     );
 };
 

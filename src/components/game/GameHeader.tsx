@@ -8,39 +8,46 @@ interface GameHeaderProps {
 
 const GameHeader: React.FC<GameHeaderProps> = ({game}) => {
     return (
-        <div className={styles.scoreContainer}>
-            <div className={styles.scoreHeader}>
-                <div>
-                    <p>Season: {game.season}</p>
-                    <p>Championship: {game.championship}</p>
-                    <p>Game type: {game.type}</p>
+        <div className={styles.container}>
+            <div className={styles.metaInfo}>
+                <span>{game.season}</span>
+                <span>•</span>
+                <span>{game.championship}</span>
+                <span>•</span>
+                <span>{game.type}</span>
+            </div>
+
+            <div className={styles.scoreboard}>
+                <div className={styles.team}>
+                    <img src={game.teams?.home.logo} alt="home team" className={styles.teamLogo}/>
+                    <span className={styles.teamName}>{game.teams.home.name}</span>
                 </div>
-                <div className={styles.scoreValue}>
-                    Score: {game.score.home.goals} - {game.score.away.goals}
+
+                <div className={styles.score}>
+                    {game.score.home.goals} - {game.score.away.goals}
+                </div>
+
+                <div className={styles.team}>
+                    <img src={game.teams?.away.logo} alt="away team" className={styles.teamLogo}/>
+                    <span className={styles.teamName}>{game.teams.away.name}</span>
                 </div>
             </div>
 
-            <div className={styles.teamStats}>
-                <div className={styles.teamSection}>
-                    <div className={styles.teamHeader}>
-                        <img src={game.teams?.home.logo} alt="home team" className={styles.teamLogo}/>
-                        <h3>Home Team</h3>
-                    </div>
-                    <div className={styles.statItem}><span>Shots:</span> <span>{game.score.home.shots}</span></div>
-                    <div className={styles.statItem}><span>Turnovers:</span>
-                        <span>{game.score.home.turnovers}</span></div>
-                    <div className={styles.statItem}><span>Hits:</span> <span>{game.score.home.hits}</span></div>
+            <div className={styles.statsGrid}>
+                <div>
+                    <div className={styles.statValue}>{game.score.home.shots}</div>
+                    <div className={styles.statValue}>{game.score.home.turnovers}</div>
+                    <div className={styles.statValue}>{game.score.home.hits}</div>
                 </div>
-
-                <div className={styles.teamSection}>
-                    <div className={styles.teamHeader}>
-                        <img src={game.teams?.away.logo} alt="away team" className={styles.teamLogo}/>
-                        <h3>Away Team</h3>
-                    </div>
-                    <div className={styles.statItem}><span>Shots:</span> <span>{game.score.away.shots}</span></div>
-                    <div className={styles.statItem}><span>Turnovers:</span>
-                        <span>{game.score.away.turnovers}</span></div>
-                    <div className={styles.statItem}><span>Hits:</span> <span>{game.score.away.hits}</span></div>
+                <div>
+                    <div className={styles.statLabel}>Shots</div>
+                    <div className={styles.statLabel}>Turnovers</div>
+                    <div className={styles.statLabel}>Hits</div>
+                </div>
+                <div>
+                    <div className={styles.statValue}>{game.score.away.shots}</div>
+                    <div className={styles.statValue}>{game.score.away.turnovers}</div>
+                    <div className={styles.statValue}>{game.score.away.hits}</div>
                 </div>
             </div>
         </div>

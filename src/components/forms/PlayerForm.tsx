@@ -6,6 +6,7 @@ import Select from "../Select";
 import Checkbox from "../Checkbox";
 import Button from "../Button";
 import {IPlayer} from "../../OOP/interfaces/IPlayer";
+import styles from "./PlayerForm.module.css";
 
 export interface PlayerFormData {
     name: string;
@@ -58,7 +59,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
         .map(t => ({value: t.id, label: t.name}));
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={styles.form}>
             <Input
                 id="name"
                 label="Name:"
@@ -116,9 +117,9 @@ const PlayerForm: React.FC<PlayerFormProps> = ({
                 </>
             )}
 
-            {errors.general && <span>{errors.general}</span>}
+            {errors.general && <span className={styles.error}>{errors.general}</span>}
 
-            <div>
+            <div className={styles.buttonGroup}>
                 <Button styleType={"positive"} type="submit">{submitLabel}</Button>
                 <Button styleType={"negative"} type="button" onClick={onCancel}>
                     {initialData && !showTeamSelector ? "Discard" : "Go Back"}

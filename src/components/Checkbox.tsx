@@ -1,4 +1,5 @@
 import React, {InputHTMLAttributes} from 'react';
+import styles from './Checkbox.module.css';
 
 interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
     id: string;
@@ -7,13 +8,14 @@ interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const Checkbox: React.FC<CheckboxProps> = ({id, label, className, ...props}) => {
     return (
-        <div className={`checkbox-group ${className || ''}`}>
+        <div className={`${styles.container} ${className || ''}`}>
             <input
                 type="checkbox"
                 id={id}
+                className={styles.input}
                 {...props}
             />
-            <label htmlFor={id}>
+            <label htmlFor={id} className={styles.label}>
                 {label}
             </label>
         </div>

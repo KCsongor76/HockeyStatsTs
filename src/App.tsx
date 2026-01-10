@@ -102,7 +102,7 @@ function App() {
     const placeholderRoutes = [
         {
             path: "*",
-            element: <LoadingSpinner/>,
+            element: <LoadingSpinner overlay={false}/>,
             errorElement: <ErrorPage/>,
         },
     ];

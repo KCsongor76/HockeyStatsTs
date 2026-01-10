@@ -7,6 +7,7 @@ import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
 import PlayerForm, {PlayerFormData} from "../components/forms/PlayerForm";
+import styles from "./CreatePlayerPage.module.css";
 
 const CreatePlayerPage = () => {
     const location = useLocation();
@@ -115,32 +116,38 @@ const CreatePlayerPage = () => {
     };
 
     return (
-        <>
-            <h1>Create New Player</h1>
-            <h2>Upload Players from File</h2>
+        <div className={styles.pageContainer}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>Create New Player</h1>
+                
+                <div className={styles.uploadSection}>
+                    <h2 className={styles.sectionTitle}>Upload Players from File</h2>
+                    <Input
+                        id="fileUpload"
+                        label="Upload player file (.txt) (Line 1: Header/Ignored, Line 2: TeamID, Line 3+: JerseyNumber | Name | Position):"
+                        type="file"
+                        accept=".txt"
+                        onChange={handleFileUpload}
+                    />
 
-            <Input
-                id="fileUpload"
-                label="Upload player file (.txt) (Line 1: Header/Ignored, Line 2: TeamID, Line 3+: JerseyNumber | Name | Position):"
-                type="file"
-                accept=".txt"
-                onChange={handleFileUpload}
-            />
+                    {isUploading && <p className={styles.statusMessage}>Uploading players...</p>}
+                    {uploadStatus && <p className={styles.statusMessage}>{uploadStatus}</p>}
+                </div>
 
-            {isUploading && <p>Uploading players...</p>}
-            {uploadStatus && <p>{uploadStatus}</p>}
-
-            <h2>Create Player Manually</h2>
-            <PlayerForm
-                teams={teams}
-                showTeamSelector={true}
-                onSubmit={submitHandler}
-                onCancel={() => navigate(-1)}
-                submitLabel="Create player"
-                errors={errors}
-                setErrors={setErrors}
-            />
-        </>
+                <div>
+                    <h2 className={styles.sectionTitle}>Create Player Manually</h2>
+                    <PlayerForm
+                        teams={teams}
+                        showTeamSelector={true}
+                        onSubmit={submitHandler}
+                        onCancel={() => navigate(-1)}
+                        submitLabel="Create player"
+                        errors={errors}
+                        setErrors={setErrors}
+                    />
+                </div>
+            </div>
+        </div>
     );
 };
 

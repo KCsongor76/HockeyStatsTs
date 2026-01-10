@@ -13,6 +13,7 @@ import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import PaginatedList from "../components/PaginatedList";
 import GameListItem from "../components/GameListItem";
+import styles from "./SavedGamesPage.module.css";
 
 interface SavedGamesPageProps {
     playerGames?: Game[];
@@ -88,13 +89,13 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
         ...Object.values(GameType).map(gt => ({value: gt, label: gt}))
     ];
 
-    if (isLoading) return <LoadingSpinner/>;
+    if (isLoading) return <LoadingSpinner overlay={false}/>;
     if (error) return <div>{error}</div>;
 
     return (
-        <>
+        <div className={styles.container}>
             {showFilters && (
-                <div>
+                <div className={styles.filters}>
                     <Select
                         id="homeTeam"
                         label="Home Team"
@@ -144,7 +145,7 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                     />
                 )}
             />
-        </>
+        </div>
     );
 };
 

@@ -21,6 +21,7 @@ import {ActionTypeFilter, ColorSelector, PeriodFilter, TeamFilter} from "../comp
 import RinkMap from "../components/game/RinkMap";
 import ActionTable from "../components/game/ActionTable";
 import PlayerStatsTable, {RosterPlayer} from "../components/tables/PlayerStatsTable";
+import styles from "./GamePage.module.css";
 
 type SortField = 'type' | 'period' | 'time' | 'team' | 'player';
 type SortDirection = 'asc' | 'desc';
@@ -387,34 +388,42 @@ const SavedGameDetailPage = () => {
     };
 
     return (
-        <>
+        <div className={styles.pageContainer}>
             <GameHeader game={game}/>
 
-            <h3 style={{textAlign: 'center'}}>Team View</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Team View</h3>
             <TeamFilter teamView={teamView} setTeamView={setTeamView}/>
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Icon Colors</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Icon Colors</h3>
             <ColorSelector
                 useDefaultHome={useDefaultHomeTeamColors}
                 setUseDefaultHome={setUseDefaultHomeTeamColors}
                 useDefaultAway={useDefaultAwayTeamColors}
                 setUseDefaultAway={setUseDefaultAwayTeamColors}
             />
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Periods</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Periods</h3>
             <PeriodFilter
                 availablePeriods={availablePeriods}
                 selectedPeriods={selectedPeriods}
                 togglePeriod={togglePeriod}
                 gameType={game.type}
             />
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Action Types</h3>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Action Types</h3>
             <ActionTypeFilter
                 availableActionTypes={availableActionTypes}
                 selectedActionTypes={selectedActionTypes}
                 toggleActionType={toggleActionType}
             />
+            </div>
 
             <RinkMap
                 rinkImage={game.selectedImage}
@@ -423,8 +432,9 @@ const SavedGameDetailPage = () => {
                 onIconClick={handleIconClick}
             />
 
-            <h3 style={{textAlign: 'center'}}>Skaters</h3>
-            <div style={{width: '100%', overflowX: 'auto'}}>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Skaters</h3>
+            <div className={styles.tableSection}>
                 <PlayerStatsTable
                     title=""
                     variant="roster"
@@ -432,11 +442,14 @@ const SavedGameDetailPage = () => {
                     sortConfig={{field: playerSortField, direction: playerSortDirection}}
                     onSort={handlePlayerSort}
                     onView={(id) => togglePlayer(id)}
+                    selectedPlayerId={selectedPlayer}
                 />
             </div>
+            </div>
 
-            <h3 style={{textAlign: 'center'}}>Goalies</h3>
-            <div style={{width: '100%', overflowX: 'auto'}}>
+            <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Goalies</h3>
+            <div className={styles.tableSection}>
                 <PlayerStatsTable
                     title=""
                     variant="roster"
@@ -444,7 +457,9 @@ const SavedGameDetailPage = () => {
                     sortConfig={{field: playerSortField, direction: playerSortDirection}}
                     onSort={handlePlayerSort}
                     onView={(id) => togglePlayer(id)}
+                    selectedPlayerId={selectedPlayer}
                 />
+            </div>
             </div>
 
             <ActionTable
@@ -505,7 +520,7 @@ const SavedGameDetailPage = () => {
                 onClose={() => setSelectedAction(null)}
                 action={selectedAction}
             />
-        </>
+        </div>
     );
 };
 

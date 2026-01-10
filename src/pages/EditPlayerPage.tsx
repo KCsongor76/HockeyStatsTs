@@ -4,6 +4,7 @@ import {Player} from "../OOP/classes/Player";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {PlayerService} from "../OOP/services/PlayerService";
 import PlayerForm, {PlayerFormData} from "../components/forms/PlayerForm";
+import styles from "./EditPlayerPage.module.css";
 
 const EditPlayerPage = () => {
     const location = useLocation();
@@ -43,18 +44,20 @@ const EditPlayerPage = () => {
     };
 
     return (
-        <>
-            <h1>Edit {player.name}</h1>
-            {errors.general && <span>{errors.general}</span>}
-            <PlayerForm
-                initialData={player}
-                onSubmit={handleSave}
-                onCancel={() => navigate(-1)}
-                submitLabel="Save Changes"
-                errors={errors}
-                setErrors={setErrors}
-            />
-        </>
+        <div className={styles.pageContainer}>
+            <div className={styles.formCard}>
+                <h1 className={styles.title}>Edit {player.name}</h1>
+                {errors.general && <div className={styles.errorContainer}>{errors.general}</div>}
+                <PlayerForm
+                    initialData={player}
+                    onSubmit={handleSave}
+                    onCancel={() => navigate(-1)}
+                    submitLabel="Save Changes"
+                    errors={errors}
+                    setErrors={setErrors}
+                />
+            </div>
+        </div>
     );
 };
 

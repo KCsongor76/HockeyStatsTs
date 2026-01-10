@@ -41,8 +41,8 @@ const ActionTable: React.FC<ActionTableProps> = ({
     );
 
     return (
-        <div className={styles.tableContainer}>
-            <h3>All Actions</h3>
+        <div className={styles.container}>
+            <h3 className={styles.title}>All Actions</h3>
             <table className={styles.table}>
                 <thead>
                 <tr>

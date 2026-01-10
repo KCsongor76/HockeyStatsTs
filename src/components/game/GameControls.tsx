@@ -20,7 +20,7 @@ const GameControls: React.FC<GameControlsProps> = ({
                                                        onToggleDetails
                                                    }) => {
     return (
-        <div className={styles.controlsContainer}>
+        <div className={styles.container}>
             <Button styleType={"positive"} type="button" onClick={onSaveLocally}>
                 Save Game Locally
             </Button>

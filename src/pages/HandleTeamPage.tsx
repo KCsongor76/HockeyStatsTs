@@ -14,34 +14,9 @@ import {Season} from "../OOP/enums/Season";
 import {Championship} from "../OOP/enums/Championship";
 import {GameType} from "../OOP/enums/GameType";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
-
-interface TeamStats {
-    gp: number;
-    w: number;
-    otw: number;
-    l: number;
-    otl: number;
-    gf: number;
-    ga: number;
-    gd: number;
-    s: number;
-    h: number;
-    t: number;
-}
-
-interface PlayerStats {
-    player: Player;
-    name: Player["name"]
-    jerseyNumber: Player["jerseyNumber"]
-    position: Player["position"]
-    gp: number;
-    g: number;
-    a: number;
-    p: number;
-    s: number;
-    h: number;
-    t: number;
-}
+import HandleTeamStatsTable, {HandleTeamStatsData} from "../components/tables/HandleTeamStatsTable";
+import HandlePlayerStatsTable, {HandlePlayerStatsData} from "../components/tables/HandlePlayerStatsTable";
+import styles from "./HandleTeamPage.module.css";
 
 const HandleTeamPage = () => {
     const navigate = useNavigate();
@@ -65,7 +40,7 @@ const HandleTeamPage = () => {
         });
     }, [games, filters]);
 
-    const teamStats = useMemo(() => {
+    const teamStats: HandleTeamStatsData = useMemo(() => {
         let gp = 0;
         let w = 0;
         let otw = 0;
@@ -130,8 +105,8 @@ const HandleTeamPage = () => {
         return {gp, w, otw, l, otl, gf, ga, gd, s, h, t};
     }, [filteredGames, team.id]);
 
-    const playerStats = useMemo(() => {
-        const stats: PlayerStats[] = []
+    const playerStats: HandlePlayerStatsData[] = useMemo(() => {
+        const stats: HandlePlayerStatsData[] = []
 
         team.players.forEach(player => {
             let gp = 0;
@@ -173,6 +148,7 @@ const HandleTeamPage = () => {
             p = g + a;
             stats.push({
                 player,
+                id: player.id,
                 name: player.name,
                 jerseyNumber: player.jerseyNumber,
                 position: player.position,
@@ -196,11 +172,13 @@ const HandleTeamPage = () => {
     ];
 
     return (
-        <>
-            <h1>{team.name}</h1>
-            <img src={team.logo} alt={team.name}/>
+        <div className={styles.pageContainer}>
+            <div className={styles.header}>
+                <img src={team.logo} alt={team.name} className={styles.logo}/>
+                <h1 className={styles.title}>{team.name}</h1>
+            </div>
 
-            <div>
+            <div className={styles.filtersSection}>
                 <Select
                     id="season"
                     label="Season"
@@ -224,92 +202,33 @@ const HandleTeamPage = () => {
                 />
             </div>
 
-            {/*  Team table  */}
-            <table>
-                <thead>
-                <tr>
-                    <th>GP</th>
-                    <th>W</th>
-                    <th>OTW</th>
-                    <th>L</th>
-                    <th>OTL</th>
-                    <th>GF</th>
-                    <th>GA</th>
-                    <th>GD</th>
-                    <th>S</th>
-                    <th>H</th>
-                    <th>T</th>
-                </tr>
-                </thead>
+            <div>
+                <h2 className={styles.sectionTitle}>Team Statistics</h2>
+                <HandleTeamStatsTable stats={teamStats}/>
+            </div>
 
-                <tbody>
-                <tr>
-                    <td>{teamStats.gp}</td>
-                    <td>{teamStats.w}</td>
-                    <td>{teamStats.otw}</td>
-                    <td>{teamStats.l}</td>
-                    <td>{teamStats.otl}</td>
-                    <td>{teamStats.gf}</td>
-                    <td>{teamStats.ga}</td>
-                    <td>{teamStats.gd}</td>
-                    <td>{teamStats.s}</td>
-                    <td>{teamStats.h}</td>
-                    <td>{teamStats.t}</td>
-                </tr>
-                </tbody>
-            </table>
+            <div>
+                <h2 className={styles.sectionTitle}>Player Statistics</h2>
+                <HandlePlayerStatsTable
+                    players={playerStats}
+                    onView={(playerStat) => navigate(`/${HANDLE_PLAYERS}/${playerStat.id}`, {
+                        state: {
+                            player: playerStat.player,
+                            games
+                        }
+                    })}
+                />
+            </div>
 
-            {/*  Players table  */}
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>#</th>
-                    <th>Position</th>
-                    <th>GP</th>
-                    <th>G</th>
-                    <th>A</th>
-                    <th>P</th>
-                    <th>S</th>
-                    <th>H</th>
-                    <th>T</th>
-                    <th>View</th>
-                </tr>
-                </thead>
+            <div>
+                <h2 className={styles.sectionTitle}>Game History</h2>
+                <SavedGamesPage playerGames={filteredGames}/>
+            </div>
 
-                <tbody>
-                {playerStats.map((playerStat, index) => <tr key={index}>
-                    <td>{playerStat.name}</td>
-                    <td>{playerStat.jerseyNumber}</td>
-                    <td>{playerStat.position}</td>
-                    <td>{playerStat.gp}</td>
-                    <td>{playerStat.g}</td>
-                    <td>{playerStat.a}</td>
-                    <td>{playerStat.p}</td>
-                    <td>{playerStat.s}</td>
-                    <td>{playerStat.h}</td>
-                    <td>{playerStat.t}</td>
-                    <td>
-                        <Button
-                            styleType={"neutral"}
-                            onClick={() => navigate(`/${HANDLE_PLAYERS}/${playerStat.player.id}`, {
-                                state: {
-                                    player: playerStat.player,
-                                    games
-                                }
-                            })}
-                        >
-                            View
-                        </Button>
-                    </td>
-                </tr>)}
-                </tbody>
-            </table>
-
-            <SavedGamesPage playerGames={filteredGames}/>
-
-            <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
-        </>
+            <div className={styles.footer}>
+                <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
+            </div>
+        </div>
     );
 };
 

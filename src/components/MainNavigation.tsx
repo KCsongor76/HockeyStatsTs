@@ -35,6 +35,10 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
 
     return (
         <nav className={styles.nav}>
+            <NavLink to="/" className={styles.brand} onClick={closeMenu}>
+                HockeyStats
+            </NavLink>
+
             <button
                 className={styles.mobileToggle}
                 onClick={toggleMenu}

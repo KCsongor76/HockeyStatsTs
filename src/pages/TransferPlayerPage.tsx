@@ -9,6 +9,7 @@ import Select from "../components/Select";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {ITeam} from "../OOP/interfaces/ITeam";
+import styles from "./TransferPlayerPage.module.css";
 
 const TransferPlayerPage = () => {
     const location = useLocation();
@@ -96,10 +97,21 @@ const TransferPlayerPage = () => {
     const teamOptions = teams.map(t => ({value: t.id, label: t.name}));
 
     return (
-        <form onSubmit={submitHandler}>
-            <h1>Transfer Player</h1>
-            <p>Player: {player.name} (#{player.jerseyNumber})</p>
-            <p>Current Team: {currentTeam?.name || "Free Agent"}</p>
+        <div className={styles.pageContainer}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>Transfer Player</h1>
+                <div className={styles.infoSection}>
+                    <div className={styles.infoRow}>
+                        <span className={styles.label}>Player</span>
+                        <span className={styles.value}>{player.name} (#{player.jerseyNumber})</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                        <span className={styles.label}>Current Team</span>
+                        <span className={styles.value}>{currentTeam?.name || "Free Agent"}</span>
+                    </div>
+                </div>
+
+                <form onSubmit={submitHandler} className={styles.form}>
 
             {player.teamId !== "free-agent" && (
                 <Select
@@ -113,10 +125,10 @@ const TransferPlayerPage = () => {
                 />
             )}
 
-            {errors.jersey && <span>{errors.jersey}</span>}
-            {errors.general && <span>{errors.general}</span>}
+            {errors.jersey && <span className={styles.error}>{errors.jersey}</span>}
+            {errors.general && <span className={styles.error}>{errors.general}</span>}
 
-            <div>
+            <div className={styles.buttonGroup}>
                 {/* Only show "Set to Free Agent" if not already one */}
                 {player.teamId !== "free-agent" && (
                     <Button
@@ -150,6 +162,8 @@ const TransferPlayerPage = () => {
                 </Button>
             </div>
         </form>
+            </div>
+        </div>
     );
 };
 

@@ -1,198 +1,209 @@
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
+    background-color: #f9fafb;
 }
 
-.formGrid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.form {
+    width: 100%;
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
     margin-bottom: 1.5rem;
 }
 
-.colorGroup {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    gap: 1rem;
-    min-width: 300px;
+.row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
 }
 
-.colorGroup input {
-    align-self: center;
+/* Tablet and up */
+@media (min-width: 640px) {
+    .row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .row.threeCols {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.colorsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.teamColorGroup {
+    flex: 1;
+    background-color: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.teamColorGroup h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #4b5563;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.colorInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.previewIcon {
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+@media (min-width: 768px) {
+    .colorsContainer {
+        flex-direction: row;
+    }
 }
 
 .rinkImages {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
-    margin-bottom: 1.5rem;
-    justify-content: center; /* Center the rink images */
+    justify-content: center;
     width: 100%;
 }
 
 .rinkOption {
+    position: relative;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+    transition: all 0.2s;
+    background: white;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.rinkOption:hover {
+    border-color: #93c5fd;
+}
+
+.rinkOptionSelected {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Target the RadioButton component inside our wrapper */
+.rinkOption label {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 2px solid transparent;
-    text-align: center;
-}
-
-.rinkOption.selected {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
+    width: 100%;
 }
 
 .rinkOption img {
-    width: 150px;
-    height: 100px;
+    width: 100%;
+    max-width: 200px;
+    height: auto;
     object-fit: cover;
     border-radius: 0.25rem;
-    margin-bottom: 0.5rem;
+    border: 1px solid #e5e7eb;
 }
 
-.rosterSection {
+@media (min-width: 640px) {
+    .rinkImages {
+        flex-direction: row;
+    }
+}
+
+.rosterToggle {
+    display: flex;
+    justify-content: center;
     margin-bottom: 1.5rem;
-    padding: 1rem;
-    background-color: #f8fafc;
-    border-radius: 0.5rem;
-    width: 100%; /* Take full width */
 }
 
-.rosterHeader {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    cursor: pointer;
+.rosterContainer {
+    animation: slideDown 0.3s ease-out;
 }
 
-.rosterContent {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-.rosterColumn h4 {
-    margin-bottom: 0.5rem;
-}
-
-.playerItem {
-    padding: 0.5rem;
-    margin-bottom: 0.25rem;
-    background-color: #e2e8f0;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.playerItem:hover {
-    background-color: #cbd5e1;
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .buttonGroup {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
-    margin-top: 1.5rem;
-    justify-content: center; /* Center the buttons */
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+@media (min-width: 640px) {
+    .buttonGroup {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+}
+
+.errorSummary {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    text-align: center;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .error {
     color: #ef4444;
     font-size: 0.875rem;
     margin-top: 0.25rem;
-}
-
-/* Position counters */
-.positionCounters {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-
-.counterItem {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    background-color: #e2e8f0;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-}
-
-/* Add colored indicators for roster status */
-.playerStatus {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.playerStatus.available {
-    background-color: #10b981; /* Green for available */
-    color: white;
-}
-
-.playerStatus.selected {
-    background-color: #ef4444; /* Red for selected (to remove) */
-    color: white;
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 1rem;
-    }
-
-    .rosterContent {
-        grid-template-columns: 1fr;
-    }
-
-    .colorGroup {
-        flex-direction: column;
-    }
-}
-
-@media (min-width: 769px) {
-    .rinkImages {
-        justify-content: center;
-    }
-
-    .buttonGroup {
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0.75rem;
-    }
-
-    .rinkImages {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .buttonGroup {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .positionCounters {
-        justify-content: center;
-    }
 }

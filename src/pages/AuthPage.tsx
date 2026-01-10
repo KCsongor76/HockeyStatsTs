@@ -9,6 +9,7 @@ import {auth} from '../firebase';
 import {isAdmin} from '../admin';
 import Input from "../components/Input";
 import Button from "../components/Button";
+import styles from "./AuthPage.module.css";
 
 const AuthPage = () => {
     const navigate = useNavigate();
@@ -111,23 +112,23 @@ const AuthPage = () => {
     };
 
     return (
-        <div>
-            <div>
-                <h1>Admin Login</h1>
+        <div className={styles.pageContainer}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>Admin Login</h1>
 
                 {message && (
-                    <p>
+                    <p className={styles.message}>
                         {message}
                     </p>
                 )}
 
                 {isProcessing ? (
-                    <p>Processing...</p>
+                    <p className={styles.description}>Processing...</p>
                 ) : isSignInWithEmailLink(auth, window.location.href) ? (
                     <div>
-                        <p>Check your email for the sign-in link</p>
-                        <p>If you're on a different device, enter your email:</p>
-                        <form onSubmit={handleEmailSubmit}>
+                        <p className={styles.description}>Check your email for the sign-in link</p>
+                        <p className={styles.description}>If you're on a different device, enter your email:</p>
+                        <form onSubmit={handleEmailSubmit} className={styles.form}>
                             <Input
                                 id="email-verify"
                                 label="Your Email"
@@ -149,7 +150,7 @@ const AuthPage = () => {
                         </form>
                     </div>
                 ) : (
-                    <form onSubmit={handleEmailSubmit}>
+                    <form onSubmit={handleEmailSubmit} className={styles.form}>
                         <Input
                             id="email-signin"
                             label="Your Email"
