@@ -12,6 +12,7 @@ import {Championship} from "../OOP/enums/Championship";
 import {Season} from "../OOP/enums/Season";
 import {GameType} from "../OOP/enums/GameType";
 import PaginatedList from "../components/PaginatedList";
+import GameListItem from "../components/GameListItem";
 
 interface SavedGamesPageProps {
     playerGames?: Game[];
@@ -136,30 +137,11 @@ const SavedGamesPage = ({playerGames, showFilters}: SavedGamesPageProps) => {
                 data={filteredGames}
                 renderEmpty={() => <p>No games found.</p>}
                 renderItem={(game: Game) => (
-                    <li
+                    <GameListItem
                         key={game.id}
+                        game={game}
                         onClick={() => navigate(`/${SAVED_GAMES}/${game.id}`, {state: game})}
-                    >
-                        <div>
-                            <img src={game.teams.home.logo} alt={game.teams.home.name}/>
-                            <span>{game.teams.home.name}</span>
-                        </div>
-
-                        <span>
-                            {game.score.home.goals} - {game.score.away.goals}
-                        </span>
-
-                        <div>
-                            <span>{game.formattedDate}</span>
-                            <span>{game.championship}</span>
-                            <span>{game.type}</span>
-                        </div>
-
-                        <div>
-                            <img src={game.teams.away.logo} alt={game.teams.away.name}/>
-                            <span>{game.teams.away.name}</span>
-                        </div>
-                    </li>
+                    />
                 )}
             />
         </>
