@@ -17,11 +17,14 @@ import PlayerCRUDPage from "./pages/PlayerCRUDPage";
 import CreatePlayerPage from "./pages/CreatePlayerPage";
 import TransferPlayerPage from "./pages/TransferPlayerPage";
 import HandlePlayerPage from "./pages/HandlePlayerPage";
-import {loader as teamCRUDPageLoader} from "./pages/TeamCRUDPage2";
-import {loader as playerCRUDPageLoader} from "./pages/PlayerCRUDPage2";
+import LoadingSpinner from "./components/LoadingSpinner";
+import EditTeamPage from "./pages/EditTeamPage";
+import EditPlayerPage from "./pages/EditPlayerPage";
+import {loader as teamCRUDPageLoader} from "./pages/TeamCRUDPage";
+import {loader as playerCRUDPageLoader} from "./pages/PlayerCRUDPage";
 import {loader as startPageLoader} from "./pages/StartPage";
-import {loader as handleTeamPageLoader} from "./pages/HandleTeamPage2";
-import {loader as handlePlayerPageLoader} from "./pages/HandlePlayerPage2";
+import {loader as handleTeamPageLoader} from "./pages/HandleTeamPage";
+import {loader as handlePlayerPageLoader} from "./pages/HandlePlayerPage";
 import {adminUids} from "./admin";
 import {auth} from "./firebase";
 import {
@@ -35,14 +38,7 @@ import {
     SAVED_GAMES_GAME_ID,
     START, TRANSFER_ID
 } from "./OOP/constants/NavigationNames";
-import LoadingSpinner from "./components/LoadingSpinner";
-import TeamCrudPage2 from "./pages/TeamCRUDPage2";
-import EditTeamPage from "./pages/EditTeamPage";
-import HandleTeamPage2 from "./pages/HandleTeamPage2";
-import PlayerCRUDPage2 from "./pages/PlayerCRUDPage2";
-import EditPlayerPage from "./pages/EditPlayerPage";
-import SavedGamesPage2 from "./pages/SavedGamesPage2";
-import HandlePlayerPage2 from "./pages/HandlePlayerPage2";
+
 
 function App() {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -77,23 +73,23 @@ function App() {
                 {index: true, element: <HomePage isSignedIn={isSignedIn}/>},
                 {path: START, element: <StartPage/>, loader: startPageLoader},
                 {path: GAME, element: <GamePage/>},
-                {path: SAVED_GAMES, element: <SavedGamesPage2 showFilters={true}/>},
+                {path: SAVED_GAMES, element: <SavedGamesPage showFilters={true}/>},
                 {path: SAVED_GAMES_GAME_ID, element: <SavedGameDetailPage/>},
                 {
                     path: HANDLE_TEAMS,
                     children: [
-                        {index: true, element: <TeamCrudPage2/>, loader: teamCRUDPageLoader},
+                        {index: true, element: <TeamCRUDPage/>, loader: teamCRUDPageLoader},
                         {path: CREATE, element: <CreateTeamPage/>,},
-                        {path: ID, element: <HandleTeamPage2/>, loader: handleTeamPageLoader},
+                        {path: ID, element: <HandleTeamPage/>, loader: handleTeamPageLoader},
                         {path: `${ID}/edit`, element: <EditTeamPage/>},
                     ],
                 },
                 {
                     path: HANDLE_PLAYERS,
                     children: [
-                        {index: true, element: <PlayerCRUDPage2/>, loader: playerCRUDPageLoader},
+                        {index: true, element: <PlayerCRUDPage/>, loader: playerCRUDPageLoader},
                         {path: CREATE, element: <CreatePlayerPage/>},
-                        {path: ID, element: <HandlePlayerPage2/>, loader: handlePlayerPageLoader},
+                        {path: ID, element: <HandlePlayerPage/>, loader: handlePlayerPageLoader},
                         {path: `${ID}/edit`, element: <EditPlayerPage/>},
                         {path: TRANSFER_ID, element: <TransferPlayerPage/>},
                     ],

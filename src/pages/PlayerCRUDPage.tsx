@@ -1,20 +1,20 @@
 import React, {useMemo, useState} from 'react';
 import {TeamService} from "../OOP/services/TeamService";
-import {useLoaderData, useNavigate} from "react-router-dom";
-import {GameService} from "../OOP/services/GameService";
-import {Season} from "../OOP/enums/Season";
 import {PlayerService} from "../OOP/services/PlayerService";
-import {Position} from "../OOP/enums/Position";
-import Pagination from "../components/Pagination";
-import Button from "../components/Button";
-import Input from "../components/Input";
-import Select from "../components/Select";
-import {CREATE} from "../OOP/constants/NavigationNames";
-import EntityListItem from "../components/EntityListItem";
+import {GameService} from "../OOP/services/GameService";
 import {Player} from "../OOP/classes/Player";
 import {Team} from "../OOP/classes/Team";
 import {Game} from "../OOP/classes/Game";
-import {useFilterPagination} from "../hooks/useFilterPagination";
+import {useLoaderData, useNavigate} from "react-router-dom";
+import {CREATE} from "../OOP/constants/NavigationNames";
+import Button from "../components/Button";
+import {useFilter} from "../hooks/useFilter";
+import Input from "../components/Input";
+import Select from "../components/Select";
+import {Season} from "../OOP/enums/Season";
+import {Position} from "../OOP/enums/Position";
+import PaginatedList from "../components/PaginatedList";
+
 
 interface LoaderData {
     teams: Team[];
@@ -22,35 +22,32 @@ interface LoaderData {
     games: Game[];
 }
 
-interface PlayerFilterCriteria {
-    team: string;
-    position: string;
-    jerseyNr: string;
-    search: string;
-    season: string;
-}
-
 const PlayerCrudPage = () => {
+    const navigate = useNavigate();
     const loaderData = useLoaderData() as LoaderData;
+    const teams = loaderData.teams ?? [];
+    const [players, setPlayers] = useState<Player[]>(loaderData.players ?? []);
+    const games = loaderData.games ?? [];
 
-    const [players, setPlayers] = useState<Player[]>(loaderData.players);
-    const teams = loaderData.teams;
-    const games = loaderData.games;
-
-    const {
-        filters,
-        handleFilterChange,
-        pagination,
-        setPagination,
-        paginate
-    } = useFilterPagination<Player, PlayerFilterCriteria>({
+    const {filters, handleFilterChange} = useFilter({
+        search: '',
+        season: '',
         team: '',
         position: '',
-        jerseyNr: '',
-        search: '',
-        season: ''
+        jerseyNr: ''
     });
-    const navigate = useNavigate();
+
+    const deleteHandler = async (player: Player) => {
+        if (window.confirm(`Are you sure you want to delete ${player.name}?`)) {
+            try {
+                await PlayerService.deletePlayer(player.teamId, player.id);
+                setPlayers(prev => prev.filter(p => p.id !== player.id));
+            } catch (error) {
+                console.error("Failed to delete player:", error);
+                alert("Failed to delete player.");
+            }
+        }
+    };
 
     const teamsActiveInSeason = useMemo(() => {
         if (!filters.season) return null;
@@ -66,36 +63,16 @@ const PlayerCrudPage = () => {
     }, [games, filters.season]);
 
     const filteredPlayers = useMemo(() => {
-        // todo: make this more readable
         return players.filter(player => {
             if (filters.search && !player.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
             if (filters.team && player.teamId !== filters.team) return false;
             if (filters.position && player.position !== filters.position) return false;
             if (filters.jerseyNr && player.jerseyNumber.toString() !== filters.jerseyNr) return false;
-            // If a season is selected, check if the player's team was active in that season.
-            return !(teamsActiveInSeason && !teamsActiveInSeason.has(player.teamId));
+            if (teamsActiveInSeason && !teamsActiveInSeason.has(player.teamId)) return false;
+            return true;
         });
     }, [players, filters, teamsActiveInSeason]);
 
-    // Pagination Logic
-    const {
-        currentItems: currentPlayers,
-        totalPages
-    } = useMemo(() => paginate(filteredPlayers), [filteredPlayers, paginate]);
-
-    const deleteHandler = async (player: Player) => {
-        if (window.confirm(`Are you sure you want to delete ${player.name}?`)) {
-            try {
-                await PlayerService.deletePlayer(player.teamId, player.id);
-                setPlayers(prev => prev.filter(p => p.id !== player.id));
-            } catch (error) {
-                console.error("Failed to delete player:", error);
-                alert("Failed to delete player.");
-            }
-        }
-    };
-
-    // Filter Options
     const seasonOptions = [
         {value: "", label: "All Seasons"},
         ...Object.values(Season).map(s => ({value: s, label: s}))
@@ -110,10 +87,11 @@ const PlayerCrudPage = () => {
     ];
 
     return (
-        <div>
-            <h1>Players Registry</h1>
-
-            <Button styleType={"positive"} onClick={() => navigate(CREATE, {state: {teams}})}>
+        <>
+            <Button
+                styleType={"positive"}
+                onClick={() => navigate(CREATE, {state: {teams}})}
+            >
                 Add New Player
             </Button>
 
@@ -162,38 +140,50 @@ const PlayerCrudPage = () => {
                 />
             </div>
 
-            <ul>
-                {currentPlayers.length > 0 ? currentPlayers.map((player: Player) => (
-                    <EntityListItem
-                        key={player.id}
-                        onView={() => navigate(`${player.id}`, {state: {player, games}})}
-                        onDelete={() => deleteHandler(player)}
-                    >
-                        {player.name} {` #${player.jerseyNumber} (${player.position}) `}
-                        <span>
-                            {teams.find(t => t.id === player.teamId)?.name || 'Unknown Team'}
-                        </span>
-                    </EntityListItem>
-                )) : <p>No players found.</p>}
-            </ul>
+            <PaginatedList
+                data={filteredPlayers}
+                renderEmpty={() => <p>No players found.</p>}
+                renderItem={(player: Player) => (
+                    <li key={player.id}>
+                        {player.name}
 
-            <Pagination pagination={pagination} totalPages={totalPages} setPagination={setPagination}/>
+                        <Button
+                            styleType={"positive"}
+                            onClick={() => navigate(`${player.id}`, {state: {player, games}})}
+                        >
+                            View
+                        </Button>
+
+                        <Button
+                            styleType={"neutral"}
+                            onClick={() => navigate(`${player.id}/edit`, {state: {player, teams}})}
+                        >
+                            Edit
+                        </Button>
+
+                        <Button
+                            styleType={"negative"}
+                            onClick={() => deleteHandler(player)}
+                        >
+                            Delete
+                        </Button>
+                    </li>
+                )}
+            />
+
             <Button styleType={"negative"} onClick={() => navigate(-1)}>Go Back</Button>
-        </div>
+        </>
     );
 };
 
 export default PlayerCrudPage;
 
 export const loader = async (): Promise<LoaderData> => {
-    const [teamsData, playersData, gamesData] = await Promise.all([
-        TeamService.getAllTeams(),
-        PlayerService.getAllPlayers(),
-        GameService.getAllGames()
-    ]);
 
-    const teams = teamsData;
-    const games = gamesData;
+    const teams = await TeamService.getAllTeams();
+    const games = await GameService.getAllGames();
+    // todo: make sure PlayerService returns Player objects
+    const playersData = await PlayerService.getAllPlayers()
     const players = playersData.map(p => new Player(p.id, p.jerseyNumber, p.name, p.position, p.teamId));
 
     return {teams, players, games};
