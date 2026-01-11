@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.12.28)  11 JAN 2026 23:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.12.28)  11 JAN 2026 23:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./documentation.tex
-(documentation.tex
+**./implementation_plan.tex
+(implementation_plan.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
 (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/base\report.cls
@@ -223,35 +223,27 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
-) (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
-Package: enumitem 2025/02/06 v3.11 Customized lists
-\labelindent=\skip54
-\enit@outerparindent=\dimen166
-\enit@toks=\toks22
-\enit@inbox=\box54
-\enit@count@id=\count299
-\enitdp@description=\count300
 ) (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
-\lst@mode=\count301
-\lst@gtempboxa=\box55
-\lst@token=\toks23
-\lst@length=\count302
-\lst@currlwidth=\dimen167
-\lst@column=\count303
-\lst@pos=\count304
-\lst@lostspace=\dimen168
-\lst@width=\dimen169
-\lst@newlines=\count305
-\lst@lineno=\count306
-\lst@maxwidth=\dimen170
+\lst@mode=\count299
+\lst@gtempboxa=\box54
+\lst@token=\toks22
+\lst@length=\count300
+\lst@currlwidth=\dimen166
+\lst@column=\count301
+\lst@pos=\count302
+\lst@lostspace=\dimen167
+\lst@width=\dimen168
+\lst@newlines=\count303
+\lst@lineno=\count304
+\lst@maxwidth=\dimen169
 (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
 File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
 )
 (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
-\c@lstnumber=\count307
-\lst@skipnumbers=\count308
-\lst@framebox=\box56
+\c@lstnumber=\count305
+\lst@skipnumbers=\count306
+\lst@framebox=\box55
 )
 (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
 File: listings.cfg 2025/11/14 1.11b listings configuration
@@ -263,50 +255,73 @@ Package: listings 2025/11/14 1.11b (Carsten Heinz)
     but found:
         2025/11/14 1.11b (Carsten Heinz)
     so I'm assuming it got fixed.
-(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty
-Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
-\LTleft=\skip55
-\LTright=\skip56
-\LTpre=\skip57
-\LTpost=\skip58
-\LTchunksize=\count309
-\LTcapwidth=\dimen171
-\LT@head=\box57
-\LT@firsthead=\box58
-\LT@foot=\box59
-\LT@lastfoot=\box60
-\LT@gbox=\box61
-\LT@cols=\count310
-\LT@rows=\count311
-\c@LT@tables=\count312
-\c@LT@chunks=\count313
-\LT@p@ftn=\toks24
+(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
+Package: enumitem 2025/02/06 v3.11 Customized lists
+\labelindent=\skip54
+\enit@outerparindent=\dimen170
+\enit@toks=\toks23
+\enit@inbox=\box56
+\enit@count@id=\count307
+\enitdp@description=\count308
 )
+(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty
+Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
+
+\f@nch@headwidth=\skip55
+\f@nch@offset@elh=\skip56
+\f@nch@offset@erh=\skip57
+\f@nch@offset@olh=\skip58
+\f@nch@offset@orh=\skip59
+\f@nch@offset@elf=\skip60
+\f@nch@offset@erf=\skip61
+\f@nch@offset@olf=\skip62
+\f@nch@offset@orf=\skip63
+\f@nch@height=\skip64
+\f@nch@footalignment=\skip65
+\f@nch@widthL=\skip66
+\f@nch@widthC=\skip67
+\f@nch@widthR=\skip68
+\@temptokenb=\toks24
+)
+(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks25
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+Package hyperref Info: Option `colorlinks' set `true' on input line 28.
+
 (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 tex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count314
-) (documentation.aux)
-\openout1 = `documentation.aux'.
+\l__color_backend_stack_int=\count309
+) (implementation_plan.aux)
+\openout1 = `implementation_plan.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -325,7 +340,7 @@ LaTeX Font Info:    ... okay on input line 19.
 * \oddsidemargin=-1.1381pt
 * \evensidemargin=-1.1381pt
 * \topmargin=-38.1381pt
-* \headheight=12.0pt
+* \headheight=14.0pt
 * \headsep=25.0pt
 * \topskip=11.0pt
 * \footskip=30.0pt
@@ -342,133 +357,219 @@ LaTeX Font Info:    ... okay on input line 19.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring OFF on input line 19.
-(documentation.out) (documentation.out)
+Package hyperref Info: Link coloring ON on input line 43.
+(implementation_plan.out) (implementation_plan.out)
 \@outlinefile=\write3
-\openout3 = `documentation.out'.
+\openout3 = `implementation_plan.out'.
 
 
 (C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count315
-\scratchdimen=\dimen172
-\scratchbox=\box62
-\nofMPsegments=\count316
-\nofMParguments=\count317
-\everyMPshowfont=\toks25
-\MPscratchCnt=\count318
-\MPscratchDim=\dimen173
-\MPnumerator=\count319
-\makeMPintoPDFobject=\count320
-\everyMPtoPDFconversion=\toks26
+\scratchcounter=\count310
+\scratchdimen=\dimen171
+\scratchbox=\box57
+\nofMPsegments=\count311
+\nofMParguments=\count312
+\everyMPshowfont=\toks26
+\MPscratchCnt=\count313
+\MPscratchDim=\dimen172
+\MPnumerator=\count314
+\makeMPintoPDFobject=\count315
+\everyMPtoPDFconversion=\toks27
 )
-\c@lstlisting=\count321
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 22.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 22.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 22.
+\c@lstlisting=\count316
  [1
 
 {C:/Users/krist/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-(documentation.toc
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 2.
+(implementation_plan.toc
+LaTeX Font Info:    Trying to load font information for U+msa on input line 2.
+
+(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 2.
+
+(C:\Users\krist\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+! Misplaced alignment tab character &.
+<argument> ...pace {1em}Phase 8: Polish, Testing &
+                                                   Deploy}\Hy@toclinkend 
+l.18 ...e 8: Polish, Testing & Deploy}{13}{part.6}
+                                                  %
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
 )
 \tf@toc=\write4
-\openout4 = `documentation.toc'.
+\openout4 = `implementation_plan.toc'.
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.23 	\newpage
+l.58 	\newpage
                [1
 
-]
-Chapter 1.
-[2
+] [2
 
 ]
-Chapter 2.
 
-Underfull \hbox (badness 1052) in paragraph at lines 67--68
-[]|\T1/cmr/m/n/10.95 Lists his-tor-i-cal games from Fire-
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 66.
+
+
+Overfull \hbox (2.5422pt too wide) in paragraph at lines 68--69
+[]\T1/cmr/bx/n/10.95 Scaffold Project: \T1/cmr/m/n/10.95 Run \T1/cmtt/m/n/10.95
+ npm create vite@latest hockeystats -- --template react-ts\T1/cmr/m/n/10.95 . 
  []
 
 
-Overfull \hbox (7.54721pt too wide) in alignment at lines 57--75
- [] [] [] 
+Overfull \hbox (39.55807pt too wide) in paragraph at lines 75--76
+[]\T1/cmr/bx/n/10.95 Core Logic: \T1/cmtt/m/n/10.95 npm install inversify refle
+ct-metadata date-fns zod clsx tailwind-merge 
  []
 
-[3
+
+Overfull \hbox (4.6765pt too wide) in paragraph at lines 89--90
+[]\T1/cmr/m/n/10.95 Enable dec-o-ra-tors: \T1/cmtt/m/n/10.95 "experimentalDecor
+ators": true\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 "emitDecoratorMetadata":
+ []
+
+
+Overfull \hbox (45.11075pt too wide) in paragraph at lines 91--92
+[]\T1/cmr/bx/n/10.95 Tailwind Init: \T1/cmr/m/n/10.95 Run \T1/cmtt/m/n/10.95 np
+x tailwindcss init -p\T1/cmr/m/n/10.95 . Con-fig-ure \T1/cmtt/m/n/10.95 content
+ \T1/cmr/m/n/10.95 paths in \T1/cmtt/m/n/10.95 tailwind.config.js\T1/cmr/m/n/10
+.95 . 
+ []
+
+
+Overfull \hbox (30.47852pt too wide) in paragraph at lines 98--99
+[]\T1/cmr/m/n/10.95 Create \T1/cmtt/m/n/10.95 src/features/auth\T1/cmr/m/n/10.9
+5 , \T1/cmtt/m/n/10.95 src/features/games\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95
+ src/features/roster\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 src/features/stats 
+ []
+
+[3] [4
 
 ]
-Overfull \hbox (15.33409pt too wide) in paragraph at lines 113--114
-[]\T1/cmr/bx/n/10.95 Selection: \T1/cmr/m/n/10.95 User clicks an Ac-tion Type (
-e.g., GOAL). Sys-tem stores \T1/cmtt/m/n/10.95 currentAction.type
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 114.
+
+
+Overfull \hbox (2.54988pt too wide) in paragraph at lines 129--130
+[]\T1/cmr/m/n/10.95 Define Poly-mor-phic types: \T1/cmtt/m/n/10.95 BaseAction\T
+1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 GoalAction\T1/cmr/m/n/10.95 , \T1/cmtt/m/n
+/10.95 PenaltyAction\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 GameAction \T1/cmr/m
+/n/10.95 (Union). 
  []
 
-[4]
-Overfull \hbox (29.86028pt too wide) in paragraph at lines 141--142
-[]\T1/cmr/m/n/10.95 The sys-tem writes the en-tire \T1/cmtt/m/n/10.95 gameState
- \T1/cmr/m/n/10.95 ob-ject to \T1/cmtt/m/n/10.95 localStorage \T1/cmr/m/n/10.95
- un-der the key \T1/cmtt/m/n/10.95 'unfinishedGame'
+[5] [6
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 152.
+
+[7] [8
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 184.
+
+[9] [10
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 218.
+
+[11] [12
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 248.
+
+[13] [14
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 276.
+
+
+Overfull \hbox (2.30588pt too wide) in paragraph at lines 293--294
+[]\T1/cmr/m/n/10.95 Create \T1/cmtt/m/n/10.95 useGameLogger \T1/cmr/m/n/10.95 h
+ook to man-age flow state: \T1/cmtt/m/n/10.95 IDLE \T1/cmr/m/n/10.95 -> \T1/cmt
+t/m/n/10.95 SELECT_TYPE \T1/cmr/m/n/10.95 -> \T1/cmtt/m/n/10.95 SELECT_PLAYER
  []
 
-[5] (documentation.aux)
+[15] [16
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 312.
+
+[17] [18
+
+]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 345.
+
+
+Overfull \hbox (187.76016pt too wide) in paragraph at lines 354--355
+[]\T1/cmr/m/n/10.95 Logic: \T1/cmtt/m/n/10.95 allow write: if exists(/databases
+/$(database)/documents/whitelisted_users/$(request.auth.token.email)) 
+ []
+
+[19] (implementation_plan.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 
 
-Package rerunfilecheck Warning: File `documentation.out' has changed.
+Package rerunfilecheck Warning: File `implementation_plan.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
 (rerunfilecheck)                or use package `bookmark'.
 
-Package rerunfilecheck Info: Checksums for `documentation.out':
-(rerunfilecheck)             Before: 3AA9E9B1B3B3A2C9BB631C2AA7F79B42;1304
-(rerunfilecheck)             After:  131BC371601035C86A8F50546387246C;2215.
+Package rerunfilecheck Info: Checksums for `implementation_plan.out':
+(rerunfilecheck)             Before: D498CB11B7D6B03AF6CA84ED382311D4;3582
+(rerunfilecheck)             After:  E7E831CFF775C45A69B4A52F67A8E297;7235.
  ) 
 Here is how much of TeX's memory you used:
- 11376 strings out of 467871
- 173829 string characters out of 5418375
- 610040 words of memory out of 5000000
- 40116 multiletter control sequences out of 15000+600000
- 641304 words of font info for 66 fonts, out of 8000000 for 9000
+ 12167 strings out of 467871
+ 184959 string characters out of 5418375
+ 610221 words of memory out of 5000000
+ 40864 multiletter control sequences out of 15000+600000
+ 640240 words of font info for 69 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,466b,679s stack positions out of 10000i,1000n,20000p,200000b,200000s
-
-pdfTeX warning (dest): name{section.3.1} has been referenced but does not exist
-, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{chapter.3} has been referenced but does not exist, 
-replaced by a fixed one
-
-
-pdfTeX warning (dest): name{section.2.4} has been referenced but does not exist
-, replaced by a fixed one
-
- <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx12
-00.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\
-ectt1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/d
-pi600\tcrm1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappe
-n/ec/dpi600\ecbx1440.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/j
-knappen/ec/dpi600\ecbx2074.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/lj
-four/jknappen/ec/dpi600\ecrm1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts
-/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\krist\AppData\Local\MiKTeX
-\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk> <C:\Users\krist\AppData\Local\
-MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\krist\AppData\
-Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk><C:/Users/krist/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on documentation.pdf (6 pages, 137264 bytes).
+ 75i,11n,79p,348b,494s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt
+1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
+0\ecbx1440.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
+/dpi600\ecti1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
+pen/ec/dpi600\ecbx1200.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\ecrm1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fonts/pk/
+ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\krist\AppData\Local\MiKTeX\fon
+ts/pk/ljfour/jknappen/ec/dpi600\ecti1440.pk> <C:\Users\krist\AppData\Local\MiKT
+eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk><C:/Users/krist/AppData/Local
+/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb>
+Output written on implementation_plan.pdf (20 pages, 195060 bytes).
 PDF statistics:
- 453 PDF objects out of 1000 (max. 8388607)
- 36 named destinations out of 1000 (max. 500000)
- 81 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 657 PDF objects out of 1000 (max. 8388607)
+ 65 named destinations out of 1000 (max. 500000)
+ 153 words of extra memory for PDF output out of 10000 (max. 10000000)
 

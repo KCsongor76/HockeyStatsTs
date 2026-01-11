@@ -34,6 +34,11 @@ const TeamCRUDPage = () => {
     const navigate = useNavigate();
 
     const deleteHandler = async (team: Team) => {
+        if (team.id === 'free-agent') {
+            alert("Cannot delete Free Agents team.");
+            return;
+        }
+
         if (window.confirm(`Are you sure you want to delete ${team.name}?`)) {
             try {
                 await TeamService.deleteTeam(team.id);
@@ -58,12 +63,15 @@ const TeamCRUDPage = () => {
     }, [games, filters.season]);
 
     const filteredTeams = useMemo(() => {
-        return teams.filter(team =>
+        const freeAgentTeam = teams.find(t => t.id === 'free-agent');
+        const otherTeams = teams.filter(team =>
             (!filters.name || team.name.toLowerCase().includes(filters.name.toLowerCase())) &&
             (!filters.championship || team.championships.includes(filters.championship as Championship)) &&
             (!seasonTeamIDs || seasonTeamIDs.has(team.id)) &&
             (team.id !== 'free-agent')
         );
+
+        return freeAgentTeam ? [freeAgentTeam, ...otherTeams] : otherTeams;
     }, [teams, filters, seasonTeamIDs]);
 
     const seasonOptions = [

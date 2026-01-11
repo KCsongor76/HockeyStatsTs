@@ -1,0 +1,364 @@
+\documentclass[11pt, a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{amssymb} % Replaces 'checkbox' for the square symbol
+
+% --- Configuration ---
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\setlength{\headheight}{14pt}
+
+% Colors
+\definecolor{primaryBlue}{RGB}{0, 51, 102}
+\definecolor{codeGray}{RGB}{245, 245, 245}
+
+% Hyperlinks
+\hypersetup{
+	colorlinks=true,
+	linkcolor=primaryBlue,
+	urlcolor=cyan,
+	pdftitle={HockeyStatsTS Implementation Plan},
+}
+
+% Header/Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{HockeyStatsTS Implementation Roadmap}
+\fancyhead[R]{v1.0.0}
+\fancyfoot[C]{\thepage}
+
+\titleformat{\part}[display]
+{\bfseries\Huge\color{primaryBlue}}
+{\filleft\partname\ \thepart}
+{20pt}
+{\filleft}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		\vspace*{2cm}
+		{\Huge \textbf{HockeyStatsTS}} \\
+		\vspace{0.5cm}
+		{\Large \textit{Detailed Engineering Implementation Plan}}
+		\vspace{1.5cm}
+		\textbf{Date:} January 2026 \\
+		\textbf{Target Stack:} React, TypeScript, Firebase, Redux Toolkit
+		\vfill
+	\end{titlepage}
+	
+	\tableofcontents
+	\newpage
+	
+	% ==============================================================================
+	% PHASE 0
+	% ==============================================================================
+	\part{Phase 0: Environment \& Boilerplate}
+	\textit{Goal: A running "Hello World" app with correct folder structure and tooling.}
+	
+	\section{Project Initialization}
+	\begin{itemize}
+		\item[$\square$] \textbf{Scaffold Project:} Run \texttt{npm create vite@latest hockeystats -- --template react-ts}.
+		\item[$\square$] \textbf{Clean Up:} Remove \texttt{src/assets}, \texttt{src/App.css}, and clear \texttt{src/index.css}.
+		\item[$\square$] \textbf{Git Init:} Initialize repository and create \texttt{.gitignore}.
+	\end{itemize}
+	
+	\section{Dependency Installation}
+	\begin{itemize}
+		\item[$\square$] \textbf{Core Logic:} \texttt{npm install inversify reflect-metadata date-fns zod clsx tailwind-merge}
+		\item[$\square$] \textbf{State Management:} \texttt{npm install @reduxjs/toolkit react-redux redux-persist}
+		\item[$\square$] \textbf{Routing:} \texttt{npm install react-router-dom}
+		\item[$\square$] \textbf{Backend:} \texttt{npm install firebase}
+		\item[$\square$] \textbf{Styling (Dev):} \texttt{npm install -D tailwindcss postcss autoprefixer}
+		\item[$\square$] \textbf{UI Assets:} \texttt{npm install lucide-react}
+	\end{itemize}
+	
+	\section{Configuration}
+	\begin{itemize}
+		\item[$\square$] \textbf{TypeScript Config:} Update \texttt{tsconfig.json}:
+		\begin{itemize}
+			\item Set \texttt{"strict": true}
+			\item Set \texttt{"noImplicitAny": true}
+			\item Enable decorators: \texttt{"experimentalDecorators": true}, \texttt{"emitDecoratorMetadata": true}
+		\end{itemize}
+		\item[$\square$] \textbf{Tailwind Init:} Run \texttt{npx tailwindcss init -p}. Configure \texttt{content} paths in \texttt{tailwind.config.js}.
+		\item[$\square$] \textbf{Global Styles:} Add Tailwind directives (@tailwind base; ...) to \texttt{src/index.css}.
+	\end{itemize}
+	
+	\section{Folder Structure Setup}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/types}, \texttt{src/core/di}, \texttt{src/core/schemas}, \texttt{src/core/constants}
+		\item[$\square$] Create \texttt{src/features/auth}, \texttt{src/features/games}, \texttt{src/features/roster}, \texttt{src/features/stats}
+		\item[$\square$] Create \texttt{src/infrastructure/firebase}, \texttt{src/infrastructure/repositories}
+		\item[$\square$] Create \texttt{src/shared/components}, \texttt{src/shared/layouts}, \texttt{src/shared/hooks}
+	\end{itemize}
+	
+	\section{Asset Migration}
+	\begin{itemize}
+		\item[$\square$] Copy \texttt{icerink\_up.jpg} and team logos from old project to \texttt{public/} folder.
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 1
+	% ==============================================================================
+	\part{Phase 1: The Domain Layer (Contracts)}
+	\textit{Goal: Define all Data Types. Pure TypeScript, no UI.}
+	
+	\section{Constants \& Enums}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/constants.ts}.
+		\item[$\square$] Export Enums: \texttt{GameStatus}, \texttt{ActionType}, \texttt{Period}, \texttt{PlayerPosition}, \texttt{PenaltyType}.
+	\end{itemize}
+	
+	\section{Entity Interfaces}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/types/entities.ts}.
+		\item[$\square$] Define interfaces: \texttt{Player}, \texttt{Team}, \texttt{GameRosterEntry}.
+	\end{itemize}
+	
+	\section{Game \& Action Interfaces}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/types/actions.ts}.
+		\item[$\square$] Define Polymorphic types: \texttt{BaseAction}, \texttt{GoalAction}, \texttt{PenaltyAction}, \texttt{GameAction} (Union).
+		\item[$\square$] Create \texttt{src/core/types/game.ts}. define \texttt{Game} aggregate interface.
+	\end{itemize}
+	
+	\section{Service Interfaces (Abstractions)}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/interfaces/services.ts}.
+		\item[$\square$] Define \texttt{IGameService}: \texttt{createGame}, \texttt{addAction}, \texttt{finalizeGame}.
+		\item[$\square$] Define \texttt{IAuthService}: \texttt{login}, \texttt{logout}, \texttt{getCurrentUser}.
+	\end{itemize}
+	
+	\section{Validation Schemas}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/schemas/game.schema.ts}.
+		\item[$\square$] Implement Zod schemas matching the interfaces above for runtime validation.
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 2
+	% ==============================================================================
+	\part{Phase 2: Infrastructure \& Services}
+	\textit{Goal: Connect to Firebase and set up Dependency Injection.}
+	
+	\section{Firebase Setup}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/infrastructure/firebase/config.ts}: Initialize App, Auth, Firestore.
+		\item[$\square$] Create \texttt{src/infrastructure/firebase/converters.ts}: Implement Firestore Data Converters for Type Safety.
+	\end{itemize}
+	
+	\section{Dependency Injection}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/core/di/types.ts}: Define Symbols (\texttt{TYPES.IGameService}).
+		\item[$\square$] Create \texttt{src/core/di/container.ts}: Configure Inversify container.
+	\end{itemize}
+	
+	\section{Auth Implementation}
+	\begin{itemize}
+		\item[$\square$] Implement \texttt{FirebaseAuthService} in \texttt{src/infrastructure/services/}.
+		\item[$\square$] Implement \texttt{loginWithGoogle}: Trigger popup, check whitelist collection.
+	\end{itemize}
+	
+	\section{Game Service Implementation}
+	\begin{itemize}
+		\item[$\square$] Implement \texttt{FirestoreGameService}.
+		\item[$\square$] Method \texttt{createGame}: Omit ID, save to \texttt{games} collection.
+		\item[$\square$] Method \texttt{addAction}: Use \texttt{arrayUnion} to append to \texttt{events} array.
+		\item[$\square$] Method \texttt{updateAction}: Read document, find index, update array (Transaction required).
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 3
+	% ==============================================================================
+	\part{Phase 3: State Management (Redux)}
+	\textit{Goal: Handle data flow and Offline Persistence.}
+	
+	\section{Store Configuration}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/store/index.ts}.
+		\item[$\square$] Configure \texttt{redux-persist} with \texttt{storage} (localStorage).
+		\item[$\square$] Define \texttt{RootState} and \texttt{AppDispatch} types.
+	\end{itemize}
+	
+	\section{Auth Slice}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/auth/authSlice.ts}.
+		\item[$\square$] State: \texttt{user} (Serialized), \texttt{status}, \texttt{error}.
+		\item[$\square$] Action: \texttt{setUser} (called by Firebase \texttt{onAuthStateChanged}).
+	\end{itemize}
+	
+	\section{Games Slice (Entity Adapter)}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/games/gamesSlice.ts}.
+		\item[$\square$] Use \texttt{createEntityAdapter<Game>} to manage normalized state.
+		\item[$\square$] Thunk \texttt{syncGame}: Subscribe to Firestore \texttt{onSnapshot}.
+		\item[$\square$] Thunk \texttt{saveLocalAction}: Optimistic update local state -> Call Service.
+	\end{itemize}
+	
+	\section{Roster Slice}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/roster/rosterSlice.ts}.
+		\item[$\square$] Thunks to fetch all Teams and Players (cached).
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 4
+	% ==============================================================================
+	\part{Phase 4: UI Foundation \& Routing}
+	\textit{Goal: A working visual shell.}
+	
+	\section{Layouts}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/shared/layouts/RootLayout.tsx}: Sidebar navigation + Outlet.
+		\item[$\square$] Create \texttt{src/shared/components/Sidebar.tsx}: Nav links.
+	\end{itemize}
+	
+	\section{Components (Design System)}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{Button.tsx}, \texttt{Input.tsx}, \texttt{Card.tsx} using Tailwind.
+		\item[$\square$] Create \texttt{Modal.tsx}: Base component with Backdrop and Focus Trap.
+	\end{itemize}
+	
+	\section{Routing}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/shared/components/ProtectedRoute.tsx}: Redirect to login if auth slice is empty.
+		\item[$\square$] Configure \texttt{App.tsx}:
+		\begin{itemize}
+			\item Route \texttt{/login} (Public)
+			\item Route \texttt{/} (Private, Home)
+			\item Route \texttt{/games/new} (Private)
+			\item Route \texttt{/games/:id/log} (Private)
+		\end{itemize}
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 5
+	% ==============================================================================
+	\part{Phase 5: Master Data \& Setup}
+	\textit{Goal: Allow creating the data needed to play a game.}
+	
+	\section{Login Page}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/auth/LoginPage.tsx}.
+		\item[$\square$] Add Google Sign-In Button calling \texttt{authService.login()}.
+		\item[$\square$] Handle Errors (Whitelist rejection).
+	\end{itemize}
+	
+	\section{Admin Dashboard (Rosters)}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/roster/pages/TeamListPage.tsx}.
+		\item[$\square$] Create \texttt{TeamForm.tsx}: Name, ShortName, Logo Upload.
+		\item[$\square$] \textit{Optional:} Create script to import JSON data from old project to Firestore.
+	\end{itemize}
+	
+	\section{Game Setup Wizard}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/games/pages/NewGamePage.tsx}.
+		\item[$\square$] \textbf{Step 1:} Form for Season, Championship, Date, Home/Away Teams.
+		\item[$\square$] \textbf{Step 2:} \texttt{RosterSelector} component. Lists players, Checkbox for "Dressing".
+		\item[$\square$] \textbf{Step 3:} Submit -> Call \texttt{gameService.createGame()} -> Redirect to Log.
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 6
+	% ==============================================================================
+	\part{Phase 6: The Game Logger (Core)}
+	\textit{Goal: The Interactive Rink and Event Engine.}
+	
+	\section{Layout}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/game-logging/GameLogLayout.tsx}.
+		\item[$\square$] Implement Grid: Header (Score), Main (Rink), Sidebar (Feed).
+		\item[$\square$] \textbf{Mobile:} Implement Split View (Fixed Top, Scrollable Bottom).
+	\end{itemize}
+	
+	\section{Interactive Rink}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{InteractiveRink.tsx}.
+		\item[$\square$] Render \texttt{icerink\_up.jpg}.
+		\item[$\square$] \texttt{onClick} handler: Calculate \% coordinates relative to image dimensions.
+		\item[$\square$] Render Dots: Map over \texttt{game.events} and render absolute positioned divs.
+	\end{itemize}
+	
+	\section{Action Flow (State Machine)}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{useGameLogger} hook to manage flow state: \texttt{IDLE} -> \texttt{SELECT\_TYPE} -> \texttt{SELECT\_PLAYER} -> \texttt{CONFIRM}.
+		\item[$\square$] \textbf{Modal 1:} \texttt{ActionTypeSelector}. Grid of Icons.
+		\item[$\square$] \textbf{Modal 2:} \texttt{PlayerSelector}. List of Roster entries. Add "Unknown Player" option.
+		\item[$\square$] \textbf{Modal 3:} \texttt{ConfirmationModal}. Show summary. Buttons: Confirm/Edit/Cancel.
+	\end{itemize}
+	
+	\section{Logic Integration}
+	\begin{itemize}
+		\item[$\square$] On Confirm: Dispatch \texttt{saveLocalAction}.
+		\item[$\square$] Update \texttt{gamesSlice} to optimistic add action.
+		\item[$\square$] Service syncs to Firestore in background.
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 7
+	% ==============================================================================
+	\part{Phase 7: Post-Game \& Analytics}
+	\textit{Goal: Review workflow and Stats calculation.}
+	
+	\section{Staging Workflow}
+	\begin{itemize}
+		\item[$\square$] Add "Finish Game" button to Logger. Updates status to \texttt{STAGING}.
+		\item[$\square$] Create \texttt{AdminGameList.tsx}: Filter by \texttt{status == STAGING}.
+	\end{itemize}
+	
+	\section{Review Interface}
+	\begin{itemize}
+		\item[$\square$] Reuse \texttt{GameLogLayout}.
+		\item[$\square$] Enable "Edit Mode": Clicking a dot opens \texttt{EditEventModal} instead of creating new.
+		\item[$\square$] Add "Finalize" button (Admin only).
+	\end{itemize}
+	
+	\section{Stats Engine}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{src/features/stats/engine.ts}.
+		\item[$\square$] Implement \texttt{calculateBoxScore(game)}.
+		\item[$\square$] Implement \texttt{calculateGoalieStats(game)}.
+	\end{itemize}
+	
+	\section{Stats View}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{GameStatsPage.tsx}.
+		\item[$\square$] Render "Box Score" table.
+		\item[$\square$] Integrate \texttt{Recharts} for Shot Map visualization.
+	\end{itemize}
+	
+	% ==============================================================================
+	% PHASE 8
+	% ==============================================================================
+	\part{Phase 8: Polish \& Deployment}
+	\textit{Goal: Production Ready.}
+	
+	\section{Testing}
+	\begin{itemize}
+		\item[$\square$] \textbf{E2E:} Install Playwright. Write test: Login -> Create Game -> Log Goal -> Save.
+		\item[$\square$] \textbf{Unit:} Test \texttt{stats/engine.ts} with complex game scenarios.
+	\end{itemize}
+	
+	\section{Security}
+	\begin{itemize}
+		\item[$\square$] Create \texttt{firestore.rules}.
+		\item[$\square$] Logic: \texttt{allow write: if exists(/databases/\$(database)/documents/whitelisted\_users/\$(request.auth.token.email))}
+	\end{itemize}
+	
+	\section{Deployment}
+	\begin{itemize}
+		\item[$\square$] Run \texttt{npm run build}.
+		\item[$\square$] Initialize Hosting: \texttt{firebase init hosting}.
+		\item[$\square$] Deploy: \texttt{firebase deploy}.
+	\end{itemize}
+	
+\end{document}

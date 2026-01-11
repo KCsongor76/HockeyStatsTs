@@ -81,7 +81,7 @@ const PlayerCrudPage = () => {
     ];
     const teamOptions = [
         {value: "", label: "All Teams"},
-        ...teams.filter(t => t.id !== 'free-agent').map(t => ({value: t.id, label: t.name}))
+        ...teams.map(t => ({value: t.id, label: t.name}))
     ];
     const positionOptions = [
         {value: "", label: "All Positions"},

@@ -6,6 +6,7 @@ import {TeamService} from "../OOP/services/TeamService";
 import {PlayerService} from "../OOP/services/PlayerService";
 import Button from "../components/Button";
 import Select from "../components/Select";
+import Input from "../components/Input";
 import {HANDLE_PLAYERS} from "../OOP/constants/NavigationNames";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
 import {ITeam} from "../OOP/interfaces/ITeam";
@@ -27,6 +28,7 @@ const TransferPlayerPage = () => {
 
     const [teams, setTeams] = useState<Team[]>([]);
     const [selectedTeamId, setSelectedTeamId] = useState<string>("");
+    const [jerseyNumber, setJerseyNumber] = useState<number>(player.jerseyNumber);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,12 +38,12 @@ const TransferPlayerPage = () => {
         }
     };
 
-    const executeTransfer = async (targetTeamId: string, isRelease: boolean) => {
+    const executeTransfer = async (targetTeamId: string, isRelease: boolean, playerToTransfer: IPlayer = player) => {
         setIsSubmitting(true);
         setErrors({});
 
         try {
-            await PlayerService.transferPlayer(player.teamId, targetTeamId, player);
+            await PlayerService.transferPlayer(player.teamId, targetTeamId, playerToTransfer);
             alert(isRelease ? "Player released to Free Agents." : "Player transferred successfully.");
             navigate(`/${HANDLE_PLAYERS}`);
         } catch (error) {
@@ -53,8 +55,22 @@ const TransferPlayerPage = () => {
 
     const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrors({});
+
         if (!selectedTeamId) {
             setErrors({team: "Please select a team."});
+            return;
+        }
+
+        const jerseyError = Player.validateJerseyNumber(jerseyNumber);
+        if (jerseyError) {
+            setErrors({jersey: jerseyError});
+            return;
+        }
+
+        const isAvailable = await PlayerService.isJerseyNumberAvailable(selectedTeamId, jerseyNumber);
+        if (!isAvailable) {
+            setErrors({jersey: `Jersey number ${jerseyNumber} is already taken in the target team.`});
             return;
         }
 
@@ -66,7 +82,8 @@ const TransferPlayerPage = () => {
         }
 
         if (window.confirm(`Are you sure you want to transfer ${player.name} to ${targetTeam.name}?`)) {
-            await executeTransfer(selectedTeamId, false);
+            const updatedPlayer = {...player, jerseyNumber: Number(jerseyNumber)};
+            await executeTransfer(selectedTeamId, false, updatedPlayer);
         }
     };
 
@@ -113,19 +130,26 @@ const TransferPlayerPage = () => {
 
                 <form onSubmit={submitHandler} className={styles.form}>
 
-            {player.teamId !== "free-agent" && (
-                <Select
-                    id="teamSelect"
-                    label="Transfer to:"
-                    value={selectedTeamId}
-                    onChange={(e) => setSelectedTeamId(e.target.value)}
-                    disabled={isSubmitting}
-                    options={teamOptions}
-                    error={errors.team}
-                />
-            )}
+                    <Select
+                        id="teamSelect"
+                        label="Transfer to:"
+                        value={selectedTeamId}
+                        onChange={(e) => setSelectedTeamId(e.target.value)}
+                        disabled={isSubmitting}
+                        options={teamOptions}
+                        error={errors.team}
+                    />
 
-            {errors.jersey && <span className={styles.error}>{errors.jersey}</span>}
+                    <Input
+                        id="jerseyNumber"
+                        label="Jersey Number"
+                        type="number"
+                        value={jerseyNumber}
+                        onChange={(e) => setJerseyNumber(Number(e.target.value))}
+                        disabled={isSubmitting}
+                        error={errors.jersey}
+                    />
+
             {errors.general && <span className={styles.error}>{errors.general}</span>}
 
             <div className={styles.buttonGroup}>

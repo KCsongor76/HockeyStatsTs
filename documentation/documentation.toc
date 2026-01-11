@@ -1,41 +1,13 @@
-\contentsline {chapter}{\numberline {1}Architectural Standards & Conventions}{2}{chapter.1}%
-\contentsline {section}{\numberline {1.1}The "Why" of Clean Architecture}{2}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Strict Coding Rules}{2}{section.1.2}%
-\contentsline {chapter}{\numberline {2}Domain Layer Specification}{3}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Value Objects}{3}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}TeamColor}{3}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}GameClock}{3}{subsection.2.1.2}%
-\contentsline {section}{\numberline {2.2}Entities}{4}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Game Entity}{4}{subsection.2.2.1}%
-\contentsline {chapter}{\numberline {3}Presentation: Component Catalog}{5}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Atoms (Base UI)}{5}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Button}{5}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}StatBadge}{5}{subsection.3.1.2}%
-\contentsline {section}{\numberline {3.2}Molecules (Composite UI)}{5}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}PlayerListItem}{5}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}ActionLogItem}{6}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}Organisms (Complex Business Components)}{6}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}RinkInteractive}{6}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}TeamRosterEditor}{6}{subsection.3.3.2}%
-\contentsline {section}{\numberline {3.4}Templates (Layouts)}{6}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}GameDashboardLayout}{6}{subsection.3.4.1}%
-\contentsline {chapter}{\numberline {4}Presentation: Page Specifications}{7}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Page 1: GamePage (The Core)}{7}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Responsibilities}{7}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}The "Action Creation Wizard" Flow}{7}{subsection.4.1.2}%
-\contentsline {section}{\numberline {4.2}Page 2: TeamManagementPage}{8}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Components Used}{8}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Data Requirements}{8}{subsection.4.2.2}%
-\contentsline {chapter}{\numberline {5}Application Layer: Use Cases}{9}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Game Use Cases}{9}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}InitializeGameUseCase}{9}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}ProcessActionUseCase}{9}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}Team Use Cases}{9}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}CreateTeamUseCase}{9}{subsection.5.2.1}%
-\contentsline {chapter}{\numberline {6}State Management}{10}{chapter.6}%
-\contentsline {section}{\numberline {6.1}useGameStore}{10}{section.6.1}%
-\contentsline {section}{\numberline {6.2}useReferenceDataStore}{10}{section.6.2}%
-\contentsline {chapter}{\numberline {7}Infrastructure Implementation}{11}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Firestore Schema}{11}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Repository Implementation Details}{11}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}FirebaseGameRepository.ts}{11}{subsection.7.2.1}%
+\contentsline {chapter}{\numberline {1}System Overview}{2}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Product Scope}{2}{section.1.1}%
+\contentsline {section}{\numberline {1.2}User Roles}{2}{section.1.2}%
+\contentsline {chapter}{\numberline {2}Detailed Functional Requirements}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Module 1: Authentication \& Routing}{3}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Authentication Flow}{3}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Route Definitions}{3}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Module 2: Master Data Management}{4}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Team Management}{4}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}Module 3: The Game Logging Engine}{4}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}State Management}{4}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Event Creation Workflow}{4}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Autosave \& Persistence}{5}{subsection.2.3.3}%

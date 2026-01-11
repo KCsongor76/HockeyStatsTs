@@ -1,59 +1,19 @@
-\documentclass[10pt, a4paper]{report}
+\documentclass[11pt, a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[margin=2cm]{geometry}
+\usepackage{geometry}
 \usepackage{titlesec}
 \usepackage{hyperref}
-\usepackage{listings}
 \usepackage{xcolor}
 \usepackage{enumitem}
+\usepackage{listings}
 \usepackage{longtable}
-\usepackage{booktabs}
-\usepackage{float}
 
-% -- Configuration --
-\setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{3}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{0.5em}
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\definecolor{primaryBlue}{RGB}{0, 51, 102}
 
-% -- Colors & Code Style --
-\definecolor{vscodeblue}{rgb}{0, 0.47, 0.85}
-\definecolor{vscodegreen}{rgb}{0, 0.5, 0}
-\definecolor{vscodepurple}{rgb}{0.5, 0, 0.5}
-\definecolor{vscodebg}{rgb}{0.97, 0.97, 0.97}
-\definecolor{rationalegray}{rgb}{0.95, 0.95, 0.95}
-
-\lstset{
-	language=TypeScript,
-	backgroundcolor=\color{vscodebg},
-	basicstyle=\ttfamily\footnotesize,
-	breaklines=true,
-	keepspaces=true,
-	numbers=left,
-	numbersep=5pt,
-	numberstyle=\tiny\color{gray},
-	frame=single,
-	rulecolor=\color{gray!30},
-	commentstyle=\color{vscodegreen},
-	keywordstyle=\color{vscodeblue}\bfseries,
-	stringstyle=\color{red},
-	captionpos=b
-}
-
-\newcommand{\rationale}[1]{
-	\begin{quote}
-		\colorbox{rationalegray}{
-			\parbox{0.95\linewidth}{
-				\textbf{Architectural Rationale:} \textit{#1}
-			}
-		}
-	\end{quote}
-}
-
-\title{\textbf{HockeyStatsTs 2.0: Master Engineering Blueprint}\\
-	\large Detailed Component & Logic Specification}
-\author{Lead Architect}
+\title{\textbf{Software Requirements Specification}\\ \large Legacy System: HockeyStatsTS (v1.0)}
+\author{Detailed System Audit}
 \date{\today}
 
 \begin{document}
@@ -62,327 +22,124 @@
 	\tableofcontents
 	\newpage
 	
-	% =============================================================================
-	% CHAPTER 1: ARCHITECTURAL STANDARDS
-	% =============================================================================
-	\chapter{Architectural Standards & Conventions}
+	\chapter{System Overview}
+	\section{Product Scope}
+	HockeyStatsTS is a React-based Single Page Application (SPA) designed for post-game statistical logging. It allows administrators to define teams and players, configure game metadata, and log events (goals, shots, penalties) by interacting with a digital rink representation. The system relies on Firebase for backend services and uses a custom Object-Oriented Programming (OOP) layer within the frontend for business logic.
 	
-	\section{The "Why" of Clean Architecture}
-	We are strictly separating the \textbf{Core (Domain)} from the \textbf{Tools (React/Firebase)}.
-	\rationale{In the previous version, game logic was mixed inside React components (e.g., calculating scores inside `GamePage`). This makes testing impossible without rendering a UI. By moving logic to the Domain, we can test complex game rules (offside, overtime logic, stats) in milliseconds using pure TypeScript tests.}
-	
-	\section{Strict Coding Rules}
+	\section{User Roles}
 	\begin{itemize}
-		\item \textbf{No Logic in UI}: React components must only \textit{display} data and \textit{dispatch} events.
-		\item \textbf{No Frameworks in Domain}: The `domain/` folder must not contain `import ... from 'react'` or `'firebase'`.
-		\item \textbf{One Way Data Flow}: UI $\rightarrow$ Use Case $\rightarrow$ Domain $\rightarrow$ Repository $\rightarrow$ Store $\rightarrow$ UI.
+		\item \textbf{Public User:} Can view the Landing Page (Login).
+		\item \textbf{Administrator:} Identified via a hardcoded \texttt{adminUids} array in the source code. Has full access to CRUD operations and Game Logging.
 	\end{itemize}
 	
-	\newpage
+	\chapter{Detailed Functional Requirements}
 	
-	% =============================================================================
-	% CHAPTER 2: DOMAIN LAYER SPECIFICATION
-	% =============================================================================
-	\chapter{Domain Layer Specification}
+	\section{Module 1: Authentication \& Routing}
+	\textbf{File Reference:} \texttt{App.tsx}, \texttt{AuthPage.tsx}
 	
-	\section{Value Objects}
-	\textit{Immutable objects that define the "shape" of data.}
-	
-	\subsection{TeamColor}
-	\textbf{Path}: `src/domain/value-objects/TeamColor.ts`
-	\begin{lstlisting}
-		export class TeamColor {
-			constructor(
-			public readonly primary: string, 
-			public readonly secondary: string
-			) {
-				if (!/^#[0-9A-F]{6}$/i.test(primary)) throw new Error("Invalid Primary Hex");
-				if (!/^#[0-9A-F]{6}$/i.test(secondary)) throw new Error("Invalid Secondary Hex");
-			}
-		}
-	\end{lstlisting}
-	\rationale{Validating colors on instantiation prevents "broken UI" states where a team has no valid color to render on the scoreboard.}
-	
-	\subsection{GameClock}
-	\textbf{Path}: `src/domain/value-objects/GameClock.ts`
-	\begin{lstlisting}
-		export class GameClock {
-			constructor(
-			public readonly period: number,
-			public readonly secondsRemaining: number
-			) {}
-			
-			get formattedTime(): string {
-				const m = Math.floor(this.secondsRemaining / 60);
-				const s = this.secondsRemaining % 60;
-				return `${m}:${s < 10 ? '0' : ''}${s}`;
-			}
-		}
-	\end{lstlisting}
-	
-	\section{Entities}
-	
-	\subsection{Game Entity}
-	\textbf{Path}: `src/domain/entities/Game.ts`
-	The aggregate root. It must enforce the rules of Hockey.
-	
-	\begin{lstlisting}
-		export class Game {
-			// ... properties ...
-			
-			public recordGoal(playerId: string, assistIds: string[], time: number): Game {
-				// Rule: Cannot score if game is over
-				if (this.isFinalized) throw new Error("Game is finalized");
-				
-				// Rule: A player cannot assist their own goal
-				if (assistIds.includes(playerId)) throw new Error("Player cannot assist self");
-				
-				// Logic to create action...
-				return this.cloneWithNewAction(newAction);
-			}
-		}
-	\end{lstlisting}
-	
-	\newpage
-	
-	% =============================================================================
-	% CHAPTER 3: PRESENTATION - COMPONENT CATALOG
-	% =============================================================================
-	\chapter{Presentation: Component Catalog}
-	
-	We utilize \textbf{Atomic Design} to organize components.
-	
-	\section{Atoms (Base UI)}
-	\textit{Single-responsibility, dumb components.}
-	
-	\subsection{Button}
-	\textbf{Props}:
-	\begin{itemize}
-		\item `variant`: 'primary' | 'secondary' | 'danger'
-		\item `size`: 'sm' | 'md' | 'lg'
-		\item `isLoading`: boolean
-		\item `icon?`: ReactNode
-	\end{itemize}
-	\rationale{Centralizing buttons ensures we can change the entire app's look (e.g., border-radius, shadows) in one file.}
-	
-	\subsection{StatBadge}
-	\textbf{Props}: `label`: string, `value`: number, `trend?`: 'up' | 'down' | 'neutral'.
-	\textbf{Usage}: Displays things like "Shots: 24" on the game dashboard.
-	
-	\section{Molecules (Composite UI)}
-	\textit{Combinations of atoms functioning together.}
-	
-	\subsection{PlayerListItem}
-	\textbf{Path}: `src/presentation/components/molecules/PlayerListItem.tsx`
-	\textbf{Purpose}: Displays a single row in the roster table.
-	\textbf{Props}:
-	\begin{itemize}
-		\item `player`: Player (Domain Entity)
-		\item `isSelected`: boolean
-		\item `onToggle`: (id: string) => void
-	\end{itemize}
-	\textbf{Why}: We need this reusable component because player selection happens in multiple places: creating a team, setting a game roster, and filtering stats.
-	
-	\subsection{ActionLogItem}
-	\textbf{Path}: `src/presentation/components/molecules/ActionLogItem.tsx`
-	\textbf{Purpose}: A single row in the "Play-by-Play" feed.
-	\textbf{Props}: `action`: GameAction, `homeTeamId`: string.
-	\textbf{Logic}:
-	\begin{itemize}
-		\item If `action.type === 'GOAL'`, render with gold background.
-		\item If `action.teamId === homeTeamId`, align left. Else, align right.
-	\end{itemize}
-	
-	\section{Organisms (Complex Business Components)}
-	\textit{Distinct sections of an interface.}
-	
-	\subsection{RinkInteractive}
-	\textbf{Path}: `src/presentation/components/organisms/RinkInteractive.tsx`
-	\textbf{Purpose}: The core input method for game logging.
-	\textbf{Props}:
-	\begin{itemize}
-		\item `rinkImageSrc`: string
-		\item `actions`: GameAction[] (to display markers)
-		\item `onMapClick`: (x: number, y: number) => void
-		\item `isReadOnly`: boolean
-	\end{itemize}
-	\rationale{This component must be decoupled from the `Game` entity. It simply takes coordinates and visual data. It doesn't "know" who scored, it just renders dots.}
-	
-	\subsection{TeamRosterEditor}
-	\textbf{Path}: `src/presentation/components/organisms/TeamRosterEditor.tsx`
-	\textbf{Purpose}: Complex form to add/edit/remove players from a team.
-	\textbf{State}: Local state for the "Add Player" modal.
-	\textbf{Props}: `team`: Team, `onAddPlayer`: (p: PlayerDTO) => void, `onRemovePlayer`: (id: string) => void.
-	
-	\section{Templates (Layouts)}
-	
-	\subsection{GameDashboardLayout}
-	\textbf{Structure}:
-	\begin{itemize}
-		\item \textbf{Header}: ScoreBoard (Fixed at top)
-		\item \textbf{Left Col}: RinkInteractive
-		\item \textbf{Right Col}: ActionFeed + StatPanel (Tabs)
-		\item \textbf{Footer}: GameControls (Pause, Finalize)
-	\end{itemize}
-	\rationale{Hockey games need a specific layout where the Rink is the focal point. The standard `MainLayout` with a sidebar is too distracting for live game logging.}
-	
-	\newpage
-	
-	% =============================================================================
-	% CHAPTER 4: PRESENTATION - PAGE SPECIFICATIONS
-	% =============================================================================
-	\chapter{Presentation: Page Specifications}
-	
-	\section{Page 1: GamePage (The Core)}
-	\textbf{Route}: `/game/:gameId`
-	
-	\subsection{Responsibilities}
-	\begin{itemize}
-		\item Hydrate `useGameStore` with the game ID from URL.
-		\item Handle the "Game Loop" (autosave, clock ticking if needed).
-		\item Coordinate the `ActionCreationWizard` (the modal flow).
-	\end{itemize}
-	
-	\subsection{The "Action Creation Wizard" Flow}
-	This page manages a complex state machine for creating an action. It's not just a form; it's a multi-step process.
+	\subsection{Authentication Flow}
 	\begin{enumerate}
-		\item **Step 1: Click Rink** $\rightarrow$ Save (x,y) $\rightarrow$ Open Modal.
-		\item **Step 2: Select Action Type** (Shot, Goal, Hit).
-		\item **Step 3: Select Player** (Filtered by Team).
-		\item **Step 4: (If Goal) Select Assists** (Multi-select, excluding scorer).
-		\item **Step 5: Confirm**.
-	\end{enumerate}
-	
-	\textbf{Code Structure for Wizard}:
-	\begin{lstlisting}
-		// Inside GamePage.tsx
-		const [wizardStep, setWizardStep] = useState<WizardStep>('IDLE');
-		const [draftAction, setDraftAction] = useState<Partial<GameAction>>({});
-		
-		const handleRinkClick = (coords) => {
-			setDraftAction({ x: coords.x, y: coords.y });
-			setWizardStep('SELECT_TYPE');
-		};
-		
-		const handleTypeSelect = (type) => {
-			setDraftAction(prev => ({ ...prev, type }));
-			setWizardStep('SELECT_PLAYER');
-		};
-	\end{lstlisting}
-	\rationale{We use a local state machine for the wizard because this data is ephemeral. It only becomes "Domain Data" when the user hits Confirm.}
-	
-	\section{Page 2: TeamManagementPage}
-	\textbf{Route}: `/teams/:teamId/manage`
-	
-	\subsection{Components Used}
-	\begin{itemize}
-		\item `TeamHeader` (Logo, Name, Colors)
-		\item `TeamRosterEditor` (Organism)
-		\item `TeamStatsSummary` (Molecule)
-	\end{itemize}
-	
-	\subsection{Data Requirements}
-	Must load the Team entity AND all Players associated with it.
-	\textbf{Why}: We need to edit player details (Jersey #) in the context of the team.
-	
-	\newpage
-	
-	% =============================================================================
-	% CHAPTER 5: APPLICATION LAYER (USE CASES)
-	% =============================================================================
-	\chapter{Application Layer: Use Cases}
-	
-	\section{Game Use Cases}
-	
-	\subsection{InitializeGameUseCase}
-	\textbf{Input}: `homeTeamId`, `awayTeamId`, `season`, `gameType`.
-	\textbf{Logic}:
-	\begin{enumerate}
-		\item Fetch Home and Away `Team` entities to ensure they exist.
-		\item Create a new `Game` entity with a UUID.
-		\item Set initial state (0-0 score, period 1).
-		\item Save to Repository.
-	\end{enumerate}
-	
-	\subsection{ProcessActionUseCase}
-	\textbf{Input}: `gameId`, `RawActionDTO` (from UI).
-	\textbf{Logic}:
-	\begin{enumerate}
-		\item Load Game.
-		\item Call `game.validateAction(rawAction)`.
-		\item Call `game.addAction(rawAction)`.
-		\item \textbf{Side Effect}: Check if the action triggers a stoppage (optional rule).
-		\item Save Game.
-	\end{enumerate}
-	
-	\section{Team Use Cases}
-	
-	\subsection{CreateTeamUseCase}
-	\textbf{Logic}:
-	\begin{enumerate}
-		\item specific validation: Check if name already exists in DB (async check).
-		\item validation: Check if colors contrast sufficiently (accessibility).
-		\item Save.
-	\end{enumerate}
-	
-	\newpage
-	
-	% =============================================================================
-	% CHAPTER 6: STATE MANAGEMENT (ZUSTAND)
-	% =============================================================================
-	\chapter{State Management}
-	
-	We split the store to avoid re-renders.
-	
-	\section{useGameStore}
-	\textbf{Path}: `src/presentation/store/useGameStore.ts`
-	\begin{lstlisting}
-		interface GameStore {
-			// State
-			activeGame: Game | null;
-			isSyncing: boolean;
-			lastSaved: Date | null;
-			
-			// Actions
-			loadGame: (id: string) => Promise<void>;
-			dispatchAction: (actionParams: ActionParams) => void;
-			undoLastAction: () => void;
-		}
-	\end{lstlisting}
-	
-	\section{useReferenceDataStore}
-	\textbf{Purpose}: Caches "static" data like Teams and Seasons so we don't refetch them on every page navigation.
-	\rationale{Teams rarely change. Fetching them once at app launch (or lazily) and keeping them in memory improves navigation speed significantly.}
-	
-	\newpage
-	
-	% =============================================================================
-	% CHAPTER 7: INFRASTRUCTURE (FIREBASE)
-	% =============================================================================
-	\chapter{Infrastructure Implementation}
-	
-	\section{Firestore Schema}
-	We use a sub-collection strategy for Actions to avoid hitting the 1MB document limit for very long games.
-	
-	\begin{itemize}
-		\item `teams/{teamId}`
-		\item `games/{gameId}`
+		\item \textbf{Initialization:} On application load, \texttt{App.tsx} triggers a Firebase \texttt{onAuthStateChanged} listener.
+		\item \textbf{Verification:}
 		\begin{itemize}
-			\item `actions/{actionId}` (Sub-collection)
+			\item If a user object exists, the system checks if \texttt{user.uid} is present in the \texttt{adminUids} array.
+			\item State variable \texttt{isSignedIn} is set to \texttt{true} ONLY if the UID matches.
 		\end{itemize}
-		\item `players/{playerId}`
+		\item \textbf{Routing Guard:}
+		\begin{itemize}
+			\item If \texttt{isSignedIn} is false, any attempt to access protected routes (starts with \texttt{/admin}, \texttt{/game}, etc.) triggers a redirect to \texttt{/}.
+			\item A \texttt{LoadingSpinner} is displayed while the auth check resolves.
+		\end{itemize}
+	\end{enumerate}
+	
+	\subsection{Route Definitions}
+	The application uses \texttt{createBrowserRouter} with the following structure:
+	\begin{longtable}{|p{4cm}|p{5cm}|p{6cm}|}
+		\hline
+		\textbf{Path} & \textbf{Component} & \textbf{Functionality} \\
+		\hline
+		\texttt{/} & \texttt{HomePage} & Dashboard showing menu options based on auth status. \\
+		\hline
+		\texttt{/start} & \texttt{StartPage} & \textbf{Loader:} Fetches all Teams. Displays Game Setup form. \\
+		\hline
+		\texttt{/game} & \texttt{GamePage} & The core logging interface. Requires \texttt{location.state} with setup data. \\
+		\hline
+		\texttt{/saved-games} & \texttt{SavedGamesPage} & Lists historical games from Firestore. \\
+		\hline
+		\texttt{/handle-teams} & \texttt{TeamCRUDPage} & \textbf{Loader:} Fetches Teams + Games. Lists teams with filters. \\
+		\hline
+		\texttt{/handle-teams/create} & \texttt{CreateTeamPage} & Form to add new Team entities. \\
+		\hline
+		\texttt{/handle-players} & \texttt{PlayerCRUDPage} & \textbf{Loader:} Fetches Players + Teams. Lists players. \\
+		\hline
+	\end{longtable}
+	
+	\section{Module 2: Master Data Management}
+	\textbf{File Reference:} \texttt{TeamCRUDPage.tsx}, \texttt{PlayerCRUDPage.tsx}
+	
+	\subsection{Team Management}
+	\begin{enumerate}
+		\item \textbf{Data Loading:} The route loader fetches all teams via \texttt{TeamService.getAllTeams()} and games via \texttt{GameService.getAllGames()} (for dependency checking).
+		\item \textbf{Filtering:} Users can filter the list by Name (text input), Season (dropdown), and Championship (dropdown).
+		\item \textbf{Deletion Logic:}
+		\begin{itemize}
+			\item User clicks Delete.
+			\item System prompts \texttt{window.confirm}.
+			\item Calls \texttt{TeamService.deleteTeam(id)}.
+			\item \textbf{Constraint:} Does not check if the team has existing games before deletion (potential for orphaned data).
+		\end{itemize}
+	\end{enumerate}
+	
+	\section{Module 3: The Game Logging Engine}
+	\textbf{File Reference:} \texttt{GamePage.tsx}
+	
+	\subsection{State Management}
+	The page maintains complex local state:
+	\begin{itemize}
+		\item \texttt{gameSetup}: Metadata passed from StartPage.
+		\item \texttt{actions}: Array of \texttt{IGameAction} representing the event log.
+		\item \texttt{homeScore / awayScore}: Computed local state objects.
+		\item \texttt{modalStep}: Finite State Machine (\texttt{'action'} $\rightarrow$ \texttt{'player'} $\rightarrow$ \texttt{'assist'} $\rightarrow$ \texttt{'confirm'}).
 	\end{itemize}
 	
-	\section{Repository Implementation Details}
-	
-	\subsection{FirebaseGameRepository.ts}
-	When `findById(id)` is called:
+	\subsection{Event Creation Workflow}
 	\begin{enumerate}
-		\item Fetch `games/{id}` document.
-		\item \textbf{Parallel Fetch}: Fetch `games/{id}/actions` subcollection.
-		\item Combine the Game metadata and the list of Actions into the Domain `Game` entity.
-		\item Return the entity.
+		\item \textbf{Trigger:} User clicks \texttt{InteractiveRink}.
+		\item \textbf{Step 1: Action Selection (Modal A)}
+		\begin{itemize}
+			\item \textbf{UI:} Displays Time Input (Period, Min, Sec).
+			\item \textbf{Grid:} Two distinct rows. Row 1 = Home Team Actions. Row 2 = Away Team Actions.
+			\item \textbf{Visuals:} Icons use the respective Team's Primary/Secondary colors passed via props.
+			\item \textbf{Selection:} User clicks an Action Type (e.g., GOAL). System stores \texttt{currentAction.type} and \texttt{currentAction.team}.
+		\end{itemize}
+		\item \textbf{Step 2: Player Selection (Modal B)}
+		\begin{itemize}
+			\item \textbf{UI:} Lists players from the selected team's roster.
+			\item \textbf{Selection:} User selects a player.
+			\item \textbf{Branching:} If Action == GOAL, proceed to Step 3. Else, proceed to Step 4.
+		\end{itemize}
+		\item \textbf{Step 3: Assist Selection (Modal C)}
+		\begin{itemize}
+			\item \textbf{UI:} Multi-select list of teammates (excluding the scorer).
+			\item \textbf{Actions:} User selects 0, 1, or 2 players and clicks "Next".
+		\end{itemize}
+		\item \textbf{Step 4: Confirmation (Modal D)}
+		\begin{itemize}
+			\item \textbf{UI:} Displays summary card (Action, Time, Player, Location).
+			\item \textbf{Controls:} "Confirm" (Commit), "Edit" (Step Back), "Cancel" (Abort).
+		\end{itemize}
+		\item \textbf{Commit:}
+		\begin{itemize}
+			\item New action pushed to \texttt{actions} array.
+			\item \texttt{updateScores} function recalculates the scoreboard immediately.
+			\item \texttt{autosave} triggers \texttt{localStorage.setItem('unfinishedGame')}.
+		\end{itemize}
 	\end{enumerate}
-	\rationale{Separating actions into a subcollection allows us to load the "Game List" (Schedule) very quickly without downloading thousands of shot coordinates for every game.}
+	
+	\subsection{Autosave \& Persistence}
+	\begin{itemize}
+		\item The system writes the entire \texttt{gameState} object to \texttt{localStorage} under the key \texttt{'unfinishedGame'} on every action change if autosave is toggled on.
+		\item On \texttt{GamePage} mount, it checks for this key and hydrates state if found.
+	\end{itemize}
 	
 \end{document}
