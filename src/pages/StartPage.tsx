@@ -6,8 +6,6 @@ import {Championship, CHAMPIONSHIP_RULES} from "../OOP/enums/Championship";
 import {Team} from "../OOP/classes/Team";
 import {GameType} from "../OOP/enums/GameType";
 import {IPlayer} from "../OOP/interfaces/IPlayer";
-import {getDownloadURL, ref} from "firebase/storage";
-import {storage} from "../firebase";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Select from "../components/Select";
@@ -347,10 +345,9 @@ export default StartPage;
 
 export const loader = async () => {
     const teamsData = await TeamService.getAllTeams();
-    const [rinkDown, rinkUp] = await Promise.all([
-        getDownloadURL(ref(storage, "rink-images/icerink_down.jpg")),
-        getDownloadURL(ref(storage, "rink-images/icerink_up.jpg")),
-    ]);
+    // Using local public folder paths instead of fetching from storage
+    const rinkDown = "/rink/icerink_down.jpg";
+    const rinkUp = "/rink/icerink_up.jpg";
     const teams = teamsData.filter(t => t.id !== "free-agent");
     return {teams, rinkDown, rinkUp};
 }

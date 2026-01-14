@@ -1,7 +1,6 @@
 import styles from './MainNavigation.module.css';
 import {NavLink, useNavigate} from 'react-router-dom';
-import {auth} from "../firebase";
-import {signOut} from "firebase/auth";
+import {supabase} from "../supabase";
 import {useState} from 'react';
 import {ADMIN, HANDLE_PLAYERS, HANDLE_TEAMS, SAVED_GAMES, START} from "../OOP/constants/NavigationNames";
 
@@ -16,7 +15,11 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
     const handleLogout = async () => {
         try {
             if (window.confirm('Are you sure you want to sign out?')) {
-                await signOut(auth);
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+
+                // Clear any local tokens if you are manually managing them,
+                // though Supabase handles session in local storage automatically.
                 localStorage.removeItem('token');
                 navigate('/');
             }

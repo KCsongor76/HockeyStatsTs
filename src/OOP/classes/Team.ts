@@ -1,8 +1,7 @@
 import {ITeam} from "../interfaces/ITeam";
 import {Championship} from "../enums/Championship";
 import {IPlayer} from "../interfaces/IPlayer";
-import {getDownloadURL, ref} from "firebase/storage";
-import {storage} from "../../firebase";
+import {supabase} from "../../supabase";
 import {IGame} from "../interfaces/IGame";
 import {GameType} from "../enums/GameType";
 import {PlayoffPeriod, RegularPeriod} from "../enums/Period";
@@ -56,7 +55,7 @@ export class Team implements ITeam {
         const totalSkaters = counts.defenders + counts.forwards;
 
         if (counts.goalies !== rules.goalies) {
-            return `Team must have exactly ${rules.goalies} goalies!`; // Message can be generic or passed in
+            return `Team must have exactly ${rules.goalies} goalies!`;
         }
         if (totalSkaters < rules.minSkaters) {
             return `Team must have at least ${rules.minSkaters} skaters`;
@@ -98,16 +97,23 @@ export class Team implements ITeam {
     }
 
     static checkLogoExists = async (fileName: string, isTeamCreation: boolean = false): Promise<boolean> => {
-        const logoRef = ref(storage, `team-logos/${fileName}`);
-        try {
-            await getDownloadURL(logoRef);
-            return true;
-        } catch (error) {
+        // Supabase: Check if file exists in the bucket
+        const { data, error } = await supabase.storage
+            .from('team-logos')
+            .list('', {
+                limit: 100, // adjust if you have huge number of files, or rely on search
+                search: fileName
+            });
+
+        if (error) {
             if (!isTeamCreation) {
-                console.error("Error deleting logo:", error);
+                console.error("Error checking logo:", error);
             }
             return false;
         }
+
+        // Strict match check
+        return data.some(file => file.name === fileName);
     };
 
     static validateLogoFile(file: File): string | null {
@@ -140,7 +146,9 @@ export class Team implements ITeam {
     static async validateLogoFileName(fileName: string, currentLogoUrl?: string): Promise<string | null> {
         if (currentLogoUrl) {
             const currentFileName = this.getFileNameFromLogoUrl(currentLogoUrl);
-            if (currentFileName && `team-logos/${fileName}` === currentFileName) {
+            // NOTE: This check might need adjustment if Supabase URL structure differs significantly
+            // but generally the filename is at the end.
+            if (currentFileName && currentFileName.includes(fileName)) {
                 return 'Please choose a different file name';
             }
         }
@@ -247,7 +255,6 @@ export class Team implements ITeam {
     ): IPlayer[] {
         const uniquePlayers = new Map<string, IPlayer>();
 
-        // 1. Add players from games
         games.forEach(game => {
             const roster = game.teams.home.id === teamId
                 ? game.teams.home.roster
@@ -258,7 +265,6 @@ export class Team implements ITeam {
             });
         });
 
-        // 2. Add current roster (if filters allow or if needed as fallback)
         currentRoster.forEach(p => {
             if (!uniquePlayers.has(p.id)) uniquePlayers.set(p.id, p);
         });
