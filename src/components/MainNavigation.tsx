@@ -66,20 +66,20 @@ const MainNavigation = ({isSignedIn}: MainNavigationProps) => {
                         Start Game
                     </NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        to={`/${SAVED_GAMES}`}
+                        className={({isActive}) => isActive ? styles.active : styles.link}
+                        onClick={closeMenu}
+                    >
+                        Previous Games
+                    </NavLink>
+                </li>
 
                 {isSignedIn === undefined && <li className={styles.link}>Loading...</li>}
 
                 {isSignedIn && (
                     <>
-                        <li>
-                            <NavLink
-                                to={`/${SAVED_GAMES}`}
-                                className={({isActive}) => isActive ? styles.active : styles.link}
-                                onClick={closeMenu}
-                            >
-                                Previous Games
-                            </NavLink>
-                        </li>
                         <li>
                             <NavLink
                                 to={`/${HANDLE_TEAMS}`}

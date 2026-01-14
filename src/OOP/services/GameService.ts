@@ -1,48 +1,59 @@
-import {collection, deleteDoc, doc, getDocs, query, setDoc, where, or} from "firebase/firestore";
-import {db} from "../../firebase";
-import {IGame} from "../interfaces/IGame";
-import {Game} from "../classes/Game";
+import { supabase } from "../../supabase";
+import { IGame } from "../interfaces/IGame";
+import { Game } from "../classes/Game";
+import { v4 as uuidv4 } from 'uuid';
 
 export class GameService {
-    private static collectionRef = collection(db, 'games');
 
     static saveGame = async (game: IGame): Promise<Game> => {
-        const docRef = doc(this.collectionRef);
-        const gameWithId = {...game, id: docRef.id};
-        await setDoc(docRef, gameWithId);
+        const newId = uuidv4();
+        const gameWithId = { ...game, id: newId };
+
+        const { error } = await supabase.from('games').insert({
+            id: newId,
+            timestamp: new Date().toISOString(),
+            home_team_id: game.teams.home.id,
+            away_team_id: game.teams.away.id,
+            data: gameWithId
+        });
+
+        if (error) throw error;
         return new Game(gameWithId);
     }
 
     static getAllGames = async (): Promise<Game[]> => {
-        const querySnapshot = await getDocs(this.collectionRef);
-        return querySnapshot.docs.map(doc =>
-            new Game({id: doc.id, ...doc.data()} as IGame)
-        );
+        const { data, error } = await supabase
+            .from('games')
+            .select('data');
+
+        if (error) throw error;
+
+        return data.map((row: any) => new Game(row.data as IGame));
     }
 
     static getGamesByTeamId = async (teamId: string): Promise<Game[]> => {
         if (!teamId) throw new Error("Team ID is required");
 
-        // Query checks if teamId matches either home or away nested ID
-        const q = query(
-            this.collectionRef,
-            or(
-                where('teams.home.id', '==', teamId),
-                where('teams.away.id', '==', teamId)
-            )
-        );
+        // Use the explicit columns for fast filtering
+        const { data, error } = await supabase
+            .from('games')
+            .select('data')
+            .or(`home_team_id.eq.${teamId},away_team_id.eq.${teamId}`);
 
-        const querySnapshot = await getDocs(q);
+        if (error) throw error;
 
-        return querySnapshot.docs.map(doc =>
-            new Game({id: doc.id, ...doc.data()} as IGame)
-        );
+        return data.map((row: any) => new Game(row.data as IGame));
     }
 
     static deleteGame = async (game: IGame) => {
         if (!game.id) return;
-        const docRef = doc(this.collectionRef, game.id);
-        await deleteDoc(docRef);
+
+        const { error } = await supabase
+            .from('games')
+            .delete()
+            .eq('id', game.id);
+
+        if (error) throw error;
     }
 
     static updateGame = async (game: IGame): Promise<Game> => {
@@ -50,13 +61,22 @@ export class GameService {
             throw new Error("Cannot update game without an ID");
         }
 
-        const docRef = doc(this.collectionRef, game.id);
         const updatedData = {
             ...game,
             timestamp: new Date().toISOString()
         };
 
-        await setDoc(docRef, updatedData, {merge: true});
+        const { error } = await supabase
+            .from('games')
+            .update({
+                timestamp: updatedData.timestamp,
+                home_team_id: updatedData.teams.home.id,
+                away_team_id: updatedData.teams.away.id,
+                data: updatedData
+            })
+            .eq('id', game.id);
+
+        if (error) throw error;
 
         return new Game(updatedData);
     }

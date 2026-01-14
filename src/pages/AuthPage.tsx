@@ -1,11 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {
-    sendSignInLinkToEmail,
-    isSignInWithEmailLink,
-    signInWithEmailLink
-} from 'firebase/auth';
-import {auth} from '../firebase';
+import {supabase} from '../supabase'; // ✅ Changed to Supabase
 import {isAdmin} from '../admin';
 import Input from "../components/Input";
 import Button from "../components/Button";
@@ -17,6 +12,11 @@ const AuthPage = () => {
     const [message, setMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [emailHistory, setEmailHistory] = useState<string[]>([]);
+
+    // Helper to detect if we are on the "landing" of a magic link
+    const isMagicLink = (url: string) => {
+        return url.includes('access_token') || url.includes('type=magiclink') || url.includes('code=');
+    };
 
     // Load email history from localStorage
     useEffect(() => {
@@ -33,46 +33,44 @@ const AuthPage = () => {
         }
     }, []);
 
-    // Handle email link sign-in
+    // Handle email link sign-in (Supabase Version)
     useEffect(() => {
         const handleSignIn = async () => {
-            if (isSignInWithEmailLink(auth, window.location.href)) {
+            // ✅ Check for Supabase hash/query params instead of Firebase helper
+            if (isMagicLink(window.location.href)) {
                 setIsProcessing(true);
 
                 try {
-                    // Get stored email or prompt user
-                    let storedEmail = localStorage.getItem('emailForSignIn');
-                    if (!storedEmail) {
-                        // Use first email from history if available
-                        if (emailHistory.length > 0) {
-                            storedEmail = emailHistory[0];
-                        } else {
-                            setMessage('Please enter your email to complete sign-in');
+                    // ✅ Supabase Client automatically detects the hash/code on load and sets the session.
+                    // We just need to retrieve it.
+                    const { data: { session }, error } = await supabase.auth.getSession();
+
+                    if (error) throw error;
+
+                    if (session?.user) {
+                        // Check if user is admin
+                        if (!isAdmin(session.user.id)) {
+                            await supabase.auth.signOut();
+                            setMessage('⛔ You do not have admin privileges');
                             setIsProcessing(false);
                             return;
                         }
+
+                        // Save email to history (using the verified email from session)
+                        const confirmedEmail = session.user.email || '';
+                        if (confirmedEmail && !emailHistory.includes(confirmedEmail)) {
+                            const newHistory = [confirmedEmail, ...emailHistory.filter(e => e !== confirmedEmail)].slice(0, 5);
+                            setEmailHistory(newHistory);
+                            localStorage.setItem('emailHistory', JSON.stringify(newHistory));
+                        }
+
+                        localStorage.removeItem('emailForSignIn');
+                        navigate('/');
+                    } else {
+                        // If we have a code but no session yet, wait slightly or handle as error
+                        // usually getSession resolves this immediately.
+                        throw new Error("Session could not be established.");
                     }
-
-                    // Complete sign-in
-                    const result = await signInWithEmailLink(auth, storedEmail, window.location.href);
-
-                    // Check if user is admin
-                    if (!isAdmin(result.user.uid)) {
-                        await auth.signOut();
-                        setMessage('⛔ You do not have admin privileges');
-                        setIsProcessing(false);
-                        return;
-                    }
-
-                    // Save email to history
-                    if (!emailHistory.includes(storedEmail)) {
-                        const newHistory = [storedEmail, ...emailHistory.filter(e => e !== storedEmail)].slice(0, 5);
-                        setEmailHistory(newHistory);
-                        localStorage.setItem('emailHistory', JSON.stringify(newHistory));
-                    }
-
-                    localStorage.removeItem('emailForSignIn');
-                    navigate('/');
                 } catch (error) {
                     console.error('Email sign-in error:', error);
                     setMessage('Error completing sign-in. Please try again.');
@@ -90,12 +88,16 @@ const AuthPage = () => {
         setMessage('');
 
         try {
-            const actionCodeSettings = {
-                url: `${window.location.origin}/admin`,
-                handleCodeInApp: true,
-            };
+            // ✅ Supabase Magic Link
+            const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                    emailRedirectTo: window.location.href, // Redirect back here
+                }
+            });
 
-            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+            if (error) throw error;
+
             localStorage.setItem('emailForSignIn', email);
 
             // Add to email history
@@ -122,13 +124,21 @@ const AuthPage = () => {
                     </p>
                 )}
 
+                {/* ✅ Supabase "consumes" the link automatically via the hash, so we
+                   stay in 'isProcessing' state until the redirect happens.
+                   The "Enter email manually" UI is preserved below but typically won't be seen
+                   because Supabase doesn't require manual email re-entry for Magic Links.
+                */}
                 {isProcessing ? (
                     <p className={styles.description}>Processing...</p>
-                ) : isSignInWithEmailLink(auth, window.location.href) ? (
+                ) : isMagicLink(window.location.href) ? (
                     <div>
-                        <p className={styles.description}>Check your email for the sign-in link</p>
-                        <p className={styles.description}>If you're on a different device, enter your email:</p>
+                        <p className={styles.description}>Verifying secure link...</p>
+                        {/* This form is kept to match your structure, but Supabase auth
+                            typically bypasses this need. It serves as a fallback UI.
+                        */}
                         <form onSubmit={handleEmailSubmit} className={styles.form}>
+                            {/* Reusing existing components to maintain style */}
                             <Input
                                 id="email-verify"
                                 label="Your Email"
@@ -145,7 +155,7 @@ const AuthPage = () => {
                                 ))}
                             </datalist>
                             <Button styleType="positive" type="submit">
-                                Complete Sign-in
+                                Retry Sign-in
                             </Button>
                         </form>
                     </div>

@@ -1,32 +1,47 @@
-import {collection, collectionGroup, deleteDoc, doc, getDocs, setDoc, updateDoc} from "firebase/firestore";
-import {db} from "../../firebase";
-import {IPlayer} from "../interfaces/IPlayer";
-import {TeamService} from "./TeamService";
+import { supabase } from "../../supabase";
+import { IPlayer } from "../interfaces/IPlayer";
+import { TeamService } from "./TeamService";
+import { v4 as uuidv4 } from 'uuid';
+import { Position } from "../enums/Position";
 
 export class PlayerService {
+
+    private static mapToPlayer(p: any): IPlayer {
+        return {
+            id: p.id,
+            teamId: p.team_id,
+            name: p.name,
+            jerseyNumber: p.jersey_number,
+            position: p.position as Position
+        };
+    }
+
     static getPlayersByTeam = async (teamId: string): Promise<IPlayer[]> => {
-        const playersCollectionRef = collection(db, `teams/${teamId}/players`);
-        const querySnapshot = await getDocs(playersCollectionRef);
-        return querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()} as IPlayer));
+        const { data, error } = await supabase
+            .from('players')
+            .select('*')
+            .eq('team_id', teamId);
+
+        if (error) throw error;
+
+        return data.map(this.mapToPlayer);
     }
 
     static getAllPlayers = async (): Promise<IPlayer[]> => {
-        // Single query for all players across teams
         await TeamService.createFreeAgentTeamIfNotExists();
 
-        const playersCollectionGroup = collectionGroup(db, 'players');
-        const querySnapshot = await getDocs(playersCollectionGroup);
-        const allPlayers = querySnapshot.docs.map(doc => {
-            const teamId = doc.ref.parent.parent?.id; // Extract teamId from the path
-            return {id: doc.id, teamId, ...doc.data()} as IPlayer;
-        });
+        const { data, error } = await supabase
+            .from('players')
+            .select('*');
 
-        // Existing sorting logic
+        if (error) throw error;
+
+        const allPlayers = data.map(this.mapToPlayer);
+
         allPlayers.sort((a, b) => {
-            const positionOrder = {'Goalie': 0, 'Defender': 1, 'Forward': 2};
-            const aOrder = positionOrder[a.position as keyof typeof positionOrder] ?? 3;
-            // @ts-ignore
-            const bOrder = positionOrder[b.position as keyof typeof positionOrder] ?? 3;
+            const positionOrder: Record<string, number> = {'Goalie': 0, 'Defender': 1, 'Forward': 2};
+            const aOrder = positionOrder[a.position] ?? 3;
+            const bOrder = positionOrder[b.position] ?? 3;
             return aOrder !== bOrder ? aOrder - bOrder : a.name.localeCompare(b.name);
         });
 
@@ -34,40 +49,57 @@ export class PlayerService {
     }
 
     static deletePlayer = async (teamId: string, playerId: string) => {
-        const docRef = doc(db, `teams/${teamId}/players`, playerId);
-        await deleteDoc(docRef);
+        const { error } = await supabase
+            .from('players')
+            .delete()
+            .eq('id', playerId);
+
+        if (error) throw error;
     }
 
     static isJerseyNumberAvailable = async (teamId: string, jerseyNumber: number): Promise<boolean> => {
-        const existingPlayers = await PlayerService.getPlayersByTeam(teamId);
-        return !existingPlayers.some(p => p.jerseyNumber === jerseyNumber);
+        const { data } = await supabase
+            .from('players')
+            .select('id')
+            .eq('team_id', teamId)
+            .eq('jersey_number', jerseyNumber);
+
+        return !data || data.length === 0;
     }
 
     static createPlayer = async (teamId: string, player: IPlayer): Promise<void> => {
-        const docRef = doc(collection(db, `teams/${teamId}/players`)); // Generate ID
-        const playerWithId = {...player, id: docRef.id, teamId}; // Include teamId
-        await setDoc(docRef, playerWithId); // Single write
+        const { error } = await supabase.from('players').insert({
+            id: uuidv4(),
+            team_id: teamId,
+            name: player.name,
+            jersey_number: player.jerseyNumber,
+            position: player.position
+        });
+
+        if (error) throw error;
     }
 
     static updatePlayer = async (teamId: string, playerId: string, player: Partial<IPlayer>) => {
-        const docRef = doc(db, `teams/${teamId}/players`, playerId);
-        await updateDoc(docRef, player);
+        const updateData: any = {};
+        if (player.name !== undefined) updateData.name = player.name;
+        if (player.jerseyNumber !== undefined) updateData.jersey_number = player.jerseyNumber;
+        if (player.position !== undefined) updateData.position = player.position;
+
+        const { error } = await supabase
+            .from('players')
+            .update(updateData)
+            .eq('id', playerId);
+
+        if (error) throw error;
     }
 
     static transferPlayer = async (fromTeamId: string, toTeamId: string, player: IPlayer) => {
-        try {
-            // Remove from the old team
-            if (fromTeamId) {
-                const fromRef = doc(db, `teams/${fromTeamId}/players`, player.id);
-                await deleteDoc(fromRef);
-            }
+        const { error } = await supabase
+            .from('players')
+            .update({ team_id: toTeamId })
+            .eq('id', player.id);
 
-            // Add to the new team
-            if (toTeamId) {
-                const toRef = doc(db, `teams/${toTeamId}/players`, player.id);
-                await setDoc(toRef, {...player, teamId: toTeamId});
-            }
-        } catch (error) {
+        if (error) {
             console.error('Error transferring player:', error);
             throw new Error('Failed to transfer player');
         }

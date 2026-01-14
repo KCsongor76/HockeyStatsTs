@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useMemo} from "react";
 import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import "./App.css";
-import {onAuthStateChanged} from "firebase/auth";
 import RootLayout from "./components/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
 import HomePage from "./pages/HomePage";
@@ -26,7 +25,7 @@ import {loader as startPageLoader} from "./pages/StartPage";
 import {loader as handleTeamPageLoader} from "./pages/HandleTeamPage";
 import {loader as handlePlayerPageLoader} from "./pages/HandlePlayerPage";
 import {adminUids} from "./admin";
-import {auth} from "./firebase";
+import { supabase } from "./supabase";
 import {
     ADMIN,
     CREATE,
@@ -45,24 +44,33 @@ function App() {
     const [isSignedIn, setIsSignedIn] = useState<boolean | undefined>(undefined);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Verify if user is admin
-                const isAdmin = adminUids.includes(user.uid);
-                setIsSignedIn(isAdmin);
-
-                // Redirect non-admin users home
-                if (!isAdmin && window.location.pathname.startsWith(`/${ADMIN}`)) {
-                    window.location.href = '/';
-                }
-            } else {
-                setIsSignedIn(false);
-            }
+        // 1. Check active session immediately
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            handleSession(session);
             setIsLoaded(true);
         });
 
-        return () => unsubscribe();
+        // 2. Listen for changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            handleSession(session);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
+
+    const handleSession = (session: any) => {
+        if (session?.user) {
+            // Verify if user is admin
+            const isAdmin = adminUids.includes(session.user.id); // Supabase uses .id, not .uid
+            setIsSignedIn(isAdmin);
+
+            if (!isAdmin && window.location.pathname.startsWith(`/${ADMIN}`)) {
+                window.location.href = '/';
+            }
+        } else {
+            setIsSignedIn(false);
+        }
+    };
 
     const adminRoutes = [
         {

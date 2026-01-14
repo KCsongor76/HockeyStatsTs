@@ -1,6 +1,6 @@
 // Add your admin UIDs from Firebase console
 export const adminUids = [
-    "zhmIGdsr5nU5czTyskXSUD4O1Sl1",
+    "cb83f583-c924-43e8-a8cc-3322257dedea",
     "bGd7uyqqoXenTkK0Ab4jZuDwiIh1"
 ];
 
